@@ -23,18 +23,6 @@ A modern, fully responsive portfolio website showcasing my projects, skills, and
 
 ---
 
-## 📸 Preview
-
-(Add your screenshots here later)
-
----
-
-## 🔗 Live Demo
-
-👉 (Add your Vercel link here after deployment)
-
----
-
 ## 📬 Contact Me
 
 - Email: a.srishanth1733@gmail.com
