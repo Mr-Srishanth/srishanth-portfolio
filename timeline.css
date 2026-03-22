@@ -1,0 +1,343 @@
+/* ═══════════════════════════════════════════════════════════════════
+   TIMELINE.CSS — Cinematic Scroll-Based Journey  v1.0
+   Owns all .vtl-* styles. Overrides enhancements.css & timeline-drag-fix.css
+   Performance: transform + opacity only. Zero layout shifts.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. SECTION CONTAINER ─────────────────────────────────────── */
+#journey {
+  padding: 110px 6%;
+  text-align: center;
+  overflow: hidden; /* contain the line */
+}
+
+/* ── 2. TIMELINE WRAPPER ──────────────────────────────────────── */
+.vtl {
+  position: relative;
+  max-width: 720px;
+  margin: 72px auto 0;
+  padding-bottom: 32px;
+}
+
+/* ── 3. VERTICAL PROGRESS LINE ────────────────────────────────────
+   Ghost track (always visible, faint)
+   Filled line: transform: scaleY grows from top via JS.
+   NEVER animate height — only transform + opacity.
+──────────────────────────────────────────────────────────────── */
+.vtl-track {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.055);
+  border-radius: 2px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* The animated fill line — scaleY grows 0→1 from top */
+.vtl-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 100% !important; /* fixed height — scaleY does the work */
+  transform: translateX(-50%) scaleY(0) !important;
+  transform-origin: top center;
+  background: linear-gradient(
+    180deg,
+    var(--acc, #4f6ef5) 0%,
+    color-mix(in srgb, var(--acc, #4f6ef5) 60%, transparent) 70%,
+    transparent 100%
+  ) !important;
+  border-radius: 2px;
+  z-index: 1;
+  pointer-events: none;
+  will-change: transform;
+  transition: background 0.4s ease;
+}
+
+/* Travelling dot at tip of the line */
+.vtl-line-dot {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--acc, #4f6ef5);
+  box-shadow: 0 0 10px var(--acc, #4f6ef5), 0 0 20px color-mix(in srgb, var(--acc, #4f6ef5) 40%, transparent);
+  transform: translateX(-50%) translateY(0px);
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity;
+  transition: opacity 0.3s ease;
+}
+
+/* ── 4. TIMELINE ITEMS ────────────────────────────────────────── */
+.vtl-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 56px;
+  /* ENTRY STATE — before reveal */
+  opacity: 0;
+  transform: translateY(32px) scale(0.96);
+  /* No transition here — JS adds .tl-revealed which triggers it */
+}
+
+/* Left side items (odd) */
+.vtl-item:nth-child(odd) {
+  flex-direction: row-reverse;
+}
+
+/* Revealed state */
+.vtl-item.tl-revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition:
+    opacity   0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Stagger delay per item index (set via JS inline style) */
+/* .vtl-item.tl-revealed { transition-delay: var(--tl-delay, 0s); } */
+
+/* ── 5. NODE DOTS ─────────────────────────────────────────────── */
+.vtl-dot {
+  position: absolute !important;
+  left: 50% !important;
+  top: 20px;
+  transform: translateX(-50%);
+  z-index: 4;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--acc, #4f6ef5);
+  border: 2px solid var(--bg, #09090f);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--acc, #4f6ef5) 50%, transparent);
+  transition:
+    transform  0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease,
+    background 0.3s ease;
+  cursor: default;
+}
+
+/* Active node — when card enters center of viewport */
+.vtl-item.tl-active .vtl-dot {
+  transform: translateX(-50%) scale(1.35);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--acc, #4f6ef5) 20%, transparent),
+    0 0 12px color-mix(in srgb, var(--acc, #4f6ef5) 60%, transparent);
+}
+
+/* ── 6. CARDS ─────────────────────────────────────────────────── */
+.vtl-card {
+  background: rgba(255, 255, 255, 0.028);
+  border: 1px solid rgba(255, 255, 255, 0.065);
+  border-radius: 14px;
+  padding: 18px 20px;
+  flex: 1;
+  max-width: calc(50% - 36px);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+
+  /* Hover: transform only */
+  transition:
+    border-color 0.3s ease,
+    box-shadow   0.35s ease,
+    transform    0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+/* Even items — card on right */
+.vtl-item:nth-child(even) .vtl-card {
+  margin-left: calc(50% + 28px);
+}
+/* Odd items — card on left */
+.vtl-item:nth-child(odd) .vtl-card {
+  margin-right: calc(50% + 28px);
+  margin-left: 0;
+  text-align: right;
+}
+
+/* Hover lift */
+.vtl-card:hover {
+  border-color: color-mix(in srgb, var(--acc, #4f6ef5) 45%, transparent);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.35),
+    0 0 0 1px color-mix(in srgb, var(--acc, #4f6ef5) 15%, transparent),
+    0 0 24px color-mix(in srgb, var(--acc, #4f6ef5) 8%, transparent);
+  transform: translateY(-4px) !important;
+}
+
+/* Subtle glass shimmer at top of card */
+.vtl-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.035) 0%,
+    transparent 60%
+  );
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Active card highlight */
+.vtl-item.tl-active .vtl-card {
+  border-color: color-mix(in srgb, var(--acc, #4f6ef5) 30%, transparent);
+  box-shadow: 0 0 28px color-mix(in srgb, var(--acc, #4f6ef5) 6%, transparent);
+}
+
+/* Accent left/right border on active */
+.vtl-item:nth-child(even).tl-active .vtl-card::after,
+.vtl-item:nth-child(odd).tl-active  .vtl-card::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  width: 2px;
+  height: 60%;
+  border-radius: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    var(--acc, #4f6ef5),
+    transparent
+  );
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+.vtl-item:nth-child(even).tl-active .vtl-card::after { left: 0; }
+.vtl-item:nth-child(odd).tl-active  .vtl-card::after { right: 0; }
+
+/* ── 7. CARD CONTENT ──────────────────────────────────────────── */
+.vtl-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.vtl-item:nth-child(odd) .vtl-meta {
+  flex-direction: row-reverse;
+}
+
+.vtl-date {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.56rem;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.vtl-badge {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.vtl-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--acc, #4f6ef5);
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+  line-height: 1.4;
+  transition: color 0.3s ease;
+}
+
+.vtl-desc {
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.42);
+  line-height: 1.65;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+/* ── 8. CONNECTOR LINES (card → center dot) ───────────────────── */
+/* Horizontal dashed connector */
+.vtl-connector {
+  position: absolute;
+  top: 26px;
+  height: 1px;
+  width: calc(50% - 36px);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.04)
+  );
+  z-index: 0;
+  pointer-events: none;
+  transform-origin: left center;
+  transform: scaleX(0);
+  opacity: 0;
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.2s,
+    opacity   0.4s ease 0.2s;
+}
+/* Even: connector goes from right side of card to center */
+.vtl-item:nth-child(even) .vtl-connector {
+  left: calc(50% - calc(50% - 36px));
+}
+/* Odd: connector goes from center to left side of card */
+.vtl-item:nth-child(odd) .vtl-connector {
+  right: calc(50% - calc(50% - 36px));
+  left: auto;
+  transform-origin: right center;
+}
+
+.vtl-item.tl-revealed .vtl-connector {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+/* ── 9. MOBILE — left-aligned single column ───────────────────── */
+@media (max-width: 640px) {
+  .vtl { max-width: 100%; }
+
+  .vtl-track, .vtl-line { left: 20px; transform: translateX(0); }
+  .vtl-line              { transform: translateX(0) scaleY(0) !important; }
+  .vtl-line-dot          { left: 20px; transform: translateX(-50%) translateY(0px); }
+  .vtl-dot               { left: 20px !important; transform: translateX(-50%); }
+  .vtl-item.tl-active .vtl-dot { transform: translateX(-50%) scale(1.35); }
+
+  .vtl-item,
+  .vtl-item:nth-child(odd) { flex-direction: column; }
+
+  .vtl-card,
+  .vtl-item:nth-child(even) .vtl-card,
+  .vtl-item:nth-child(odd)  .vtl-card {
+    margin-left: 44px !important;
+    margin-right: 0 !important;
+    max-width: calc(100% - 52px);
+    text-align: left;
+  }
+
+  .vtl-item:nth-child(odd) .vtl-meta { flex-direction: row; }
+
+  .vtl-connector { display: none; }
+}
+
+/* ── 10. REDUCED MOTION ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .vtl-item {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .vtl-line {
+    transform: translateX(-50%) scaleY(1) !important;
+    transition: none !important;
+  }
+  .vtl-dot { transition: none !important; }
+  .vtl-line-dot { display: none; }
+  .vtl-connector {
+    transform: scaleX(1) !important;
+    opacity: 1 !important;
+    transition: none !important;
+  }
+}

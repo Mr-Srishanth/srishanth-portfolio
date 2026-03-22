@@ -1,0 +1,548 @@
+/* ═══════════════════════════════════════════════════════════════════
+   GODLEVEL.CSS — Awwwards-Quality Upgrade
+   Layered on top of existing system. Never breaks existing CSS.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ══ 1. HERO — PREMIUM REDESIGN ═════════════════════════════════════ */
+
+/* Subtle animated gradient background */
+#home::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 60% 40%, color-mix(in srgb, var(--acc) 6%, transparent) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 20% 80%, color-mix(in srgb, var(--acc) 4%, transparent) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+  animation: hero-bg-drift 12s ease-in-out infinite alternate;
+}
+@keyframes hero-bg-drift {
+  0%   { opacity: 0.6; transform: scale(1); }
+  100% { opacity: 1;   transform: scale(1.04); }
+}
+
+/* Particles canvas */
+#hero-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.45;
+}
+
+/* Statement line below typed text */
+.h-statement {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 24px;
+  max-width: 460px;
+  opacity: 0;
+  animation: hero-up 0.72s cubic-bezier(.22,.61,.36,1) 0.50s forwards;
+}
+.h-statement em {
+  font-style: italic;
+  color: var(--acc);
+  transition: color 0.3s;
+}
+
+/* Word-by-word glow reveal for statement */
+.h-statement .word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.h-statement .word.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Profile image: breathing glow */
+.h-ring {
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--acc) 35%, transparent));
+  animation: ring-breathe 4s ease-in-out infinite !important;
+}
+@keyframes ring-breathe {
+  0%, 100% { filter: drop-shadow(0 0 14px color-mix(in srgb, var(--acc) 28%, transparent)); }
+  50%       { filter: drop-shadow(0 0 28px color-mix(in srgb, var(--acc) 50%, transparent)); }
+}
+
+/* Ring border glow enhancement */
+.h-ring img {
+  border: 2px solid color-mix(in srgb, var(--acc) 55%, transparent) !important;
+  transition: border-color 0.4s ease !important;
+}
+
+/* Primary CTA: magnetic-ready + enhanced */
+#hire-btn, .h-btns .btn-p {
+  position: relative;
+  background: var(--acc) !important;
+  color: #000 !important;
+  font-weight: 700 !important;
+  letter-spacing: 2.5px !important;
+  padding: 13px 30px !important;
+  border-radius: 6px !important;
+  overflow: hidden;
+  transition:
+    transform 0.2s cubic-bezier(0.34,1.56,0.64,1),
+    box-shadow 0.3s ease,
+    background 0.3s ease !important;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--acc) 40%, transparent);
+}
+#hire-btn:hover, .h-btns .btn-p:hover {
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--acc) 55%, transparent) !important;
+  transform: translateY(-4px) scale(1.05) !important;
+}
+/* Shimmer sweep */
+#hire-btn::after, .h-btns .btn-p::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.25) 50%, transparent 65%);
+  transform: translateX(-150%);
+  transition: transform 0.6s ease;
+  pointer-events: none;
+}
+#hire-btn:hover::after, .h-btns .btn-p:hover::after {
+  transform: translateX(150%);
+}
+
+/* ══ 2. SCROLL PROGRESS BAR ══════════════════════════════════════════ */
+#pbar {
+  height: 2.5px !important;
+  background: linear-gradient(90deg, var(--acc), color-mix(in srgb, var(--acc) 60%, #fff)) !important;
+  box-shadow: 0 0 8px var(--glow), 0 0 2px var(--acc) !important;
+  z-index: 10000 !important;
+}
+
+/* ══ 3. CURSOR ENHANCEMENTS ══════════════════════════════════════════ */
+/* Hover state scaling handled via JS, but we add CSS scale property support */
+#cur-dot {
+  transition: background 0.25s ease, opacity 0.15s ease, scale 0.18s cubic-bezier(0.34,1.56,0.64,1) !important;
+}
+#cur-ring {
+  transition: opacity 0.2s ease, border-color 0.25s ease, scale 0.22s cubic-bezier(0.34,1.56,0.64,1) !important;
+}
+body.cursor-hover #cur-ring { scale: 1.6; }
+body.cursor-hover #cur-dot  { scale: 0;   opacity: 0; }
+body.cursor-click #cur-ring { scale: 0.8; }
+body.cursor-click #cur-dot  { scale: 2.5; }
+
+/* ══ 4. SECTION HEADINGS — STRONGER HIERARCHY ═══════════════════════ */
+.stit {
+  font-size: clamp(2rem, 4vw, 3.2rem) !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.5px !important;
+  line-height: 1.05 !important;
+}
+.stag {
+  font-size: 0.6rem !important;
+  letter-spacing: 5px !important;
+  opacity: 0.85;
+}
+.ssub {
+  font-size: 0.92rem !important;
+  line-height: 1.85 !important;
+  color: var(--muted) !important;
+  max-width: 560px !important;
+}
+
+/* ══ 5. PROJECTS — FULLSCREEN MODAL ════════════════════════════════ */
+.pj {
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+}
+/* Top accent line already exists — enhance */
+.pj::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--acc) 4%, transparent), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  border-radius: inherit;
+}
+.pj:hover::after { opacity: 1; }
+.pj:hover { transform: translateY(-8px) scale(1.012) !important; }
+
+/* "Click to view" hint on project cards */
+.pj-hint {
+  position: absolute;
+  bottom: 12px;
+  right: 14px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 2px;
+  color: var(--acc);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  text-transform: uppercase;
+}
+.pj:hover .pj-hint { opacity: 0.8; transform: none; }
+
+/* Project fullscreen modal */
+#pj-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 6000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(0px);
+  pointer-events: none;
+  transition: background 0.4s ease, backdrop-filter 0.4s ease;
+}
+#pj-modal.open {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(16px);
+  pointer-events: all;
+}
+.pj-modal-box {
+  width: min(860px, 94vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--bg2);
+  border: 1px solid color-mix(in srgb, var(--acc) 30%, transparent);
+  border-radius: 20px;
+  padding: 40px 44px;
+  position: relative;
+  opacity: 0;
+  transform: scale(0.90) translateY(24px);
+  transition: opacity 0.42s cubic-bezier(0.22,1,0.36,1), transform 0.42s cubic-bezier(0.22,1,0.36,1);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--acc) 20%, transparent),
+    0 40px 80px rgba(0,0,0,0.7),
+    0 0 60px color-mix(in srgb, var(--acc) 10%, transparent);
+  scrollbar-width: thin;
+  scrollbar-color: var(--acc) transparent;
+}
+#pj-modal.open .pj-modal-box {
+  opacity: 1;
+  transform: none;
+}
+.pj-modal-box::-webkit-scrollbar { width: 3px; }
+.pj-modal-box::-webkit-scrollbar-thumb { background: var(--acc); border-radius: 2px; }
+
+.pj-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--text);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.25s ease, color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+  z-index: 1;
+}
+.pj-modal-close:hover {
+  border-color: var(--acc);
+  color: var(--acc);
+  transform: rotate(90deg) scale(1.1);
+  background: color-mix(in srgb, var(--acc) 10%, transparent);
+}
+
+.pj-modal-preview {
+  width: 100%;
+  height: 280px;
+  background: var(--bg3);
+  border-radius: 12px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  border: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+  overflow: hidden;
+}
+.pj-modal-preview::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--acc) 12%, transparent), transparent 70%);
+  pointer-events: none;
+}
+
+.pj-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.pj-modal-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+.pj-modal-links {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.pj-modal-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  transition: transform 0.2s ease, box-shadow 0.3s ease, background 0.2s ease;
+  cursor: pointer;
+}
+.pj-modal-link.github {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text);
+}
+.pj-modal-link.github:hover {
+  border-color: var(--acc);
+  color: var(--acc);
+  transform: translateY(-2px);
+}
+.pj-modal-link.live {
+  background: var(--acc);
+  color: #000;
+  border: 1px solid transparent;
+  font-weight: 700;
+}
+.pj-modal-link.live:hover {
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--acc) 50%, transparent);
+  transform: translateY(-2px) scale(1.04);
+}
+
+.pj-modal-desc {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.85;
+  margin-bottom: 24px;
+}
+
+.pj-modal-tags-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 3px;
+  color: var(--acc);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.pj-modal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pj-modal-tag {
+  font-size: 0.62rem;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--acc) 12%, transparent);
+  color: var(--acc);
+  border: 1px solid color-mix(in srgb, var(--acc) 35%, transparent);
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 0.5px;
+  opacity: 0;
+  transform: translateY(8px) scale(0.9);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.pj-modal-tag.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ══ 6. JOURNEY TIMELINE — ENHANCED ════════════════════════════════ */
+/* Active item highlight */
+.vtl-item.active-node .vtl-dot {
+  background: var(--acc) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--acc) 25%, transparent), 0 0 12px var(--glow) !important;
+  transform: translateX(-50%) scale(1.3) !important;
+  transition: transform 0.3s ease, box-shadow 0.4s ease !important;
+}
+.vtl-item.active-node .vtl-card {
+  border-color: color-mix(in srgb, var(--acc) 60%, transparent) !important;
+  box-shadow: 0 0 20px color-mix(in srgb, var(--acc) 12%, transparent) !important;
+}
+.vtl-item.active-node .vtl-title {
+  color: var(--acc) !important;
+}
+
+/* ══ 7. MAGNETIC EFFECT TARGETS ══════════════════════════════════════ */
+.magnetic {
+  transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1) !important;
+}
+
+/* ══ 8. CONTACT SECTION — POLISHED ══════════════════════════════════ */
+.ct-right {
+  background: rgba(255,255,255,0.025) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  border-radius: 16px !important;
+  padding: 36px !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: border-color 0.3s ease, box-shadow 0.4s ease !important;
+}
+.ct-right:focus-within {
+  border-color: color-mix(in srgb, var(--acc) 30%, transparent) !important;
+  box-shadow: 0 0 40px color-mix(in srgb, var(--acc) 8%, transparent) !important;
+}
+.fg input, .fg textarea {
+  background: rgba(255,255,255,0.03) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 8px !important;
+  padding: 12px 15px !important;
+  font-size: 0.86rem !important;
+  transition: border-color 0.3s ease, box-shadow 0.35s ease, transform 0.2s ease !important;
+}
+.fg input:focus, .fg textarea:focus {
+  border-color: var(--acc) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 15%, transparent), 0 4px 16px rgba(0,0,0,0.2) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ══ 9. CARD MICRO-INTERACTIONS ═════════════════════════════════════ */
+.sk-card, .pj, .ach-card, .about-card, .vtl-card, .cg-card {
+  transition:
+    border-color 0.3s ease,
+    transform 0.35s cubic-bezier(0.34,1.56,0.64,1),
+    box-shadow 0.35s ease !important;
+}
+/* Press compression */
+.sk-card:active, .ach-card:active, .about-card:active, .cg-card:active {
+  transform: scale(0.97) !important;
+  transition-duration: 0.08s !important;
+}
+
+/* ══ 10. SECTION SEPARATORS — PREMIUM ═══════════════════════════════ */
+section:not(#contact)::after {
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--acc) 20%, transparent) 40%, color-mix(in srgb, var(--acc) 20%, transparent) 60%, transparent) !important;
+  opacity: 0.6 !important;
+}
+
+/* ══ 11. SKILL BARS — ANIMATED GRADIENT ════════════════════════════ */
+.bar-fill {
+  background: linear-gradient(90deg, var(--acc), color-mix(in srgb, var(--acc) 70%, #fff 30%)) !important;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--acc) 30%, transparent) !important;
+}
+
+/* ══ 12. NAV CTA — MAGNETIC READY ═══════════════════════════════════ */
+.nav-cta {
+  position: relative;
+  overflow: hidden;
+  border-radius: 5px !important;
+}
+.nav-cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.15) 50%, transparent 65%);
+  transform: translateX(-150%);
+  transition: transform 0.5s ease;
+  pointer-events: none;
+}
+.nav-cta:hover::after { transform: translateX(150%); }
+
+/* ══ 13. FOOTER — PREMIUM ════════════════════════════════════════════ */
+footer {
+  border-top: 1px solid rgba(255,255,255,0.04);
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.3));
+}
+
+/* ══ 14. BACK TO TOP — PREMIUM ══════════════════════════════════════ */
+#btt {
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--acc) 40%, transparent) !important;
+}
+#btt:hover {
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--acc) 60%, transparent) !important;
+}
+
+/* ══ 15. ABOUT CARDS — ENHANCED ═════════════════════════════════════ */
+.about-card {
+  background: linear-gradient(135deg, var(--bg3), rgba(255,255,255,0.015)) !important;
+}
+.about-card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 16px color-mix(in srgb, var(--acc) 10%, transparent) !important;
+}
+
+/* ══ 16. ACHIEVEMENT CARDS ═══════════════════════════════════════════ */
+.ach-card {
+  background: linear-gradient(145deg, var(--card), rgba(255,255,255,0.01)) !important;
+  position: relative;
+  overflow: hidden;
+}
+.ach-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--acc), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.ach-card:hover::before { opacity: 0.6; }
+
+/* ══ 17. CONTINUOUS GROWTH RAIL ══════════════════════════════════════ */
+.cg-card {
+  background: linear-gradient(145deg, var(--card), rgba(255,255,255,0.01)) !important;
+}
+
+/* ══ 18. HERO NAME — LARGER, MORE IMPACT ════════════════════════════ */
+.h-name {
+  font-size: clamp(2.4rem, 6.5vw, 5rem) !important;
+  font-weight: 900 !important;
+  line-height: 1.0 !important;
+  letter-spacing: -1px !important;
+}
+
+/* ══ 19. GLOBAL WHITESPACE — 8PX SYSTEM ════════════════════════════ */
+#about, #skills, #projects, #journey, #certs, #contact {
+  padding-top: 120px !important;
+  padding-bottom: 120px !important;
+}
+
+/* ══ 20. CERT MODAL SCROLL ══════════════════════════════════════════ */
+.cert-modal-box {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--acc) 25%, transparent),
+    0 40px 80px rgba(0,0,0,0.8) !important;
+}
+
+/* ══ 21. REDUCED MOTION SAFETY ══════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  #home::before,
+  #hero-particles { animation: none !important; opacity: 0.3 !important; }
+  .h-ring { animation: none !important; }
+  .pj-modal-tag { opacity: 1 !important; transform: none !important; }
+  .h-statement .word { opacity: 1 !important; transform: none !important; }
+}
+
+/* ══ 22. RESPONSIVE ══════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .pj-modal-box { padding: 28px 22px !important; }
+  .pj-modal-preview { height: 180px !important; }
+  .h-name { letter-spacing: -0.5px !important; }
+}
+@media (max-width: 580px) {
+  .pj-modal-header { flex-direction: column; }
+  .pj-modal-links { width: 100%; }
+  .pj-modal-link { flex: 1; justify-content: center; }
+}

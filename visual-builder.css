@@ -1,0 +1,834 @@
+/* ═══════════════════════════════════════════════════════════════════
+   VISUAL-BUILDER.CSS  v2.0
+   Parts: Design Token Panel · Column Builder · Ghost Drag ·
+          Floating Toolbar · Element Highlights · Reset UI
+   Extends: enhancements.css / premium-upgrades.css / visual-editor.js
+   Load order: after all other CSS, before visual-builder.js
+   ═══════════════════════════════════════════════════════════════════ */
+
+
+/* ════════════════════════════════════════════════════════════════
+   PART 1 — THEME CYCLE INDICATOR
+   The #thm-picker (palette) is hidden. Only the button remains.
+   A small color dot rides on the button to show current theme.
+════════════════════════════════════════════════════════════════ */
+#thm-picker { display: none !important; }
+
+/* Suppress old ripple system — replaced by cursor sparks */
+.cursor-ripple,
+.cur-ripple {
+  display: none !important;
+  animation: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   CURSOR: NONE — global, no exceptions for interactive elements
+   enhancements.css sets body{cursor:none} but then restores pointer
+   on a/button/label — that leaks the system cursor. We override
+   every element back to none here (later in load order).
+   Exceptions: inputs always show text cursor. Admin panel gets auto.
+════════════════════════════════════════════════════════════════ */
+html,
+body,
+*,
+*::before,
+*::after {
+  cursor: none !important;
+}
+/* Inputs: always text cursor for usability */
+input,
+textarea,
+select,
+[contenteditable] {
+  cursor: text !important;
+}
+/* Admin overlay: restore native cursor system (admin uses system pointer) */
+#adm-overlay,
+#adm-overlay *,
+#adm-login,
+#adm-login *,
+#adm-modal-ov,
+#adm-modal-ov * {
+  cursor: auto !important;
+}
+#adm-overlay input,
+#adm-overlay textarea,
+#adm-overlay select,
+#adm-login input {
+  cursor: text !important;
+}
+#adm-overlay button,
+#adm-overlay .adm-nav-item,
+#adm-overlay .adm-icon-btn,
+#adm-overlay .adm-add-btn,
+#adm-overlay .adm-btn-sm,
+#adm-login button {
+  cursor: pointer !important;
+}
+#adm-overlay [draggable="true"],
+#adm-overlay .adm-drag-handle,
+#adm-overlay .adm-cert-card-drag {
+  cursor: grab !important;
+}
+/* Mobile / touch: show auto cursor, hide custom elements */
+@media (hover: none) and (pointer: coarse) {
+  html, body, *, *::before, *::after { cursor: auto !important; }
+}
+
+/* Dot swatch that rides on the theme button after cycle */
+#thm-btn .thm-dot {
+  position: absolute;
+  bottom: 3px; right: 3px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--acc);
+  border: 1.5px solid rgba(0,0,0,0.5);
+  pointer-events: none;
+  transition: background 0.4s ease;
+}
+#thm-btn { position: relative; overflow: visible; }
+
+/* ══ THEME TRANSITION — smooth colour shift, no opacity fight ════
+   opacity is deliberately EXCLUDED — it would conflict with hero-up
+   entry animations (.h-name, .h-greet etc start at opacity:0 and
+   animate in via @keyframes; a CSS transition on opacity intercepts
+   that and holds them invisible for 0.45s before fading in).
+   Fix 3: upgraded to 0.7s cubic-bezier for premium shock effect.
+══════════════════════════════════════════════════════════════════ */
+:root { --theme-dur: 0.7s; --theme-ease: cubic-bezier(0.22,1,0.36,1); }
+html, html *, html *::before, html *::after {
+  transition-property:
+    background-color, color, border-color,
+    box-shadow, outline-color, fill, stroke;
+  transition-duration: var(--theme-dur);
+  transition-timing-function: var(--theme-ease);
+}
+/* Restore fast overrides for interactive elements */
+.btn-p, .btn-o, .btn-send, .nav-cta,
+a, button, .sk-card, .pj, .ach-card,
+.about-card, .vtl-card, .cg-card {
+  transition-duration: 0.25s, 0.25s, 0.25s, 0.45s !important;
+}
+/* Hero elements: never receive theme transition — animations own them */
+.h-name, .h-greet, .h-typed, .h-desc, .h-badge, .h-btns,
+.h-right, .h-left, .letter-reveal, .h-ring {
+  transition-property: color, border-color !important; /* only colour, not opacity */
+  transition-duration: 0.3s !important;
+}
+/* ── CURSOR ELEMENTS: translate(-50%,-50%) centers both on same coord ──
+   CSS owns transform: translate(-50%,-50%) — JS must NEVER write
+   style.transform on these elements or the centering breaks.
+   JS writes only left/top. scale and opacity transition via CSS.
+   width/height are FIXED — hover uses CSS `scale` property only.
+──────────────────────────────────────────────────────────────────── */
+#cur-dot,
+#cur-ring {
+  transform: translate(-50%, -50%) !important;
+  will-change: left, top !important;
+}
+#cur-dot {
+  transition-property: opacity, scale, background !important;
+  transition-duration: 0.15s, 0.15s, 0.25s !important;
+}
+#cur-ring {
+  transition-property: opacity, scale, border-color !important;
+  transition-duration: 0.15s, 0.18s, 0.25s !important;
+}
+
+/* ══ HERO TEXT — ALWAYS VISIBLE ═══════════════════════════════════
+   The letter-split TextReveal system has been disabled (advanced-
+   effects.js). Hero text is now statically visible from the moment
+   the browser paints — no animation chain required.
+
+   enhancements.css line 208 sets .h-name { opacity:0; animation:hero-up }
+   We override that here (visual-builder.css loads after enhancements.css)
+   with !important rules that unconditionally show the text.
+
+   .h-name children (.acc, .c-white) inherit opacity:1 via the wildcard
+   rule below — no individual span can be left invisible.
+═══════════════════════════════════════════════════════════════════ */
+.h-name {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  overflow: visible !important;
+  transform: none !important;
+  animation: none !important;   /* cancel hero-up from enhancements.css */
+  position: relative;
+  z-index: 10;
+}
+/* Every child of .h-name — including .acc and .c-white spans — is visible */
+.h-name *,
+.h-name .acc,
+.h-name .c-white {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+  animation: none !important;
+}
+/* .letter-reveal spans: if any stale ones remain from a previous run, show them */
+.h-name .letter-reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
+  animation-play-state: running !important;
+}
+.h-left {
+  transform: none !important;
+  will-change: auto !important;
+  overflow: visible !important;
+}
+/* Entire hero section: never clip its children */
+#home,
+#home .h-left {
+  overflow: visible !important;
+}
+
+/* Fix 3: Theme flash overlay */
+.theme-flash::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--acc);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9999;
+  animation: vb-theme-flash 0.35s ease forwards;
+}
+@keyframes vb-theme-flash {
+  0%   { opacity: 0.12; }
+  100% { opacity: 0; }
+}
+
+/* Fix 1: Cursor sparks */
+.cursor-spark {
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  animation: vb-spark 0.6s ease-out forwards;
+  margin: 0;
+  padding: 0;
+}
+@keyframes vb-spark {
+  from {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+  to {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy)));
+    opacity: 0;
+  }
+}
+
+/* Fix 4 + 5: Timeline line always full height (static ghost track)
+   JS still owns the filled progress line on top. */
+.vtl-line-ghost {
+  height: 100% !important;
+  opacity: 0.07 !important;
+}
+/* Scroll indicator: slim vertical line shape instead of circle dot */
+.vtl-scroll-dot {
+  width: 2px !important;
+  height: 36px !important;
+  border-radius: 1px !important;
+  border: none !important;
+  box-shadow: 0 0 8px var(--glow) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --theme-dur: 0.01ms; }
+  .theme-flash::before, .cursor-spark { animation: none !important; }
+}
+/* ════════════════════════════════════════════════════════════════
+   PART 3 — COLUMN BUILDER
+   .vb-col-wrap: flex container injected around section content
+   .vb-col: each column
+   Column borders only show in edit mode
+════════════════════════════════════════════════════════════════ */
+.vb-col-wrap {
+  display: flex;
+  gap: var(--vb-col-gap, 24px);
+  width: 100%;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+.vb-col {
+  flex: 1 1 0;
+  min-width: 180px;
+  min-height: 60px;
+  position: relative;
+  transition: outline 0.2s;
+}
+
+/* Edit mode: dashed outline on columns */
+body.edit-mode .vb-col {
+  outline: 1px dashed rgba(255,255,255,0.09);
+  border-radius: 4px;
+}
+body.edit-mode .vb-col:hover {
+  outline-color: rgba(255,255,255,0.22);
+}
+body.edit-mode .vb-col-wrap.vb-drop-target .vb-col.vb-col-over {
+  outline: 2px dashed var(--acc);
+  background: rgba(79,110,245,0.04);
+}
+
+/* Column count control strip (appears above section in edit mode) */
+.vb-col-strip {
+  position: absolute;
+  top: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9990;
+  background: rgba(10,10,15,0.95);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  display: none;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.48rem;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.4);
+  white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  backdrop-filter: blur(12px);
+}
+body.edit-mode .vb-section-wrap:hover > .vb-col-strip,
+body.edit-mode .vb-section-wrap:focus-within > .vb-col-strip {
+  display: flex;
+}
+.vb-col-strip-btn {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.7);
+  font-size: 0.65rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.vb-col-strip-btn:hover { background: var(--acc); color: #000; }
+.vb-col-strip-count {
+  min-width: 14px;
+  text-align: center;
+  color: var(--acc);
+  font-weight: 700;
+}
+.vb-section-wrap { position: relative; }
+
+
+/* ════════════════════════════════════════════════════════════════
+   PART 4 — GHOST DRAG
+   .vb-ghost: floating mirror element following mouse
+   .vb-drag-source: original element during drag (faded)
+   .vb-drop-zone: active drop areas shown during drag
+════════════════════════════════════════════════════════════════ */
+.vb-ghost {
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 99990;
+  opacity: 0.82;
+  border-radius: 10px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.55), 0 0 0 2px var(--acc);
+  transform-origin: center top;
+  will-change: transform;
+  /* scale & rotate set inline */
+  filter: brightness(1.08);
+  max-width: 320px;
+  overflow: hidden;
+}
+.vb-ghost * { pointer-events: none !important; }
+
+.vb-drag-source {
+  opacity: 0.25 !important;
+  transform: scale(0.97) !important;
+  transition: opacity 0.2s, transform 0.2s !important;
+  pointer-events: none !important;
+}
+
+/* Drop placeholder — shown in drop position during drag */
+.vb-drop-placeholder {
+  background: rgba(79,110,245,0.08);
+  border: 2px dashed var(--acc);
+  border-radius: 10px;
+  min-height: 60px;
+  pointer-events: none;
+  transition: min-height 0.2s ease;
+  animation: vb-ph-pulse 1.2s ease infinite;
+}
+@keyframes vb-ph-pulse {
+  0%,100% { border-color: var(--acc); background: rgba(79,110,245,0.06); }
+  50%      { border-color: var(--acc-hi, var(--acc)); background: rgba(79,110,245,0.12); }
+}
+
+/* FLIP animation helper */
+.vb-flip-move {
+  transition: transform 0.3s cubic-bezier(0.22,1,0.36,1) !important;
+}
+
+/* Snap pulse on drop */
+.vb-snap-pulse {
+  animation: vb-snap 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes vb-snap {
+  0%   { transform: scale(1.06); }
+  60%  { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+/* Push ripple on neighbour elements */
+.vb-push {
+  animation: vb-push-anim 0.28s ease forwards;
+}
+@keyframes vb-push-anim {
+  0%   { transform: translateY(0); }
+  40%  { transform: translateY(6px); }
+  100% { transform: translateY(0); }
+}
+
+/* Drag cursor override */
+body.vb-dragging { cursor: grabbing !important; user-select: none !important; }
+body.vb-dragging * { cursor: grabbing !important; }
+body.vb-dragging #cur-dot,
+body.vb-dragging #cur-ring { opacity: 0 !important; }
+
+
+/* ════════════════════════════════════════════════════════════════
+   PART 7 — DESIGN CONTROL PANEL
+   Injected as a tab inside the admin overlay.
+   Uses CSS custom properties to update globally live.
+════════════════════════════════════════════════════════════════ */
+
+/* Design system CSS tokens (defaults) */
+:root {
+  --ds-radius:     12px;
+  --ds-spacing:    20px;
+  --ds-glow-mult:  1;
+  --ds-anim-speed: 1;
+  --ds-font-scale: 1;
+}
+
+/* Apply design tokens to key elements */
+.sk-card, .pj, .ach-card, .about-card, .vtl-card, .cg-card,
+.ct-right, .term-box {
+  border-radius: var(--ds-radius);
+}
+#about, #skills, #projects, #journey, #certs, #contact {
+  padding-top:    calc(var(--ds-spacing) * 6);
+  padding-bottom: calc(var(--ds-spacing) * 6);
+}
+.sk-card, .pj, .ach-card, .about-card {
+  padding: var(--ds-spacing);
+}
+
+/* Glow multiplier applied via CSS calc */
+.glow-hover  { filter: drop-shadow(0 0 calc(4px * var(--ds-glow-mult)) var(--glow)); }
+.glow-active { filter: drop-shadow(0 0 calc(6px * var(--ds-glow-mult)) var(--glow)); }
+.vtl-dot     { filter: drop-shadow(0 0 calc(3px * var(--ds-glow-mult)) var(--glow)); }
+
+/* Animation speed multiplier (inverse: higher = faster = smaller duration) */
+body { --anim-fast-eff: calc(var(--anim-fast, 0.25s) / var(--ds-anim-speed)); }
+
+
+/* ════════════════════════════════════════════════════════════════
+   DESIGN PANEL UI (admin tab)
+════════════════════════════════════════════════════════════════ */
+.ds-panel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.ds-token-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 14px 12px;
+}
+.ds-token-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.48rem;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.28);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ds-token-val {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--acc);
+  font-weight: 700;
+}
+.ds-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.1);
+  outline: none;
+  cursor: pointer;
+  margin-top: 6px;
+}
+.ds-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--acc);
+  cursor: pointer;
+  transition: transform 0.15s;
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.4);
+}
+.ds-slider::-webkit-slider-thumb:hover { transform: scale(1.25); }
+.ds-slider::-moz-range-thumb {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--acc);
+  border: none; cursor: pointer;
+}
+.ds-preview-swatch {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--acc-grad, var(--acc));
+  margin-top: 6px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+.ds-preview-swatch:hover { opacity: 1; }
+
+/* Full-width card for font scale */
+.ds-token-card.ds-full { grid-column: 1 / -1; }
+
+
+/* ════════════════════════════════════════════════════════════════
+   PART 8 — FLOATING TOOLBAR (element click edit)
+   Appears near selected element with quick-action buttons
+════════════════════════════════════════════════════════════════ */
+#vb-float-toolbar {
+  position: fixed;
+  z-index: 99992;
+  display: none;
+  align-items: center;
+  gap: 3px;
+  background: rgba(10,10,15,0.97);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 5px 7px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03);
+  backdrop-filter: blur(16px);
+  font-family: 'Rajdhani', sans-serif;
+  animation: vb-toolbar-in 0.18s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  pointer-events: all;
+}
+#vb-float-toolbar.visible { display: flex; }
+@keyframes vb-toolbar-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.92); }
+  to   { opacity: 1; transform: none; }
+}
+
+.vbt-btn {
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  position: relative;
+}
+.vbt-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.vbt-btn.vbt-active { background: var(--acc); color: #000; }
+.vbt-btn[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.9);
+  color: #fff;
+  font-size: 0.48rem;
+  letter-spacing: 1px;
+  padding: 3px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.vbt-btn[data-tip]:hover::after { opacity: 1; }
+.vbt-sep {
+  width: 1px;
+  height: 18px;
+  background: rgba(255,255,255,0.1);
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+.vbt-el-id {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.46rem;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.2);
+  padding: 0 6px;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* ════════════════════════════════════════════════════════════════
+   PART 8 — EDIT HIGHLIGHT (improved)
+   Better outline, label badge, and section-level highlight
+════════════════════════════════════════════════════════════════ */
+
+/* Editable hover — only in edit-mode */
+body.edit-mode [data-editable="true"] {
+  cursor: none !important;
+  position: relative;
+}
+body.edit-mode [data-editable="true"]::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 1px dashed rgba(79,110,245,0.25);
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 9990;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+body.edit-mode [data-editable="true"]:hover::after {
+  border: 1.5px solid var(--acc);
+  box-shadow: 0 0 0 3px var(--acc2, rgba(79,110,245,0.12));
+}
+
+/* Selected element */
+.ve-selected,
+.vb-selected {
+  outline: 2px solid var(--acc) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px var(--acc2, rgba(79,110,245,0.12)) !important;
+}
+body.edit-mode .ve-selected::after,
+body.edit-mode .vb-selected::after { display: none !important; }
+
+
+/* ════════════════════════════════════════════════════════════════
+   PART 9 — RESET CONFIRMATION UI
+════════════════════════════════════════════════════════════════ */
+#vb-reset-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999990;
+  background: rgba(0,0,0,0.75);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+#vb-reset-overlay.open { display: flex; }
+
+.vb-reset-box {
+  background: rgba(13,13,28,0.98);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 18px;
+  padding: 36px 32px;
+  width: min(360px, 94vw);
+  text-align: center;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.7);
+  animation: vb-modal-in 0.25s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes vb-modal-in {
+  from { opacity: 0; transform: scale(0.88) translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+.vb-reset-ico { font-size: 2rem; margin-bottom: 12px; }
+.vb-reset-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #f87171;
+  margin-bottom: 10px;
+}
+.vb-reset-msg {
+  font-size: 0.76rem;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.7;
+  margin-bottom: 24px;
+  max-width: 260px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.vb-reset-actions { display: flex; gap: 10px; justify-content: center; }
+.vb-reset-btn {
+  flex: 1;
+  max-width: 140px;
+  padding: 10px;
+  border-radius: 8px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.7);
+}
+.vb-reset-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.vb-reset-btn.danger {
+  background: rgba(248,113,113,0.15);
+  border-color: rgba(248,113,113,0.4);
+  color: #f87171;
+}
+
+/* Section-level reset highlight */
+.vb-section-reset-active {
+  outline: 2px solid #f87171 !important;
+  outline-offset: 4px !important;
+}
+
+
+/* ════════════════════════════════════════════════════════════════
+   ADMIN PANEL ADDITIONS
+   Design tab + builder tab additions
+════════════════════════════════════════════════════════════════ */
+
+/* Template list in builder */
+.vb-tpl-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 7px;
+  margin-bottom: 6px;
+  font-size: 0.70rem;
+  color: rgba(255,255,255,0.55);
+}
+.vb-tpl-item:hover { border-color: var(--acc); color: rgba(255,255,255,0.8); }
+.vb-tpl-actions { display: flex; gap: 5px; }
+.vb-tpl-act {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.54rem;
+  font-family: 'Space Mono', monospace;
+  cursor: pointer;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.5);
+  transition: background 0.2s, color 0.2s;
+}
+.vb-tpl-act:hover { background: var(--acc); color: #000; border-color: transparent; }
+.vb-tpl-act.del:hover { background: #f87171; color: #fff; }
+
+/* Column layout preset chips */
+.vb-col-presets {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.vb-col-preset {
+  display: flex;
+  gap: 3px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.vb-col-preset:hover { border-color: var(--acc); background: var(--acc2); }
+.vb-col-preset.active { border-color: var(--acc); background: var(--acc2); }
+.vb-col-preset-bar {
+  width: 6px;
+  height: 16px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 2px;
+}
+
+/* Drag handle visible in edit mode */
+body.edit-mode [data-editable="true"] .vb-grip,
+body.edit-mode [data-draggable="vb"] .vb-grip {
+  display: flex;
+}
+.vb-grip {
+  display: none;
+  position: absolute;
+  top: 6px; left: 6px;
+  width: 18px; height: 18px;
+  background: var(--acc);
+  border-radius: 4px;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: #000;
+  cursor: grab;
+  z-index: 9991;
+  opacity: 0.85;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.vb-grip:hover { opacity: 1; transform: scale(1.1); }
+.vb-grip:active { cursor: grabbing; }
+
+
+/* ════════════════════════════════════════════════════════════════
+   ADMIN PANEL — Design + Visual Builder tab in sidebar
+════════════════════════════════════════════════════════════════ */
+.adm-nav-item[data-panel="vb-design"] .adm-ico { color: #f97316; }
+.adm-nav-item[data-panel="vb-builder"] .adm-ico { color: #22d3ee; }
+
+
+/* ════════════════════════════════════════════════════════════════
+   PERFORMANCE SAFEGUARDS
+   Ensure dragging and animations use GPU only
+════════════════════════════════════════════════════════════════ */
+.vb-ghost, .vb-flip-move,
+body.vb-dragging .sk-card,
+body.vb-dragging .pj,
+body.vb-dragging .vtl-item,
+body.vb-dragging .ach-card {
+  will-change: transform;
+}
+
+/* Reduce global transition weight during drag (avoid 100s of transitions) */
+body.vb-dragging * {
+  transition-duration: 0.01ms !important;
+}
+/* Except the ghost and drop placeholder */
+body.vb-dragging .vb-ghost,
+body.vb-dragging .vb-drop-placeholder {
+  transition-duration: unset !important;
+}
+
+
+/* ════════════════════════════════════════════════════════════════
+   REDUCED MOTION
+════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .vb-ghost { animation: none; }
+  #vb-float-toolbar { animation: none; }
+  .vb-flip-move { transition: none !important; }
+  .vb-snap-pulse,
+  .vb-push,
+  .vb-drop-placeholder { animation: none; }
+  :root { --theme-dur: 0.01ms; }
+}

@@ -1,0 +1,144 @@
+/* ═══════════════════════════════════════════════════════════════════
+   ADVANCED-EFFECTS.CSS v6.0 — Minimal Premium
+   STEP 4: Only fade+slide reveal animations. Removed bouncy/scale/chained.
+   STEP 2: .h-ring only gets JS transform — no CSS transitions on it.
+   STEP 9: Only transform+opacity for animations.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. SCROLL BEHAVIOUR — JS lerp engine owns scrolling ── */
+html { scroll-behavior: auto !important; }
+
+
+/* ── 2. HERO RING — JS rAF owns transform exclusively ── */
+.h-ring {
+  will-change: transform;
+  transition: none !important;
+  animation: none !important;
+}
+
+/* ── 2. HERO LEFT — completely static, no transforms ── */
+.h-left {
+  transform: none !important;
+  will-change: auto !important;
+  transition: none !important;
+}
+
+
+/* ── 3. STAGGER DELAY ATTRIBUTES ── */
+[data-stagger="1"] { transition-delay: 0.05s !important; }
+[data-stagger="2"] { transition-delay: 0.10s !important; }
+[data-stagger="3"] { transition-delay: 0.15s !important; }
+[data-stagger="4"] { transition-delay: 0.20s !important; }
+[data-stagger="5"] { transition-delay: 0.25s !important; }
+[data-stagger="6"] { transition-delay: 0.30s !important; }
+
+
+/* ── 4. REVEAL SYSTEM — Step 4: Simple fade+slide ONLY ── */
+/* Base reveal: fade up */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Side reveals — simplified to fade+slide */
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal-right {
+  opacity: 0;
+  transform: translateX(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal-left.in,
+.reveal-right.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Scale reveal — simplified */
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal-scale.in {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Extra reveal variants */
+.anim-fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.anim-fade-up.in { opacity: 1; transform: none; }
+
+.anim-fade-in {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.anim-fade-in.in { opacity: 1; }
+
+.anim-scale {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.anim-scale.in { opacity: 1; transform: scale(1); }
+
+.anim-slide-left  { opacity: 0; transform: translateX(-24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.anim-slide-right { opacity: 0; transform: translateX(24px);  transition: opacity 0.6s ease, transform 0.6s ease; }
+.anim-slide-left.in,
+.anim-slide-right.in { opacity: 1; transform: none; }
+
+
+/* ── 5. TIMELINE DOT ENTRY — simple fade+scale ── */
+.vtl-item.in .vtl-dot {
+  animation: dot-pop 0.4s 0.2s ease both;
+}
+@keyframes dot-pop {
+  0%   { transform: translateX(-50%) scale(0); opacity: 0; }
+  100% { transform: translateX(-50%) scale(1); opacity: 1; }
+}
+
+
+/* ── 6. NAVBAR LINKS — no transform transition (JS owns) ── */
+.nav-links a {
+  transition: color 0.25s ease;
+}
+
+
+/* ── 7. RADAR POLYGON — keep for enhancements.css compat ── */
+#radar-poly {
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 1200;
+  transition: stroke-dashoffset 1.8s ease, fill 0.6s ease, stroke 0.4s ease;
+}
+
+
+/* ── 8. PROGRESS BAR ── */
+#pbar {
+  transition: width 0.1s linear, background 0.25s !important;
+}
+
+
+/* ── 9. REDUCED MOTION ── */
+@media (prefers-reduced-motion: reduce) {
+  .vtl-item.in .vtl-dot { animation: none !important; }
+  .h-ring { will-change: auto !important; }
+  .reveal, .reveal-left, .reveal-right, .reveal-scale,
+  .anim-fade-up, .anim-fade-in, .anim-scale,
+  .anim-slide-left, .anim-slide-right {
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

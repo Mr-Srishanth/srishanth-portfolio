@@ -1,0 +1,742 @@
+/* ═══════════════════════════════════════════════════════════════════
+   FINAL-POLISH.CSS  v1.0
+   Load order: 5 of 5  (last — wins all specificity conflicts)
+   ─────────────────────────────────────────────────────────────────
+   Philosophy:
+   • Only GPU-composited properties: transform + opacity + filter
+   • No layout-triggering properties inside transitions
+   • Easing curves: --ease-main for spatial, --ease-spring for physical
+   • Glow budget: idle 0–4px · hover 6px · active 10px (down from 14)
+   • Every interactive element: press → 0.08s snap · release → 0.25s
+   • Animations: prefer cubic-bezier over ease/linear everywhere
+   ═══════════════════════════════════════════════════════════════════ */
+
+
+/* ══ 0. CUSTOM EASING LIBRARY ════════════════════════════════════════
+   Names follow Apple HIG conventions.
+   All curves tuned for 60fps — no overshoots on fast elements.
+═══════════════════════════════════════════════════════════════════ */
+:root {
+  /* Core motion curves */
+  --ease-main:    cubic-bezier(0.22, 1, 0.36, 1);      /* decel — most hovers */
+  --ease-spring:  cubic-bezier(0.34, 1.40, 0.64, 1);   /* slight overshoot — physical */
+  --ease-in:      cubic-bezier(0.40, 0, 1, 1);          /* accelerate — exits */
+  --ease-out:     cubic-bezier(0, 0, 0.20, 1);          /* decelerate — entries */
+  --ease-precise: cubic-bezier(0.25, 0.46, 0.45, 0.94);/* iOS-style precise */
+
+  /* Duration tokens — final definitive values */
+  --dur-instant: 0.08s;   /* press feedback — must feel immediate */
+  --dur-fast:    0.22s;   /* colour/border hover                  */
+  --dur-mid:     0.35s;   /* transform hover, glow transition     */
+  --dur-reveal:  0.60s;   /* scroll-in reveals                    */
+  --dur-major:   0.70s;   /* page-level transitions               */
+
+  /* Glow budget — rebalanced downward for subtlety */
+  --glow-idle:   2px;     /* breathing pulse peak                 */
+  --glow-hover:  6px;     /* hover state                          */
+  --glow-active: 10px;    /* press / selected state               */
+}
+
+
+/* ══ 1. MICRO-INTERACTIONS — BUTTONS ════════════════════════════════
+   System: press → instant compress → release → spring-back
+   Only transform + filter animated (no layout props = no reflow)
+   contain: layout style paint on btn — prevents ancestor repaints
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── Primary button ── */
+.btn-p {
+  transition:
+    background  var(--dur-fast)  var(--ease-out),
+    color       var(--dur-fast)  var(--ease-out),
+    filter      var(--dur-mid)   var(--ease-main),
+    transform   var(--dur-mid)   var(--ease-spring);
+  transform-origin: center bottom; /* press compresses downward, feels physical */
+  contain: layout style paint;
+  backface-visibility: hidden;     /* eliminate sub-pixel flicker on GPU layer */
+}
+.btn-p:hover  { transform: translateY(-2px) scale(1.03); }
+.btn-p:active {
+  transform: translateY(1px) scale(0.968);
+  transition-duration: var(--dur-instant), var(--dur-instant), var(--dur-instant), var(--dur-instant);
+  filter: brightness(0.92);
+}
+
+/* ── Outline button ── */
+.btn-o {
+  transition:
+    border-color var(--dur-fast)  var(--ease-out),
+    color        var(--dur-fast)  var(--ease-out),
+    filter       var(--dur-mid)   var(--ease-main),
+    transform    var(--dur-mid)   var(--ease-spring);
+  transform-origin: center bottom;
+  contain: layout style paint;
+  backface-visibility: hidden;
+}
+.btn-o:hover  { transform: translateY(-2px) scale(1.03); }
+.btn-o:active {
+  transform: translateY(1px) scale(0.968);
+  transition-duration: var(--dur-instant), var(--dur-instant), var(--dur-instant), var(--dur-instant);
+  filter: brightness(0.88);
+}
+
+/* ── Send / CTA button ── */
+.btn-send {
+  transition:
+    filter    var(--dur-mid)   var(--ease-main),
+    transform var(--dur-mid)   var(--ease-spring);
+  transform-origin: center bottom;
+  backface-visibility: hidden;
+}
+.btn-send:hover  { transform: translateY(-1px) scale(1.015); }
+.btn-send:active {
+  transform: translateY(1px) scale(0.978);
+  transition-duration: var(--dur-instant), var(--dur-instant);
+  filter: brightness(0.9);
+}
+
+/* ── Nav CTA ── */
+.nav-cta {
+  transition:
+    background   var(--dur-fast)  var(--ease-out),
+    color        var(--dur-fast)  var(--ease-out),
+    border-color var(--dur-fast)  var(--ease-out),
+    transform    var(--dur-mid)   var(--ease-spring);
+  backface-visibility: hidden;
+}
+.nav-cta:hover  { transform: scale(1.04); }
+.nav-cta:active {
+  transform: scale(0.96);
+  transition-duration: var(--dur-instant), var(--dur-instant), var(--dur-instant), var(--dur-instant);
+}
+
+/* ── Shimmer sweep on .btn-p and .btn-send — single clean pass ── */
+.btn-p::after,
+.btn-send::after {
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255,255,255,0.14) 50%,
+    transparent 65%
+  );
+  transition: transform 0.50s var(--ease-main);
+}
+.btn-p:hover::after,
+.btn-send:hover::after { transform: translateX(150%); }
+
+
+/* ══ 2. MICRO-INTERACTIONS — CARDS ══════════════════════════════════
+   Philosophy: lift on hover (translate only — no scale on cards),
+   instant border-color, delayed shadow for premium depth layering.
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── Common card base ── */
+.sk-card,
+.pj,
+.ach-card,
+.about-card,
+.vtl-card,
+.cg-card {
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow   var(--dur-mid)  var(--ease-main),
+    transform    var(--dur-mid)  var(--ease-spring);
+  backface-visibility: hidden;
+  transform-origin: center center;
+}
+
+/* ── Individual lift amounts — larger cards lift more ── */
+.sk-card:hover    { transform: translateY(-3px); }
+.pj:hover         { transform: translateY(-4px); }
+.ach-card:hover   { transform: translateY(-3px); }
+.about-card:hover { transform: translateY(-3px); }
+.vtl-card:hover   { transform: translateY(-2px) !important; }
+.cg-card:hover    { transform: translateY(-3px); }
+
+/* ── Press feedback on cards ── */
+.sk-card:active,
+.pj:active,
+.ach-card:active,
+.cg-card:active {
+  transform: translateY(0) scale(0.99);
+  transition-duration: var(--dur-instant), var(--dur-instant), var(--dur-instant);
+}
+
+/* ── Subtle inner shadow on hover for depth perception ── */
+.sk-card:hover,
+.pj:hover,
+.ach-card:hover,
+.cg-card:hover {
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.35),
+    0 2px 8px  rgba(0,0,0,0.25),
+    0 0 20px color-mix(in srgb, var(--acc) 25%, transparent),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+
+/* ══ 3. MICRO-INTERACTIONS — SMALL ELEMENTS ═════════════════════════ */
+
+/* ── Social icon ── */
+.soc {
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    color        var(--dur-fast) var(--ease-out),
+    transform    var(--dur-mid)  var(--ease-spring);
+  backface-visibility: hidden;
+}
+.soc:hover  { transform: translateY(-4px) scale(1.10); }
+.soc:active {
+  transform: translateY(1px) scale(0.92);
+  transition-duration: var(--dur-instant), var(--dur-instant), var(--dur-instant);
+}
+
+/* ── Theme swatch ── */
+.tsw {
+  transition:
+    transform    var(--dur-mid)  var(--ease-spring),
+    border-color var(--dur-fast) var(--ease-out),
+    filter       var(--dur-mid)  var(--ease-main);
+  backface-visibility: hidden;
+}
+.tsw:hover  { transform: scale(1.28) rotate(8deg); }
+.tsw:active {
+  transform: scale(0.88);
+  transition-duration: var(--dur-instant), var(--dur-instant), var(--dur-instant);
+}
+
+/* ── Back to top ── */
+#btt {
+  transition:
+    opacity    var(--dur-fast)  var(--ease-out),
+    background var(--dur-fast)  var(--ease-out),
+    transform  var(--dur-mid)   var(--ease-spring);
+  backface-visibility: hidden;
+}
+#btt:hover  { transform: translateY(-4px) scale(1.10); }
+#btt:active {
+  transform: translateY(2px) scale(0.90);
+  transition-duration: var(--dur-instant), var(--dur-instant), var(--dur-instant);
+}
+
+/* ── Cert ring button ── */
+.cert-ring-btn {
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow   var(--dur-mid)  var(--ease-main),
+    transform    var(--dur-mid)  var(--ease-spring);
+  backface-visibility: hidden;
+}
+.cert-ring-btn:hover  { transform: scale(1.08) rotate(3deg); }
+.cert-ring-btn:active {
+  transform: scale(0.93);
+  transition-duration: var(--dur-instant), var(--dur-instant), var(--dur-instant);
+}
+
+/* ── Tree node ── */
+.tree-node {
+  transition: transform var(--dur-mid) var(--ease-spring);
+  backface-visibility: hidden;
+}
+.tree-node:hover  { transform: translateY(-5px) scale(1.05); }
+.tree-node:active {
+  transform: scale(0.95);
+  transition-duration: var(--dur-instant);
+}
+
+/* ── Nav logo ── */
+.nav-logo {
+  transition:
+    color          var(--dur-fast) var(--ease-out),
+    letter-spacing var(--dur-mid)  var(--ease-main);
+}
+.nav-logo:hover { letter-spacing: 5px; }
+
+/* ── Footer social links ── */
+.fs a {
+  transition:
+    color     var(--dur-fast) var(--ease-out),
+    transform var(--dur-mid)  var(--ease-spring);
+  backface-visibility: hidden;
+}
+.fs a:hover  { transform: translateY(-2px); }
+.fs a:active {
+  transform: translateY(1px);
+  transition-duration: var(--dur-instant), var(--dur-instant);
+}
+
+/* ── About card icon bounce ── */
+@keyframes icon-spin {
+  0%   { transform: rotate(0)     scale(1);    }
+  30%  { transform: rotate(-10deg) scale(1.18); }
+  65%  { transform: rotate(5deg)  scale(0.96); }
+  100% { transform: rotate(0)     scale(1);    }
+}
+.about-card:hover .about-card-icon { animation: icon-spin 0.42s var(--ease-spring); }
+
+/* ── Ach card icon bounce ── */
+@keyframes icon-pop {
+  0%   { transform: scale(1) rotate(0);    }
+  35%  { transform: scale(1.30) rotate(-6deg); }
+  65%  { transform: scale(0.92) rotate(2deg); }
+  100% { transform: scale(1) rotate(0);    }
+}
+.ach-card:hover .ach-ic { animation: icon-pop 0.40s var(--ease-spring); }
+
+/* ── Contact icon micro-lift ── */
+.ct-ic {
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    color        var(--dur-fast) var(--ease-out),
+    transform    var(--dur-mid)  var(--ease-spring);
+  backface-visibility: hidden;
+}
+.ct-row:hover .ct-ic { transform: scale(1.08); }
+
+/* ── Form field press ── */
+.fg input,
+.fg textarea {
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow   var(--dur-mid)  var(--ease-main),
+    transform    var(--dur-mid)  var(--ease-main);
+}
+.fg input:focus,
+.fg textarea:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 2px var(--acc2), 0 4px 16px rgba(0,0,0,0.2);
+}
+
+
+/* ══ 4. GLOW SYSTEM — REBALANCED ════════════════════════════════════
+   Full audit of every glow value. New budget:
+     idle   → 0→4px breathing  (was 0→5px)
+     hover  → 6px              (was 9px)
+     active → 10px             (was 14px)
+   Cards get same values as base — they are large enough that 6px reads.
+   Buttons same.  Nav text-shadow 30% dimmer.
+   Transition extended to 0.35s var(--ease-main) everywhere (was 0.35s ease).
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── State transitions ── */
+.glow-idle,
+.glow-hover,
+.glow-active {
+  transition: filter 0.35s var(--ease-main), text-shadow 0.35s var(--ease-main);
+}
+
+/* ── Idle: barely-there breathing pulse ── */
+.glow-idle {
+  filter: drop-shadow(0 0 1px var(--glow));
+  animation: glow-breathe 4.5s var(--ease-main) infinite;
+}
+@keyframes glow-breathe {
+  0%,  100% { filter: drop-shadow(0 0 1px var(--glow)); }
+  50%        { filter: drop-shadow(0 0 var(--glow-idle) var(--glow)); }
+}
+
+/* ── Hover: perceptible, not blazing ── */
+.glow-hover {
+  animation: none;
+  filter: drop-shadow(0 0 var(--glow-hover) var(--glow));
+}
+
+/* ── Active: peak — clean single shadow ── */
+.glow-active {
+  animation: none;
+  filter: drop-shadow(0 0 var(--glow-active) var(--glow));
+}
+
+/* ── Nav links: text-shadow only (inline — filter bleeds to parent) ── */
+.nav-links a.glow-idle,
+.nav-links a.glow-hover,
+.nav-links a.glow-active {
+  filter: none !important;
+  transition: text-shadow 0.35s var(--ease-main);
+}
+.nav-links a.glow-idle {
+  animation: nav-glow-breathe 4.5s var(--ease-main) infinite;
+}
+@keyframes nav-glow-breathe {
+  0%,  100% { text-shadow: none; }
+  50%        { text-shadow: 0 0 3px var(--glow); }
+}
+.nav-links a.glow-hover  { animation: none; text-shadow: 0 0 6px var(--glow); }
+.nav-links a.glow-active { animation: none; text-shadow: 0 0 9px var(--glow); }
+
+/* ── Cards: same budget as base ── */
+.sk-card.glow-hover, .pj.glow-hover, .ach-card.glow-hover,
+.about-card.glow-hover, .vtl-card.glow-hover, .cg-card.glow-hover {
+  filter: drop-shadow(0 0 var(--glow-hover) var(--glow));
+}
+.sk-card.glow-active, .pj.glow-active, .ach-card.glow-active,
+.about-card.glow-active, .vtl-card.glow-active, .cg-card.glow-active {
+  filter: drop-shadow(0 0 var(--glow-active) var(--glow));
+}
+
+/* ── Buttons ── */
+.btn-p.glow-hover,  .btn-o.glow-hover  { filter: drop-shadow(0 0 6px var(--glow)); }
+.btn-p.glow-active, .btn-o.glow-active { filter: drop-shadow(0 0 10px var(--glow)); }
+.nav-cta.glow-hover  { filter: drop-shadow(0 0 5px var(--glow)); }
+.nav-cta.glow-active { filter: drop-shadow(0 0 8px var(--glow)); }
+
+/* ── Social ── */
+.soc.glow-hover  { filter: drop-shadow(0 0 5px var(--glow)); }
+.soc.glow-active { filter: drop-shadow(0 0 8px var(--glow)); }
+
+/* ── Cert rings ── */
+.cert-ring-btn.glow-hover  { filter: drop-shadow(0 0 6px var(--glow)); }
+.cert-ring-btn.glow-active { filter: drop-shadow(0 0 10px var(--glow)); }
+
+/* ── Skill tree nodes ── */
+.tn-circle.glow-hover  { filter: drop-shadow(0 0 5px var(--glow)); }
+.tn-circle.glow-active { filter: drop-shadow(0 0 9px var(--glow)); }
+.tree-node-active .tn-circle {
+  border-color: var(--acc) !important;
+  filter: drop-shadow(0 0 7px var(--glow));
+  transition: filter 0.35s var(--ease-main), border-color 0.35s var(--ease-main);
+}
+
+/* ── Progress bar ── */
+#pbar {
+  /* Halved glow — it's a utility element, not a feature */
+  box-shadow: 0 0 4px var(--glow);
+  transition: box-shadow var(--dur-fast);
+}
+
+/* ── Radar SVG ── */
+#radar-svg {
+  filter: drop-shadow(0 0 4px var(--glow));
+  transition: filter 0.40s var(--ease-main), opacity 0.60s var(--ease-main);
+}
+
+/* ── Timeline dot ── */
+.vtl-dot {
+  filter: drop-shadow(0 0 3px var(--glow));
+  transition: filter 0.35s var(--ease-main);
+}
+
+/* ── Timeline line ── */
+.vtl-line {
+  background: linear-gradient(
+    180deg,
+    var(--acc) 0%,
+    rgba(var(--acc), 0.5) 60%,
+    transparent 100%
+  ) !important;
+}
+
+/* ── Swatch pulse: subtler ── */
+@keyframes swatch-pulse {
+  0%,  100% { filter: drop-shadow(0 0 2px var(--glow)); }
+  50%        { filter: drop-shadow(0 0 6px var(--glow)); }
+}
+.tsw.on { animation-duration: 4.5s; }
+
+/* ── Tree popup glow: pulled back ── */
+#tree-popup {
+  filter: drop-shadow(0 0 6px var(--glow));
+}
+
+/* ── Terminal box: no outer glow — it's content, not chrome ── */
+.term-box {
+  border-color: var(--acc2) !important;
+  box-shadow:
+    0 0 0 1px var(--acc2),
+    0 0 28px rgba(0,0,0,0.6),
+    inset 0 0 16px rgba(0,0,0,0.35) !important;
+  /* No drop-shadow — terminal is a contained element */
+}
+
+/* ── Chain highlight (skill tree ancestry) ── */
+.tn-circle.chain-highlight {
+  border-color: var(--acc) !important;
+  filter: drop-shadow(0 0 7px var(--glow)) !important;
+  transition: border-color 0.22s var(--ease-out), filter 0.22s var(--ease-out);
+}
+
+
+/* ══ 5. SCROLL REVEAL — PERFORMANCE PASS ════════════════════════════
+   • All reveals use only opacity + transform (compositor-only)
+   • Remove translateY from .reveal so GPU handles it without layout
+   • Reduced travel distance: 28px→18px — snappier, less theatrical
+   • Use contain: layout on revealed sections (avoids ancestor repaints)
+═══════════════════════════════════════════════════════════════════ */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);          /* was 28px */
+  transition:
+    opacity   var(--dur-reveal) var(--ease-main),
+    transform var(--dur-reveal) var(--ease-main);
+  will-change: opacity, transform;      /* hint compositor before reveal */
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+  will-change: auto;                    /* free GPU layer after settled */
+}
+
+.reveal-left  { transform: translateX(-20px); }   /* was -28px */
+.reveal-right { transform: translateX(20px);  }   /* was 28px  */
+.reveal-scale { transform: scale(0.92);       }   /* was 0.88 — subtler */
+
+.reveal-left.in,
+.reveal-right.in,
+.reveal-scale.in {
+  will-change: auto;
+}
+
+/* Anim variants — unified distance */
+.anim-fade-up    { transform: translateY(18px); }
+.anim-slide-left  { transform: translateX(-20px); }
+.anim-slide-right { transform: translateX(20px); }
+
+
+/* ══ 6. PERFORMANCE — GPU LAYER MANAGEMENT ══════════════════════════
+   Strategy:
+   • Elements that animate EVERY frame: will-change: transform (already set)
+   • Elements that animate OCCASIONALLY (hover): no will-change
+     → Adding will-change on hover elements causes constant GPU layer
+        allocation which wastes memory and can cause layer explosion
+   • contain: layout style on interactive cards = stops ancestor repaints
+   • Cursor elements: already compositor-owned, no change needed
+═══════════════════════════════════════════════════════════════════ */
+
+/* Cards isolated from ancestor repaints */
+.sk-card,
+.pj,
+.ach-card,
+.about-card,
+.vtl-card,
+.cg-card {
+  contain: layout style;     /* block-level containment — safe for cards */
+  isolation: isolate;        /* own stacking context — cleaner filter compositing */
+}
+
+/* Nav isolated */
+#nav {
+  contain: layout style paint;
+  isolation: isolate;
+}
+
+/* Buttons isolated */
+.btn-p, .btn-o, .btn-send, .nav-cta {
+  isolation: isolate;
+}
+
+/* Cinematic loader — own layer while visible */
+#cinematic-loader {
+  isolation: isolate;
+  contain: layout style paint;
+}
+
+/* Skill tree modal overlay — own layer */
+#sk-modal-overlay {
+  isolation: isolate;
+  contain: layout style paint;
+}
+
+/* Tree SVG — pointer-events off means it never triggers hit testing */
+/* Already set inline but reinforce here */
+.tree-nodes svg {
+  pointer-events: none;
+  isolation: isolate;
+}
+
+
+/* ══ 7. NAVBAR — SCROLL COMPACT ANIMATION ═══════════════════════════
+   JS writes inline styles — we set default transitions here.
+   Height change is layout-triggering but happens rarely (on/off scroll
+   threshold), so it is acceptable.
+═══════════════════════════════════════════════════════════════════ */
+#nav {
+  transition:
+    height          0.40s var(--ease-main),
+    background      0.40s var(--ease-main),
+    box-shadow      0.40s var(--ease-main),
+    border-color    0.40s var(--ease-main);
+}
+
+/* ── Active link indicator — smooth underline ── */
+.nav-links a::after {
+  transition: width var(--dur-mid) var(--ease-main);
+}
+.nav-links a:hover::after,
+.nav-links a.active::after { width: 100%; }
+
+
+/* ══ 8. HERO SECTION POLISH ══════════════════════════════════════════
+   • Ring image border hover — only runs once ring settles from rAF
+   • Badge pulse — very subtle, non-distracting
+═══════════════════════════════════════════════════════════════════ */
+.h-ring img {
+  transition: border-color var(--dur-mid) var(--ease-main);
+}
+
+/* Status dots — controlled, not frantic */
+.dg, .do {
+  animation-duration: 2.5s;     /* was 2s — slightly slower */
+}
+
+/* Badge */
+.h-badge {
+  transition: border-color var(--dur-mid) var(--ease-main);
+}
+.h-badge:hover {
+  border-color: var(--acc);
+}
+
+/* Typed cursor blink — stable 1s */
+.tcur {
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+
+/* ══ 9. CINEMATIC LOADER — FINAL POLISH ═════════════════════════════ */
+#cinematic-loader {
+  transition:
+    opacity    0.70s var(--ease-in),   /* ease-in on exit feels intentional */
+    visibility 0.70s linear;
+}
+.cl-line {
+  transition:
+    opacity   0.50s var(--ease-main),
+    transform 0.50s var(--ease-main);
+}
+
+
+/* ══ 10. FOCUS STATES — ACCESSIBLE + POLISHED ═══════════════════════
+   Consistent 2px offset, uses --acc with 30% alpha ring.
+═══════════════════════════════════════════════════════════════════ */
+*:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 3px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 4px var(--acc2);
+  transition: box-shadow var(--dur-fast) var(--ease-out);
+}
+/* Remove default on elements with custom focus */
+.btn-p:focus-visible,
+.btn-o:focus-visible,
+.nav-cta:focus-visible {
+  outline-offset: 4px;
+}
+
+
+/* ══ 11. SELECTION & SCROLLBAR POLISH ═══════════════════════════════ */
+::selection {
+  background: var(--acc);
+  color: #000;
+  text-shadow: none;
+}
+
+::-webkit-scrollbar       { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--acc);
+  border-radius: 2px;
+  opacity: 0.7;
+}
+::-webkit-scrollbar-thumb:hover { opacity: 1; }
+
+
+/* ══ 12. SECTION DIVIDERS ════════════════════════════════════════════ */
+section:not(#contact)::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.04) 30%,
+    rgba(255,255,255,0.04) 70%,
+    transparent
+  );
+  height: 1px;
+}
+
+
+/* ══ 13. SKILL MODAL POLISH ══════════════════════════════════════════ */
+#sk-modal-overlay {
+  transition: opacity 0.28s var(--ease-main);
+}
+#sk-modal {
+  transition:
+    transform 0.32s var(--ease-spring),
+    opacity   0.28s var(--ease-main);
+}
+
+/* Cert modal */
+#cert-modal {
+  transition: opacity 0.25s var(--ease-main);
+}
+.cert-modal-box {
+  animation: modal-enter 0.28s var(--ease-spring) both;
+}
+@keyframes modal-enter {
+  from { opacity: 0; transform: scale(0.92) translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+
+/* ══ 14. CONTACT FORM — INPUT POLISH ════════════════════════════════ */
+.fg input, .fg textarea {
+  /* Smooth placeholder colour */
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    box-shadow   var(--dur-mid)  var(--ease-main),
+    transform    var(--dur-mid)  var(--ease-main);
+}
+/* Label colour transition on focus */
+.fg label {
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+
+/* ══ 15. REDUCED MOTION — COMPREHENSIVE OVERRIDE ════════════════════
+   Every animation shut down. Transitions kept to 0.01ms (not 0)
+   so state changes still apply without flashing.
+═══════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:       0.01ms !important;
+    animation-iteration-count: 1     !important;
+    transition-duration:      0.01ms !important;
+    scroll-behavior:          auto   !important;
+  }
+
+  /* Glow: static, no breathing */
+  .glow-idle  { animation: none !important; filter: none !important; }
+  .glow-hover { filter: none !important; }
+  .glow-active{ filter: none !important; }
+  .nav-links a.glow-idle,
+  .nav-links a.glow-hover,
+  .nav-links a.glow-active { text-shadow: none !important; animation: none !important; }
+
+  /* Loader: skip entirely */
+  #cinematic-loader { display: none !important; }
+
+  /* Reveal: show immediately */
+  .reveal, .reveal-left, .reveal-right, .reveal-scale,
+  .anim-fade-up, .anim-fade-in, .anim-scale,
+  .anim-slide-left, .anim-slide-right {
+    opacity: 1 !important; transform: none !important;
+  }
+
+  /* Timeline: static */
+  .vtl-dot  { filter: none !important; }
+  .vtl-line { height: 100% !important; bottom: 0 !important; }
+
+  /* Letter reveal */
+  .letter-reveal { opacity: 1 !important; transform: none !important; }
+
+  /* Cursors */
+  #cur-dot, #cur-ring { display: none !important; }
+}
+
+/* ── Cinematic loader — hidden (Step 8) ── */
+#cinematic-loader { display: none !important; }
+
+/* ── Skill tree section — hidden (Step 1) ── */
+#skill-tree-section { display: none !important; }

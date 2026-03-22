@@ -1,0 +1,471 @@
+/* ═══════════════════════════════════════════════════════════════════
+   CLOUDINARY MEDIA SYSTEM — Styles  v1.0
+   All animation, modal, upload widget, and image rendering styles.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. IMAGE TRANSITIONS — blur-to-sharp fade-in ─────────────── */
+.cl-img {
+  display: block;
+  transition:
+    filter    0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity   0.5s  cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: filter, opacity, transform;
+}
+
+/* ── 2. PROJECT CARD THUMBNAIL ──────────────────────────────────── */
+.cl-pj-card {
+  overflow: hidden;
+  position: relative;
+}
+
+.pj-thumb-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+  background: #0e0e18;
+  position: relative;
+}
+
+.pj-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    filter    0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity   0.5s  cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, filter;
+}
+
+.cl-pj-card:hover .pj-thumb {
+  transform: scale(1.06);
+}
+
+/* ── 3. CERTIFICATE CARD THUMBNAIL ─────────────────────────────── */
+.cert-circle-img {
+  overflow: hidden;
+  border-radius: 50%;
+  background: #111120;
+}
+
+.cert-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  transition:
+    filter    0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity   0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cert-item:hover .cert-thumb {
+  transform: scale(1.08) !important;
+}
+
+/* ── 4. FULLSCREEN IMAGE MODAL ─────────────────────────────────── */
+#cl-img-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9000000;
+  align-items: center;
+  justify-content: center;
+}
+
+#cl-img-modal.cl-modal-open {
+  display: flex;
+}
+
+#cl-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 4, 14, 0.96);
+  backdrop-filter: blur(18px) saturate(0.6);
+  -webkit-backdrop-filter: blur(18px) saturate(0.6);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+#cl-img-modal.cl-modal-visible #cl-modal-backdrop {
+  opacity: 1;
+}
+
+#cl-modal-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: min(92vw, 1100px);
+  max-height: 92vh;
+  width: 100%;
+  opacity: 0;
+  transform: scale(0.93) translateY(16px);
+  transition:
+    opacity   0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#cl-img-modal.cl-modal-visible #cl-modal-inner {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* Image wrapper */
+#cl-modal-img-wrap {
+  position: relative;
+  width: 100%;
+  max-height: calc(92vh - 100px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0a0a15;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06),
+    0 32px 80px rgba(0,0,0,0.8),
+    0 0 120px rgba(79,110,245,0.08);
+}
+
+#cl-modal-img {
+  max-width: 100%;
+  max-height: calc(92vh - 100px);
+  object-fit: contain;
+  display: block;
+  border-radius: 10px;
+  transition:
+    opacity   0.3s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Spinner */
+#cl-modal-spinner {
+  display: none;
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: var(--acc, #4f6ef5);
+  border-radius: 50%;
+  animation: cl-spin 0.75s linear infinite;
+}
+
+@keyframes cl-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Close button */
+#cl-modal-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(10,10,20,0.92);
+  color: rgba(255,255,255,0.7);
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+#cl-modal-close:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  border-color: rgba(255,255,255,0.3);
+}
+
+/* Prev / Next arrows */
+#cl-modal-prev,
+#cl-modal-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(10,10,20,0.85);
+  color: rgba(255,255,255,0.6);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s;
+  backdrop-filter: blur(4px);
+}
+#cl-modal-prev { left: -52px; }
+#cl-modal-next { right: -52px; }
+#cl-modal-prev:hover,
+#cl-modal-next:hover {
+  background: rgba(79,110,245,0.25);
+  border-color: var(--acc, #4f6ef5);
+  color: #fff;
+}
+.cl-hidden { opacity: 0 !important; pointer-events: none !important; }
+
+/* Meta bar */
+#cl-modal-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 4px;
+  width: 100%;
+}
+#cl-modal-emoji {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+#cl-modal-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+#cl-modal-org {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.5px;
+}
+#cl-modal-counter {
+  margin-left: auto;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 1px;
+}
+
+/* Dot navigation */
+#cl-modal-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-height: 8px;
+}
+.cl-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.22);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+.cl-dot-active {
+  background: var(--acc, #4f6ef5);
+  transform: scale(1.35);
+}
+
+/* Mobile arrow adjustment */
+@media (max-width: 700px) {
+  #cl-modal-prev { left: 4px;  top: auto; bottom: 110px; transform: none; }
+  #cl-modal-next { right: 4px; top: auto; bottom: 110px; transform: none; }
+  #cl-modal-close { top: 8px; right: 8px; }
+  #cl-modal-inner { max-width: 98vw; gap: 10px; }
+}
+
+/* ── 5. UPLOAD WIDGET ─────────────────────────────────────────── */
+.cl-upload-zone {
+  border: 2px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition:
+    border-color 0.25s ease,
+    background   0.25s ease,
+    transform    0.2s ease;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  user-select: none;
+  background: rgba(255,255,255,0.02);
+}
+
+.cl-upload-zone:hover,
+.cl-upload-zone.cl-drag-over {
+  border-color: var(--acc, #4f6ef5);
+  background: rgba(79, 110, 245, 0.06);
+}
+
+.cl-upload-zone.cl-drag-over {
+  transform: scale(1.02);
+}
+
+.cl-upload-icon {
+  font-size: 2rem;
+  opacity: 0.3;
+  line-height: 1;
+  transition: opacity 0.2s, transform 0.3s;
+}
+.cl-upload-zone:hover .cl-upload-icon,
+.cl-upload-zone.cl-drag-over .cl-upload-icon {
+  opacity: 0.65;
+  transform: translateY(-3px);
+}
+
+.cl-upload-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+
+.cl-upload-sublabel {
+  font-size: 0.58rem;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 0.5px;
+}
+
+.cl-upload-zone.cl-uploading {
+  pointer-events: none;
+  border-color: var(--acc, #4f6ef5);
+}
+
+.cl-upload-progress-wrap {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.cl-upload-progress-bar {
+  flex: 1;
+  height: 2px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.cl-upload-progress-bar::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: var(--pct, 0%);
+  background: var(--acc, #4f6ef5);
+  border-radius: 2px;
+  transition: width 0.15s ease;
+  box-shadow: 0 0 6px var(--acc, #4f6ef5);
+}
+
+.cl-upload-pct {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.52rem;
+  color: rgba(255,255,255,0.4);
+  min-width: 28px;
+  text-align: right;
+}
+
+.cl-upload-err {
+  font-size: 0.6rem;
+  color: #f87171;
+  min-height: 14px;
+  letter-spacing: 0.5px;
+}
+
+/* ── 6. ADMIN CLOUDINARY CONFIG PANEL ────────────────────────── */
+.cl-config-panel {
+  background: rgba(79, 110, 245, 0.05);
+  border: 1px solid rgba(79, 110, 245, 0.15);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+
+.cl-config-panel .cl-cfg-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.cl-config-panel label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+}
+
+.cl-config-panel input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #fff;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.cl-config-panel input:focus {
+  border-color: var(--acc, #4f6ef5);
+}
+
+.cl-config-save-btn {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  background: var(--acc, #4f6ef5);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.cl-config-save-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+
+.cl-config-status {
+  font-size: 0.58rem;
+  margin-top: 6px;
+  min-height: 14px;
+  color: #4ade80;
+  font-family: 'Space Mono', monospace;
+}
+
+/* ── 7. HERO IMAGE ────────────────────────────────────────────── */
+#himg {
+  transition:
+    filter    0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity   0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── 8. REDUCED MOTION ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .cl-img,
+  .pj-thumb,
+  .cert-thumb,
+  #himg,
+  #cl-modal-inner,
+  #cl-modal-backdrop {
+    transition: none !important;
+    animation: none !important;
+  }
+}

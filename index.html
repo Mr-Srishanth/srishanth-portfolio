@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="blue" class="intro-active">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<!-- CRITICAL: inline style block — fires synchronously before any CSS or JS loads.
+     Ensures #main-site is never painted during intro. Cannot flash. -->
+<style id="intro-block-style">
+  html.intro-active { overflow: hidden !important; }
+  html.intro-active body { overflow: hidden !important; background: #080810; }
+  html.intro-active #main-site { display: none !important; }
+</style>
+<title>Arrabola Srishanth | AI &amp; Software Developer</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="intro.css"/>
+<link rel="stylesheet" href="cloudinary-media.css"/>
+<link rel="stylesheet" href="cert-gallery.css"/>
+<link rel="stylesheet" href="timeline.css"/>
+<link rel="stylesheet" href="enhancements.css"/>
+<link rel="stylesheet" href="advanced-effects.css"/>
+<link rel="stylesheet" href="premium-upgrades.css"/>
+<link rel="stylesheet" href="ui-polish.css"/>
+<link rel="stylesheet" href="final-polish.css"/>
+<link rel="stylesheet" href="timeline-drag-fix.css"/>
+<link rel="stylesheet" href="awwwards-polish.css"/>
+<link rel="stylesheet" href="visual-builder.css"/>
+<link rel="stylesheet" href="godlevel.css"/>
+<link rel="stylesheet" href="pj-actions-fix.css"/>
+<link rel="stylesheet" href="cg-hscroll.css"/>
+
+
+<!-- ═══════════════ EMAILJS / CONTACT FORM STYLES ═══════════════ -->
+<style id="contact-form-styles">
+
+/* ── Toast notification ──────────────────────────────────────────
+   Slides up from bottom-right. type variants: success, error, warning.
+   Only transform + opacity animated — no layout repaints.
+──────────────────────────────────────────────────────────────── */
+.ct-toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  z-index: 9999999;
+  min-width: 240px;
+  max-width: min(380px, calc(100vw - 48px));
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.64rem;
+  letter-spacing: 0.5px;
+  line-height: 1.5;
+  pointer-events: none;
+
+  /* Entry state — hidden below */
+  opacity: 0;
+  transform: translateY(18px) scale(0.96);
+  transition:
+    opacity   0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+
+  /* Default backdrop */
+  background: rgba(12, 12, 22, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+/* Visible state */
+.ct-toast--visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Success */
+.ct-toast--success {
+  border-color: rgba(34, 197, 94, 0.35);
+  color: #86efac;
+  background: rgba(10, 20, 14, 0.97);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 24px rgba(34,197,94,0.08);
+}
+
+/* Error */
+.ct-toast--error {
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  background: rgba(20, 10, 10, 0.97);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 24px rgba(239,68,68,0.08);
+}
+
+/* Warning */
+.ct-toast--warning {
+  border-color: rgba(251, 146, 60, 0.35);
+  color: #fdba74;
+  background: rgba(20, 14, 8, 0.97);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 24px rgba(251,146,60,0.08);
+}
+
+@media (max-width: 500px) {
+  .ct-toast {
+    bottom: 20px;
+    right: 16px;
+    left: 16px;
+    min-width: unset;
+  }
+}
+
+/* ── Field validation error state ───────────────────────────────
+   Shake animation on invalid submit, red border on empty fields.
+──────────────────────────────────────────────────────────────── */
+.fg--error label {
+  color: #f87171 !important;
+}
+.inp--error,
+.fg--error input,
+.fg--error textarea {
+  border-color: rgba(239, 68, 68, 0.55) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+  animation: inp-shake 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+@keyframes inp-shake {
+  10%, 90%  { transform: translateX(-2px); }
+  20%, 80%  { transform: translateX(3px);  }
+  30%, 50%, 70% { transform: translateX(-3px); }
+  40%, 60%  { transform: translateX(3px);  }
+}
+
+/* ── Send button sending state ──────────────────────────────────
+   Spinner replaces icon while EmailJS request is in-flight.
+──────────────────────────────────────────────────────────────── */
+.ct-btn--sending {
+  opacity: 0.75;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+.ct-btn-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(0, 0, 0, 0.25);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: ct-spin 0.65s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+@keyframes ct-spin { to { transform: rotate(360deg); } }
+
+</style>
+<!-- ═══════════════ EMAILJS ═══════════════
+     CDN loaded with defer so it doesn't block render.
+     Public key only — no secret exposed.
+     Service/Template IDs used in godlevel.js ContactForm.
+═══════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
+<script>
+  /* Initialize EmailJS with public key — safe to expose in frontend */
+  (function initEmailJS() {
+    function tryInit() {
+      if (typeof emailjs !== 'undefined') {
+        emailjs.init({ publicKey: 'JTN6BSs5DTYJqVJbL' });
+        console.log('%c✉ EmailJS ready', 'color:#22c55e;font-family:monospace');
+      } else {
+        /* CDN still loading — retry after short delay */
+        setTimeout(tryInit, 200);
+      }
+    }
+    /* Wait for DOM so defer script has time to parse */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', tryInit);
+    } else {
+      tryInit();
+    }
+  })();
+</script>
+</head>
+<body>
+
+<!-- progress bar -->
+<div id="pbar"></div>
+<!-- cursor -->
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+
+
+<!-- ░░░ MAIN SITE — blocked by display:none during intro ░░░ -->
+<div id="main-site">
+
+<!-- ═══════════════ NAVBAR ═══════════════ -->
+<nav id="nav">
+  <a href="#home" class="nav-logo">A<span class="acc">S</span></a>
+  <ul class="nav-links">
+    <li><a href="#home" class="active">HOME</a></li>
+    <li><a href="#about">ABOUT</a></li>
+    <li><a href="#skills">SKILLS</a></li>
+    <li><a href="#projects">PROJECTS</a></li>
+    <li><a href="#journey">MY JOURNEY</a></li>
+    <li><a href="#certs">CERTIFICATES</a></li>
+    <li><a href="#contact">CONTACT</a></li>
+  </ul>
+  <div class="nav-right">
+    <div id="thm-wrap">
+      <button id="thm-btn" class="palette-btn" title="Click to cycle theme">
+        <svg viewBox="0 0 64 64" class="palette-icon">
+          <path d="M32 6C18 6 8 16 8 30c0 14 10 26 24 26h4c4 0 6-2 6-5 0-2-1-3-1-5 0-3 2-5 5-5h2c8 0 12-6 12-12C60 16 48 6 32 6z"/>
+          <circle cx="22" cy="26" r="2"/>
+          <circle cx="30" cy="22" r="2"/>
+          <circle cx="38" cy="26" r="2"/>
+          <circle cx="34" cy="34" r="2"/>
+        </svg>
+      </button>
+    </div>
+    <a href="#contact" class="nav-cta">Let's Talk</a>
+    <button class="ham" id="ham"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div id="mnav">
+  <a href="#home">HOME</a><a href="#about">ABOUT</a><a href="#skills">SKILLS</a>
+  <a href="#projects">PROJECTS</a><a href="#journey">MY JOURNEY</a>
+  <a href="#certs">CERTIFICATES</a><a href="#contact">CONTACT</a>
+</div>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section id="home">
+  <div class="h-left">
+    <div class="h-greet hero-load hero-load-1">&lt; <span id="greet-txt">Good Evening</span> /&gt;</div>
+    <h1 class="h-name hero-load hero-load-2">I'm <span class="acc">Arrabola</span><br><span class="c-white">Srishanth</span></h1>
+    <div class="h-typed hero-load hero-load-3"><span id="typed-txt"></span><span class="tcur"></span></div>
+    <p class="h-desc hero-load hero-load-4">A passionate student pursuing B.Tech in CSE (AI &amp; ML) at Vignan Institute of Technology and Science (2025–2029), building the future with code.</p>
+    <div class="h-badge hero-load hero-load-5">
+      <span class="dg"></span><span class="do"></span>
+      Currently working on: <strong>Data Structures &amp; Algorithms</strong>
+    </div>
+    <div class="h-btns hero-load hero-load-6">
+      <a id="hire-btn" href="mailto:srishanth@gmail.com?subject=Hiring%20Inquiry&body=Hi%20Srishanth%2C%0A%0AI%20came%20across%20your%20portfolio%20and%20would%20like%20to%20connect%20with%20you.%0A%0ALet%27s%20discuss%20a%20potential%20opportunity.%0A%0ARegards%2C" class="btn-p">Hire Me</a>
+      <a href="#" class="btn-o" onclick="return false">Download CV</a>
+    </div>
+  </div>
+  <div class="h-right hero-img-load">
+    <div class="h-ring">
+      <img id="himg" src="" alt="Arrabola Srishanth"/>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ ABOUT ═══════════════ -->
+<section id="about">
+  <div class="reveal ta-center mb-52">
+    <div class="stag">// ABOUT ME</div>
+    <h2 class="stit acc">Know Me Better</h2>
+  </div>
+  <div class="about-inner">
+    <div class="about-left reveal">
+      <div class="about-sub-h">Aspiring AI &amp; Software Developer</div>
+      <p>I'm Arrabola Srishanth, a first-year B.Tech student in Computer Science (AI &amp; ML) at Vignan Institute of Technology and Science. I'm passionate about artificial intelligence, machine learning, and building software that makes a difference.</p>
+      <p>Currently learning Python and Data Structures, I'm dedicated to mastering the foundations of computer science while exploring the exciting frontiers of AI technology.</p>
+    </div>
+    <div class="about-right reveal sd-3">
+      <div class="about-card">
+        <div class="about-card-icon">🎓</div>
+        <div class="about-card-text">
+          <strong>Education</strong>
+          <span>B.Tech CSE (AI &amp; ML) – VITS (2025–2029)</span>
+        </div>
+      </div>
+      <div class="about-card">
+        <div class="about-card-icon">&lt;/&gt;</div>
+        <div class="about-card-text">
+          <strong>Focus Areas</strong>
+          <span>Python, Data Structures &amp; Algorithms</span>
+        </div>
+      </div>
+      <div class="about-card">
+        <div class="about-card-icon">🤖</div>
+        <div class="about-card-text">
+          <strong>Interests</strong>
+          <span>Artificial Intelligence &amp; Machine Learning</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SKILLS ═══════════════ -->
+<section id="skills">
+  <div class="reveal">
+    <div class="stag">// MY SKILLS</div>
+    <h2 class="stit">Technologies &amp; <span class="acc">Tools</span></h2>
+  </div>
+  <div class="sk-grid reveal-group">
+    <div class="sk-card reveal reveal-child">
+      <div class="sk-top"><div class="sk-left"><span class="sk-ic">⚙️</span><span class="sk-nm">C Programming</span></div><span class="sk-pc">90%</span></div>
+      <div class="bar-bg"><div class="bar-fill" data-p="90"></div></div>
+    </div>
+    <div class="sk-card reveal reveal-child sd-1">
+      <div class="sk-top"><div class="sk-left"><span class="sk-ic">🐍</span><span class="sk-nm">Python</span></div><span class="sk-pc">50%</span></div>
+      <div class="bar-bg"><div class="bar-fill" data-p="50"></div></div>
+    </div>
+    <div class="sk-card reveal reveal-child sd-2">
+      <div class="sk-top"><div class="sk-left"><span class="sk-ic">🗄️</span><span class="sk-nm">Data Structures</span></div><span class="sk-pc">25%</span></div>
+      <div class="bar-bg"><div class="bar-fill" data-p="25"></div></div>
+    </div>
+    <div class="sk-card reveal reveal-child sd-3">
+      <div class="sk-top"><div class="sk-left"><span class="sk-ic">🤖</span><span class="sk-nm">Machine Learning</span></div><span class="sk-pc">10%</span></div>
+      <div class="bar-bg"><div class="bar-fill" data-p="10"></div></div>
+    </div>
+    <div class="sk-card reveal reveal-child sd-4">
+      <div class="sk-top"><div class="sk-left"><span class="sk-ic">⚛️</span><span class="sk-nm">React</span></div><span class="sk-lock">🔒 Learning Soon</span></div>
+      <div class="bar-bg"><div class="bar-fill" data-p="0"></div></div>
+    </div>
+    <div class="sk-card reveal reveal-child sd-5">
+      <div class="sk-top"><div class="sk-left"><span class="sk-ic">🔶</span><span class="sk-nm">Git</span></div><span class="sk-lock">🔒 Learning Soon</span></div>
+      <div class="bar-bg"><div class="bar-fill" data-p="0"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ PROJECTS ═══════════════ -->
+<section id="projects">
+  <div class="reveal">
+    <div class="stag">// PORTFOLIO</div>
+    <h2 class="stit acc">My Projects</h2>
+  </div>
+  <div class="projects-grid reveal-group">
+    <div class="pj reveal reveal-child">
+      <div class="pj-top"><span class="pj-ic">📁</span></div>
+      <div class="pj-title">Python Calculator</div>
+      <div class="pj-desc">A feature-rich calculator built with Python, supporting basic and scientific operations.</div>
+      <div class="pj-tags"><span class="ptag">Python</span><span class="ptag">CLI</span></div>
+      <div class="pj-actions">
+        <a href="#" class="pj-btn-gh" title="GitHub" target="_blank">⎇ GitHub</a>
+        <a href="#" class="pj-btn-live" title="Live Demo" target="_blank">↗ Live</a>
+      </div>
+    </div>
+    <div class="pj reveal reveal-child sd-1">
+      <div class="pj-top"><span class="pj-ic">📁</span></div>
+      <div class="pj-title">Student Management System</div>
+      <div class="pj-desc">A CRUD application for managing student records with file handling.</div>
+      <div class="pj-tags"><span class="ptag">Python</span><span class="ptag">File I/O</span></div>
+      <div class="pj-actions">
+        <a href="#" class="pj-btn-gh" title="GitHub" target="_blank">⎇ GitHub</a>
+        <a href="#" class="pj-btn-live" title="Live Demo" target="_blank">↗ Live</a>
+      </div>
+    </div>
+    <div class="pj reveal reveal-child sd-3">
+      <div class="pj-top"><span class="pj-ic">📁</span></div>
+      <div class="pj-title">Portfolio Website</div>
+      <div class="pj-desc">This futuristic portfolio built with HTML, CSS, and JavaScript.</div>
+      <div class="pj-tags"><span class="ptag">HTML</span><span class="ptag">CSS</span><span class="ptag">JavaScript</span></div>
+      <div class="pj-actions">
+        <a href="#" class="pj-btn-gh" title="GitHub" target="_blank">⎇ GitHub</a>
+        <a href="#" class="pj-btn-live" title="Live Demo" target="_blank">↗ Live</a>
+      </div>
+    </div>
+    <div class="pj reveal reveal-child sd-4">
+      <div class="pj-top"><span class="pj-ic">📁</span></div>
+      <div class="pj-title">DSA Practice Tracker</div>
+      <div class="pj-desc">A tool to track progress on Data Structures and Algorithms problems.</div>
+      <div class="pj-tags"><span class="ptag">Python</span><span class="ptag">Data Structures</span></div>
+      <div class="pj-actions">
+        <a href="#" class="pj-btn-gh" title="GitHub" target="_blank">⎇ GitHub</a>
+        <a href="#" class="pj-btn-live" title="Live Demo" target="_blank">↗ Live</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ MY JOURNEY ═══════════════ -->
+<section id="journey">
+  <div class="reveal">
+    <div class="stag">// TIME MACHINE</div>
+    <h2 class="stit acc">My Journey Through Time</h2>
+    <p class="ssub mb-0">Scroll to rewind through the milestones that shaped my path.</p>
+  </div>
+
+  <!-- Vertical timeline -->
+  <div class="vtl">
+    <div class="vtl-line"></div>
+    <div class="vtl-item">
+      <div class="vtl-dot"></div>
+      <div class="vtl-card">
+        <div class="vtl-meta"><span class="vtl-date">2025</span><span class="vtl-badge">🎓</span></div>
+        <div class="vtl-title">Started B.Tech CSE (AI &amp; ML)</div>
+        <div class="vtl-desc">Joined Vignan Institute of Technology and Science. The journey begins.</div>
+      </div>
+    </div>
+    <div class="vtl-item">
+      <div class="vtl-dot"></div>
+      <div class="vtl-card">
+        <div class="vtl-meta"><span class="vtl-date">2025</span><span class="vtl-badge">✅</span></div>
+        <div class="vtl-title">Started C Programming</div>
+        <div class="vtl-desc">Began learning C language – pointers, memory management, and low-level programming fundamentals.</div>
+      </div>
+    </div>
+    <div class="vtl-item">
+      <div class="vtl-dot"></div>
+      <div class="vtl-card">
+        <div class="vtl-meta"><span class="vtl-date">2025</span><span class="vtl-badge">✅</span></div>
+        <div class="vtl-title">Completed C Programming</div>
+        <div class="vtl-desc">Mastered C fundamentals — arrays, structures, file handling, and dynamic memory allocation.</div>
+      </div>
+    </div>
+    <div class="vtl-item">
+      <div class="vtl-dot"></div>
+      <div class="vtl-card">
+        <div class="vtl-meta"><span class="vtl-date">27 Feb 2026</span><span class="vtl-badge">🏆</span></div>
+        <div class="vtl-title">Hackathon Debut — VHack</div>
+        <div class="vtl-desc">Participated in my first hackathon. Built a project under 24 hours.</div>
+      </div>
+    </div>
+    <div class="vtl-item">
+      <div class="vtl-dot"></div>
+      <div class="vtl-card">
+        <div class="vtl-meta"><span class="vtl-date">2025</span><span class="vtl-badge">🧠</span></div>
+        <div class="vtl-title">Exploring AI &amp; Machine Learning</div>
+        <div class="vtl-desc">Began studying neural networks, supervised learning, and data science.</div>
+      </div>
+    </div>
+    <div class="vtl-item">
+      <div class="vtl-dot"></div>
+      <div class="vtl-card">
+        <div class="vtl-meta"><span class="vtl-date">2025</span><span class="vtl-badge">💜</span></div>
+        <div class="vtl-title">Built This Portfolio</div>
+        <div class="vtl-desc">Designed and developed this portfolio to showcase my journey.</div>
+      </div>
+    </div>
+    <div class="vtl-item">
+      <div class="vtl-dot"></div>
+      <div class="vtl-card">
+        <div class="vtl-meta"><span class="vtl-date">Future</span><span class="vtl-badge">🚀</span></div>
+        <div class="vtl-title">What's Next?</div>
+        <div class="vtl-desc">Full-stack mastery, open source contributions, and building impactful products.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Continuous Growth horizontal -->
+  <div class="cg-wrap reveal">
+    <div class="stag ta-center">// MY LEARNING JOURNEY</div>
+    <h3 class="cg-h">Continuous Growth</h3>
+    <p class="cg-sub">Tracking my progress as I build skills and explore new technologies every day.</p>
+    <div class="cg-controls">
+      <div class="cg-ctrl-pill"><span class="cg-ctrl-ico">⇔</span>Drag</div>
+      <div class="cg-ctrl-pill"><span class="cg-ctrl-ico">↔</span>Swipe</div>
+      <div class="cg-ctrl-pill"><span class="cg-ctrl-ico">⌥</span>Trackpad</div>
+      <div class="cg-ctrl-pill"><span class="cg-ctrl-ico">⟵⟶</span>Keys</div>
+      <div class="cg-ctrl-pill"><span class="cg-ctrl-ico">⇧</span>Shift+Scroll</div>
+    </div>
+    <div class="cg-rail-wrap" id="cg-rail-wrap">
+      <div class="cg-rail" id="cg-rail">
+        <div class="cg-track"><div class="cg-track-fill w-60" id="cg-track-fill"></div></div>
+        <div class="cg-item">
+          <div class="cg-dot"></div><div class="cg-stick"></div>
+          <div class="cg-card">
+            <div class="cg-card-head"><div class="cg-ic">&lt;/&gt;</div><span class="cg-st st-done">Completed ■</span></div>
+            <div class="cg-title">C Programming</div>
+            <div class="cg-desc">Mastered core C programming concepts including pointers, memory management, and systems programming.</div>
+          </div>
+        </div>
+        <div class="cg-item">
+          <div class="cg-dot"></div><div class="cg-stick"></div>
+          <div class="cg-card">
+            <div class="cg-card-head"><div class="cg-ic">&lt;/&gt;</div><span class="cg-st st-on">Ongoing</span></div>
+            <div class="cg-title">Learning Python &amp; Data Structures</div>
+            <div class="cg-desc">Currently improving programming fundamentals and problem-solving skills.</div>
+          </div>
+        </div>
+        <div class="cg-item">
+          <div class="cg-dot"></div><div class="cg-stick"></div>
+          <div class="cg-card">
+            <div class="cg-card-head"><div class="cg-ic">🔮</div><span class="cg-st st-prog">In Progress</span></div>
+            <div class="cg-title">Exploring Artificial Intelligence</div>
+            <div class="cg-desc">Studying AI and Machine Learning concepts to build intelligent systems.</div>
+          </div>
+        </div>
+        <div class="cg-item">
+          <div class="cg-dot"></div><div class="cg-stick"></div>
+          <div class="cg-card">
+            <div class="cg-card-head"><div class="cg-ic">🚀</div><span class="cg-st st-act">Active</span></div>
+            <div class="cg-title">Building Python Mini Projects</div>
+            <div class="cg-desc">Creating small applications to strengthen coding skills and apply theory.</div>
+          </div>
+        </div>
+        <div class="cg-item">
+          <div class="cg-dot"></div><div class="cg-stick"></div>
+          <div class="cg-card">
+            <div class="cg-card-head"><div class="cg-ic">📚</div><span class="cg-st st-on">Ongoing</span></div>
+            <div class="cg-title">Mastering DSA Fundamentals</div>
+            <div class="cg-desc">Working through arrays, linked lists, trees, and sorting algorithms.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Progress dots -->
+    <div class="cg-progress" id="cg-progress"></div>
+    <!-- Edge fade overlays -->
+    <div class="cg-fade-left"  id="cg-fade-left"></div>
+    <div class="cg-fade-right" id="cg-fade-right"></div>
+  </div>
+</section>
+
+<!-- ═══════════════ CERTIFICATES ═══════════════ -->
+<section id="certs">
+  <div class="reveal">
+    <h2 class="stit">Achievements &amp; <span class="acc">Certifications</span></h2>
+    <p class="ssub">Milestones, awards, and certifications I've earned along the way.</p>
+  </div>
+
+  <div class="ach-grid reveal-group">
+    <div class="ach-card reveal reveal-child">
+      <span class="ach-ic">🎓</span>
+      <div class="ach-t">B.Tech in Computer Science</div>
+      <div class="ach-d">Currently pursuing my degree with a focus on full-stack development and AI.</div>
+    </div>
+    <div class="ach-card reveal reveal-child sd-1">
+      <span class="ach-ic c-green">🏆</span>
+      <div class="ach-t">Hackathon Finalist</div>
+      <div class="ach-d">Reached the finals in a national-level coding hackathon.</div>
+    </div>
+    <div class="ach-card reveal reveal-child sd-3">
+      <span class="ach-ic c-blue">&lt;/&gt;</span>
+      <div class="ach-t">500+ GitHub Contributions</div>
+      <div class="ach-d">Consistent open-source contributions and personal project commits.</div>
+    </div>
+    <div class="ach-card reveal reveal-child sd-4">
+      <span class="ach-ic c-pink">🥇</span>
+      <div class="ach-t">Web Dev Certification</div>
+      <div class="ach-d">Completed an advanced full-stack web development certification.</div>
+      <a href="#" class="ach-v">Verify ↗</a>
+    </div>
+  </div>
+
+  <div class="mycert-wrap reveal">
+    <h3 class="mycert-h">My <span>Certificates</span></h3>
+    <p class="mycert-sub">Verified certifications from top platforms.</p>
+    <div id="cert-gallery-grid" class="cert-row">
+      <!-- JS populates this from localStorage; static defaults shown on first visit -->
+      <div class="cert-item" role="button" tabindex="0"
+           data-cert-title="Python Basics" data-cert-org="Coursera"
+           data-cert-emoji="🐍" data-cert-images="[]"
+           data-cert-body="Completed the Python for Everybody specialisation covering fundamentals, data structures, web scraping, databases, and data visualisation.">
+        <div class="cert-circle cert-circle-emoji"><span class="cert-emoji">🐍</span></div>
+        <span class="cert-label">Python Basics</span>
+      </div>
+      <div class="cert-item" role="button" tabindex="0"
+           data-cert-title="Web Development" data-cert-org="freeCodeCamp"
+           data-cert-emoji="🌐" data-cert-images="[]"
+           data-cert-body="Earned the Responsive Web Design certification by building 5 projects covering HTML, CSS, Flexbox, CSS Grid, and accessibility.">
+        <div class="cert-circle cert-circle-emoji"><span class="cert-emoji">🌐</span></div>
+        <span class="cert-label">Web Development</span>
+      </div>
+      <div class="cert-item" role="button" tabindex="0"
+           data-cert-title="AI Fundamentals" data-cert-org="Google"
+           data-cert-emoji="🤖" data-cert-images="[]"
+           data-cert-body="Completed Google's Introduction to Generative AI learning path covering large language models, responsible AI, and practical applications.">
+        <div class="cert-circle cert-circle-emoji"><span class="cert-emoji">🤖</span></div>
+        <span class="cert-label">AI Fundamentals</span>
+      </div>
+      <div class="cert-item" role="button" tabindex="0"
+           data-cert-title="Hackathon Finalist" data-cert-org="VHack 2.0 — National Level"
+           data-cert-emoji="🏆" data-cert-images="[]"
+           data-cert-body="Reached the finals of VHack 2.0, a 24-hour National-Level Hackathon conducted by Vignan Institute of Technology and Science.">
+        <div class="cert-circle cert-circle-emoji"><span class="cert-emoji">🏆</span></div>
+        <span class="cert-label">Hackathon Finalist</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="term-wrap reveal">
+    <div class="stag ta-center">// GITHUB</div>
+    <h3 class="term-h">Developer Terminal</h3>
+    <div class="term-box">
+      <div class="term-hdr">
+        <div class="tb r"></div><div class="tb y"></div><div class="tb g"></div>
+        <span class="term-pr">&gt;._ srishanth@portfolio:~</span>
+      </div>
+      <div class="term-body">
+        <div><span class="tc">$ git clone https://github.com/Mr-Srishanth</span></div>
+        <div><span class="to">Cloning into 'portfolio'...</span></div>
+        <div><span class="tc">$ cat profile.yml</span></div>
+        <div><span class="to">name: Arrabola Srishanth</span></div>
+        <div><span class="to">role: AI &amp; Software Developer</span></div>
+        <div><span class="to">stack: [Python, DSA, ML, C]</span></div>
+        <div><span class="tc">$ git log --oneline --graph</span></div>
+        <div><span class="tg">✓ feat: python-calculator — CLI-based arithmetic tool</span></div>
+        <div><span class="tg">✓ feat: student-management-system — CRUD operations</span></div>
+        <div><span class="tg">✓ feat: dsa-practice-tracker — Algorithm solutions</span></div>
+        <div><span class="tg">✓ feat: ai-chatbot — Intelligent conversational assistant</span></div>
+        <div><span class="tc">$ echo $STATUS</span></div>
+        <div><span class="tg">✓ Open to collaborate — Let's build something great.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Certificate modal (legacy text-view; image-view handled by cert-gallery.js #cg-modal) -->
+<div id="cert-modal" class="cert-modal-backdrop">
+  <div class="cert-modal-box" id="cert-modal-box">
+    <button class="cert-close-btn" id="cert-close-btn" aria-label="Close">✕</button>
+
+    <!-- Image view (shown when cert has image/images) -->
+    <div class="cert-modal-img-view" id="cert-modal-img-view">
+      <!-- Horizontal scroll area -->
+      <div class="cert-modal-img-scroll" id="cert-modal-img-scroll">
+        <button class="cert-modal-arrow cert-modal-arrow-prev hidden" id="cert-arrow-prev" aria-label="Previous">&#8592;</button>
+        <div class="cert-modal-img-list" id="cert-modal-img-list">
+          <!-- Images injected by JS -->
+        </div>
+        <button class="cert-modal-arrow cert-modal-arrow-next hidden" id="cert-arrow-next" aria-label="Next">&#8594;</button>
+      </div>
+      <!-- Dot navigation -->
+      <div class="cert-modal-dots" id="cert-modal-dots"></div>
+      <div class="cert-modal-swipe-hint" id="cert-swipe-hint">swipe · drag · scroll · ← →</div>
+      <!-- Fixed meta bar at bottom -->
+      <div class="cert-modal-img-meta">
+        <span class="cert-modal-emoji" id="cert-modal-emoji-img">🏆</span>
+        <div style="flex:1;min-width:0;">
+          <div class="cert-modal-title" id="cert-modal-title-img">Certificate</div>
+          <div class="cert-modal-org" id="cert-modal-org-img">Organisation</div>
+        </div>
+        <span class="cert-modal-count" id="cert-modal-count"></span>
+      </div>
+    </div>
+
+    <!-- Text view (shown when cert has no image — emoji + body text) -->
+    <div class="cert-modal-text-view" id="cert-modal-text-view">
+      <div class="cert-modal-emoji-big" id="cert-modal-emoji-text">🏆</div>
+      <div class="cert-modal-title" id="cert-modal-title-text">Certificate</div>
+      <div class="cert-modal-org" id="cert-modal-org-text">Organisation</div>
+      <p class="cert-modal-body-text" id="cert-modal-body-text"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ CONTACT ═══════════════ -->
+<section id="contact">
+  <div class="ct-inner">
+    <div class="ct-left reveal">
+      <div class="stag">// GET IN TOUCH</div>
+      <h2>Let's <span>Connect</span></h2>
+      <p>I'm always open to new opportunities, collaborations, and interesting conversations. Feel free to reach out — I'm actively looking for opportunities to learn and grow.</p>
+      <div class="ct-row">
+        <div class="ct-ic">📧</div>
+        <div><div class="ct-lbl">Email</div><div class="ct-val"><p id="contact-email"></p></div></div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-ic">📍</div>
+        <div><div class="ct-lbl">Location</div><div class="ct-val">Hyderabad, India</div></div>
+      </div>
+      <div class="socials">
+        <a href="https://github.com/Mr-Srishanth" target="_blank" class="soc" title="GitHub">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+        <a href="https://linkedin.com" target="_blank" class="soc" title="LinkedIn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+        <a href="https://instagram.com" target="_blank" class="soc" title="Instagram">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="ct-right reveal sd-4">
+      <div class="fg"><label>Name</label><input id="fn" type="text" placeholder="Your name"/></div>
+      <div class="fg"><label>Email</label><input id="fe" type="email" placeholder="Your email"/></div>
+      <div class="fg"><label>Subject</label><input id="fs" type="text" placeholder="Your subject"/></div>
+      <div class="fg"><label>Message</label><textarea id="fm" placeholder="Your message"></textarea></div>
+      <button class="btn-send" id="sbtn">
+        Send Message
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      </button>
+      <div id="fmsg"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ DYNAMIC SECTIONS (admin-created) ═══════════════ -->
+<div id="dynamic-sections-mount"></div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <div class="fc">© 2026 <span>Arrabola Srishanth</span>. Built with passion &amp; code.</div>
+  <div class="fs">
+    <a href="https://github.com/Mr-Srishanth" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></a>
+    <a href="https://linkedin.com" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+    <a href="https://instagram.com" target="_blank"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+  </div>
+</footer>
+
+<button id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
+<script>
+// ── THEME RESTORE (runs immediately before render) ──────────
+// Priority: 1) custom hex  2) preset theme  3) default blue
+(function restoreTheme(){
+  try {
+    // Custom accent (set by admin color picker)
+    const custom = localStorage.getItem('adm-custom-accent') || '';
+    if(custom && /^#[0-9a-fA-F]{6}$/.test(custom)){
+      const s = document.createElement('style');
+      s.id = 'admin-theme-override';
+      s.textContent = ':root{--acc:'+custom+';--acc2:'+custom+'26;--glow:'+custom+'80;}';
+      document.head.appendChild(s);
+      document.documentElement.removeAttribute('data-theme');
+      return;
+    }
+    // Preset theme from admin or theme cycler
+    const preset = localStorage.getItem('user-theme') || '';
+    if(preset) document.documentElement.setAttribute('data-theme', preset);
+  } catch(e){}
+})();
+
+// ── EMAIL RENDER ────────────────────────────────────────────
+function setEmail(email) {
+  const el = document.getElementById('contact-email');
+  if (!el) return;
+  el.innerHTML = '<a href="mailto:' + email + '" class="email-link">' + email + '</a>';
+}
+(function initEmail() {
+  const saved = localStorage.getItem('adminEmail');
+  if (saved) { setEmail(saved); return; }
+  setEmail('srishanth@example.com');
+})();
+
+(function(){
+  const v = parseInt(localStorage.getItem('analytics_visits')||'0') + 1;
+  localStorage.setItem('analytics_visits', v);
+  localStorage.setItem('analytics_lastVisit', new Date().toISOString());
+})();
+
+
+// ── LOAD permanentData ──────────────────────────────────────
+(function applyPermanentData(){
+  const raw = localStorage.getItem('permanentData');
+  if(!raw) return;
+  try {
+    const d = JSON.parse(raw);
+    if(d.name){
+      const nameEl = document.querySelector('.h-name .acc');
+      if(nameEl) nameEl.textContent = d.name.split(' ')[0];
+    }
+    if(d.bio){
+      const bioEl = document.querySelector('.h-desc');
+      if(bioEl) bioEl.textContent = d.bio;
+    }
+    if(d.email){
+      setEmail(d.email);
+      localStorage.setItem('adminEmail', d.email);
+      document.querySelectorAll('a[href^="mailto:"]').forEach(a => {
+        a.href = 'mailto:' + d.email;
+      });
+    }
+    if(d.profileImage){
+      const img = document.getElementById('himg');
+      if(img) img.src = d.profileImage;
+    }
+    if(d.skills && d.skills.length){
+      const grid = document.querySelector('.sk-grid');
+      if(grid){
+        grid.innerHTML = d.skills.map((sk,i) => `
+          <div class="sk-card reveal reveal-child" style="transition-delay:${i*0.05}s">
+            <div class="sk-top">
+              <div class="sk-left"><span class="sk-ic">${sk.icon||'⚙️'}</span><span class="sk-nm">${sk.name}</span></div>
+              ${sk.locked ? '<span class="sk-lock">🔒 Learning Soon</span>' : '<span class="sk-pc">' + sk.level + '%</span>'}
+            </div>
+            <div class="bar-bg"><div class="bar-fill" data-p="${sk.locked?0:sk.level}"></div></div>
+          </div>`).join('');
+      }
+    }
+    if(d.projects && d.projects.length){
+      const grid = document.querySelector('.projects-grid');
+      if(grid){
+        grid.innerHTML = d.projects.map((p,i) => `
+          <div class="pj reveal reveal-child" style="transition-delay:${i*0.06}s">
+            <div class="pj-top"><span class="pj-ic">📁</span></div>
+            <div class="pj-title">${p.title}</div>
+            <div class="pj-desc">${p.desc}</div>
+            <div class="pj-tags">${(p.tags||[]).map(t=>'<span class="ptag">'+t+'</span>').join('')}</div>
+            <div class="pj-actions">
+              <a href="${p.github||'#'}" target="_blank" class="pj-btn-gh">⎇ GitHub</a>
+              <a href="${p.live||'#'}" target="_blank" class="pj-btn-live">↗ Live</a>
+            </div>
+          </div>`).join('');
+      }
+    }
+  } catch(e){ console.warn('Admin data load error:', e); }
+})();
+
+function escHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+
+<script src="cloudinary.js"></script>
+<script src="cloudinary-media.js"></script>
+<script src="intro.js"></script>
+<script src="enhancements.js"></script>
+<script src="advanced-effects.js"></script>
+<script src="premium-upgrades.js"></script>
+<script src="final-polish.js"></script>
+<script src="visual-editor.js"></script>
+<script src="visual-builder.js"></script>
+<script src="godlevel.js"></script>
+<script src="cg-hscroll.js"></script>
+<script src="admin-controller.js"></script>
+<script src="cert-gallery.js"></script>
+<script src="timeline.js"></script>
+
+<!-- ── CMS Bootstrap: reads admin-cms settings on every portfolio load ── -->
+<script>
+(function CMSBootstrap() {
+  'use strict';
+
+  /* ── 1. Performance toggles (run first — before other scripts settle) ── */
+  (function applyPerfToggles() {
+    try {
+      var p = JSON.parse(localStorage.getItem('cms-perf-toggles') || '{}');
+      if (p.intro      === false) try { sessionStorage.setItem('intro_seen_v1','1'); } catch(e) {}
+      if (p.animations === false) document.documentElement.classList.add('reduce-motion');
+      if (p.cursor     === false) document.documentElement.classList.add('no-custom-cursor');
+      if (p.hscroll    === false) window.__disableHScroll  = true;
+      if (p.sparks     === false) window.__disableSparks   = true;
+      if (p.glow       === false) document.documentElement.classList.add('no-glow');
+    } catch(e) {}
+  })();
+
+  /* ── 2. Force theme (siteThemeConfig) ── */
+  (function applyThemeConfig() {
+    try {
+      var cfg = JSON.parse(localStorage.getItem('siteThemeConfig') || '{}');
+      if (!cfg.defaultTheme) return;
+      var current = localStorage.getItem('user-theme') || '';
+      /* Force mode: override visitor's saved preference */
+      if (cfg.forceTheme || !current) {
+        document.documentElement.setAttribute('data-theme', cfg.defaultTheme);
+        localStorage.setItem('user-theme', cfg.defaultTheme);
+      }
+      /* Custom hex color */
+      if (cfg.customHex && /^#[0-9a-fA-F]{6}$/.test(cfg.customHex)) {
+        var s = document.createElement('style');
+        s.id = 'cms-theme-override';
+        s.textContent = ':root{--acc:' + cfg.customHex + ';--acc2:' + cfg.customHex + '26;--glow:' + cfg.customHex + '80;}';
+        document.head.appendChild(s);
+      }
+    } catch(e) {}
+  })();
+
+  /* ── 3. Global settings (name, email, socials, buttons) ── */
+  function applyGlobalSettings() {
+    try {
+      var G = JSON.parse(localStorage.getItem('global-settings') || '{}');
+      if (!G || !G.email && !G.firstName && !G.github) return;
+
+      /* Email */
+      if (G.email) {
+        var ceEl = document.getElementById('contact-email');
+        if (ceEl) ceEl.innerHTML = '<a href="mailto:' + G.email + '" class="email-link">' + G.email + '</a>';
+        document.querySelectorAll('a[href^="mailto:"]').forEach(function(a) { a.href = 'mailto:' + G.email; });
+        localStorage.setItem('adminEmail', G.email);
+      }
+
+      /* Hire btn */
+      if (G.btn1Text) {
+        var hireBtn = document.getElementById('hire-btn');
+        if (hireBtn) { hireBtn.childNodes[0].textContent = G.btn1Text + ' '; }
+      }
+
+      /* Socials */
+      if (G.github)    document.querySelectorAll('a[href*="github.com"]').forEach(function(a)    { a.href = G.github; });
+      if (G.linkedin)  document.querySelectorAll('a[href*="linkedin.com"]').forEach(function(a)  { a.href = G.linkedin; });
+      if (G.instagram) document.querySelectorAll('a[href*="instagram.com"]').forEach(function(a) { a.href = G.instagram; });
+
+      /* CV button */
+      if (G.cvUrl) {
+        var cvBtn = document.querySelector('#hero .btn-o, a[download], a[href*="cv"], a[href*="resume"]');
+        if (cvBtn && cvBtn.href) cvBtn.href = G.cvUrl;
+      }
+    } catch(e) {}
+  }
+
+  /* ── 4. Analytics tracking ── */
+  function trackClick(type, label) {
+    if (window.__cmsTrack) { window.__cmsTrack(type, label); return; }
+    /* Fallback: write directly to storage */
+    try {
+      var a = JSON.parse(localStorage.getItem('cms-analytics') || '{}');
+      var bucket = type === 'project' ? 'projectClicks' : 'buttonClicks';
+      a[bucket] = a[bucket] || {};
+      a[bucket][label] = (a[bucket][label] || 0) + 1;
+      a.log = a.log || [];
+      a.log.unshift({ type: type, label: label, ts: Date.now() });
+      if (a.log.length > 100) a.log = a.log.slice(0, 100);
+      localStorage.setItem('cms-analytics', JSON.stringify(a));
+    } catch(e) {}
+  }
+
+  function bindAnalytics() {
+    /* Project cards */
+    document.querySelectorAll('.pj').forEach(function(card) {
+      card.addEventListener('click', function() {
+        var title = card.querySelector('.pj-title, h3, h4');
+        trackClick('project', title ? title.textContent.trim() : 'Unknown');
+      });
+    });
+    /* CTA buttons */
+    document.querySelectorAll('#hire-btn, .btn-p, .btn-o, .nav-cta').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        trackClick('button', btn.textContent.trim().slice(0, 30));
+      });
+    });
+  }
+
+  /* ── 5. Edit Mode receiver (BroadcastChannel from admin) ── */
+  function initEditModeReceiver() {
+    try {
+      if (typeof BroadcastChannel === 'undefined') return;
+      var bc = new BroadcastChannel('portfolio-admin-sync');
+      bc.addEventListener('message', function(e) {
+        if (!e.data) return;
+        if (e.data.type === 'editmode') {
+          toggleEditMode(e.data.on);
+        }
+      });
+    } catch(e) {}
+  }
+
+  var editModeOn = false;
+  var editStyleEl = null;
+
+  function toggleEditMode(on) {
+    editModeOn = on;
+    if (on) {
+      /* Inject highlight style */
+      if (!editStyleEl) {
+        editStyleEl = document.createElement('style');
+        editStyleEl.id = 'cms-edit-style';
+        editStyleEl.textContent = `
+          [contenteditable="true"] {
+            outline: 1.5px dashed var(--acc, #4f6ef5) !important;
+            outline-offset: 2px;
+            border-radius: 3px;
+            cursor: text !important;
+          }
+          [contenteditable="true"]:focus {
+            outline: 2px solid var(--acc, #4f6ef5) !important;
+            background: rgba(79,110,245,0.04) !important;
+          }
+          body::after {
+            content: '✎ EDIT MODE';
+            position: fixed;
+            bottom: 18px; right: 18px;
+            background: rgba(13,13,28,0.95);
+            border: 1px solid var(--acc, #4f6ef5);
+            color: var(--acc, #4f6ef5);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.50rem;
+            letter-spacing: 2px;
+            padding: 6px 14px;
+            border-radius: 8px;
+            z-index: 99998;
+            pointer-events: none;
+          }
+        `;
+        document.head.appendChild(editStyleEl);
+      }
+      /* Make key text nodes editable */
+      var selectors = [
+        '.hero-name', '#hero h1', '#hero h2',
+        '#about p', '#about h2',
+        '.sec-title', '.stit',
+        '.hero-desc', '#hero .desc',
+      ];
+      selectors.forEach(function(sel) {
+        document.querySelectorAll(sel).forEach(function(el) {
+          if (!el.__cmsOrigCE) el.__cmsOrigCE = el.contentEditable;
+          el.contentEditable = 'true';
+          el.addEventListener('input', function() {
+            /* Auto-save on blur */
+          });
+          el.addEventListener('blur', function() {
+            /* Save edits back to localStorage */
+            try {
+              var D = JSON.parse(localStorage.getItem('adm-portfolio-data') || '{}');
+              /* Map element to data key */
+              if (el.closest('#hero') && (el.tagName==='H1'||el.tagName==='H2')) {
+                /* crude save — store raw text */
+                D.__editOverrides = D.__editOverrides || {};
+                D.__editOverrides[sel] = el.textContent;
+                localStorage.setItem('adm-portfolio-data', JSON.stringify(D));
+              }
+            } catch(err) {}
+          });
+        });
+      });
+    } else {
+      /* Restore */
+      if (editStyleEl) { editStyleEl.remove(); editStyleEl = null; }
+      document.querySelectorAll('[contenteditable="true"]').forEach(function(el) {
+        el.contentEditable = el.__cmsOrigCE || 'false';
+        delete el.__cmsOrigCE;
+      });
+    }
+  }
+
+  /* ── RUN ── */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      applyGlobalSettings();
+      bindAnalytics();
+      initEditModeReceiver();
+    });
+  } else {
+    applyGlobalSettings();
+    bindAnalytics();
+    initEditModeReceiver();
+  }
+
+})();
+</script>
+
+<script>
+// Ctrl+S → Admin (HIGH PRIORITY)
+window.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.keyCode === 83) {
+    e.preventDefault(); e.stopImmediatePropagation();
+    window.location.href = 'admin.html'; return false;
+  }
+}, true);
+</script>
+<script>
+if (new URLSearchParams(window.location.search).get('preview') === '1') {
+  const badge = document.createElement('div');
+  badge.textContent = '🔴 ADMIN PREVIEW';
+  badge.style.cssText = 'position:fixed;top:20px;right:20px;z-index:99999;background:rgba(220,38,38,0.95);color:white;padding:10px 15px;border-radius:20px;font-size:13px;font-weight:700;box-shadow:0 8px 32px rgba(220,38,38,0.4);backdrop-filter:blur(10px);';
+  document.body.appendChild(badge);
+}
+</script>
+
+<script>
+/* ── Certificate Section Renderer v2.0 — single source of truth ──
+   Reads portfolio-cert-tabs (tabbed) or portfolio-certificates (flat).
+   Renders cert-items matching the existing cert-circle design.
+   Wires up click → openCertModal for image preview.
+   Called on load AND on storage events (cross-tab live sync).
+─────────────────────────────────────────────────────────────────── */
+(function CertSectionRenderer() {
+  'use strict';
+
+  function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function loadTabs() {
+    try {
+      var t = JSON.parse(localStorage.getItem('portfolio-cert-tabs') || 'null');
+      if (t && Array.isArray(t) && t.length) return t;
+    } catch(e) {}
+    try {
+      var flat = JSON.parse(localStorage.getItem('portfolio-certificates') || 'null');
+      if (flat && flat.length) return [{ id: 'default', name: 'All', certs: flat }];
+    } catch(e) {}
+    return null; // no admin certs — show static defaults
+  }
+
+  var certSection = null;
+  var activeTabId = null;
+
+  function getSection() {
+    if (!certSection || !certSection.isConnected)
+      certSection = document.querySelector('.mycert-wrap');
+    return certSection;
+  }
+
+  function render() {
+    var tabs = loadTabs();
+    var section = getSection();
+    if (!section) return;
+
+    if (!tabs) {
+      // No admin certs — restore default static items
+      section.querySelectorAll('.cert-item[data-cert-title]').forEach(function(el) {
+        el.style.display = '';
+      });
+      removeTabBar(section);
+      wireStaticClicks(section);
+      return;
+    }
+
+    // Hide default static items
+    section.querySelectorAll('.cert-item[data-cert-title]').forEach(function(el) {
+      el.style.display = 'none';
+    });
+
+    // Validate active tab
+    if (!activeTabId || !tabs.find(function(t) { return t.id === activeTabId; })) {
+      activeTabId = tabs[0].id;
+    }
+
+    buildTabBar(section, tabs);
+    renderCerts(section, tabs, null);
+  }
+
+  function removeTabBar(section) {
+    var bar = section.querySelector('.cert-tabs-bar');
+    if (bar) bar.remove();
+  }
+
+  function buildTabBar(section, tabs) {
+    // Only show tab bar if more than 1 tab
+    if (tabs.length <= 1) {
+      removeTabBar(section);
+      return;
+    }
+    var bar = section.querySelector('.cert-tabs-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.className = 'cert-tabs-bar';
+      var sub = section.querySelector('.mycert-sub');
+      var row = section.querySelector('.cert-row');
+      if (sub) sub.after(bar);
+      else if (row) section.insertBefore(bar, row);
+      else section.appendChild(bar);
+    }
+    bar.innerHTML = '';
+    tabs.forEach(function(tab) {
+      var btn = document.createElement('button');
+      btn.className = 'cert-tab-btn' + (tab.id === activeTabId ? ' active' : '');
+      btn.textContent = tab.name;
+      btn.addEventListener('click', function() {
+        if (activeTabId === tab.id) return;
+        var prevId = activeTabId;
+        activeTabId = tab.id;
+        bar.querySelectorAll('.cert-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        renderCerts(section, tabs, prevId);
+      });
+      bar.appendChild(btn);
+    });
+  }
+
+  function renderCerts(section, tabs, prevTabId) {
+    var row = section.querySelector('.cert-row');
+    if (!row) return;
+
+    var activeTab = tabs.find(function(t) { return t.id === activeTabId; });
+    if (!activeTab) return;
+
+    // Determine slide direction
+    var dir = null;
+    if (prevTabId) {
+      var allIds = tabs.map(function(t) { return t.id; });
+      var prevIdx = allIds.indexOf(prevTabId);
+      var newIdx  = allIds.indexOf(activeTabId);
+      dir = newIdx > prevIdx ? 'left' : 'right';
+    }
+
+    var newHTML = '';
+    if (!activeTab.certs || !activeTab.certs.length) {
+      newHTML = '<p class="cert-empty-msg">No certificates in this tab yet.</p>';
+    } else {
+      newHTML = activeTab.certs.map(function(c) {
+        var emoji   = c.emoji || '🎓';
+        var firstImg = (c.images && c.images.length) ? c.images[0] : (c.image || '');
+        var imgs     = (c.images && c.images.length) ? c.images : (c.image ? [c.image] : []);
+        // Always show emoji in the circle — images only open in the popup
+        var circleContent = '<span class="cert-emoji">' + emoji + '</span>';
+        return (
+          '<div class="cert-item cert-item-admin" role="button" tabindex="0"' +
+          ' data-cert-title="' + esc(c.title) + '"' +
+          ' data-cert-org="'   + esc(c.org || '') + '"' +
+          ' data-cert-body="'  + esc(c.body || c.desc || '') + '"' +
+          ' data-cert-emoji="' + esc(emoji) + '"' +
+          ' data-cert-img="'   + esc(imgs[0] || '') + '"' +
+          ' data-cert-images="'+ esc(JSON.stringify(imgs)) + '">' +
+          '<div class="cert-circle cert-circle-emoji">' + circleContent + '</div>' +
+          '<span class="cert-label">' + esc(c.title) + '</span>' +
+          '</div>'
+        );
+      }).join('');
+    }
+
+    function swap() {
+      row.innerHTML = newHTML;
+      wireClicks(row);
+    }
+
+    if (!dir) {
+      // First load — fade in
+      row.style.opacity = '0';
+      swap();
+      requestAnimationFrame(function() {
+        row.style.transition = 'opacity 0.38s ease';
+        row.style.opacity = '1';
+        setTimeout(function() { row.style.transition = ''; }, 400);
+      });
+      return;
+    }
+
+    // Horizontal slide
+    var outX = dir === 'left' ? '-100%' : '100%';
+    var inX  = dir === 'left' ? '100%'  : '-100%';
+
+    row.style.overflow = 'hidden';
+    row.style.transition = 'transform 0.36s cubic-bezier(0.4,0,0.2,1), opacity 0.28s ease';
+    row.style.transform   = 'translateX(' + outX + ')';
+    row.style.opacity     = '0';
+
+    setTimeout(function() {
+      swap();
+      row.style.transition = 'none';
+      row.style.transform  = 'translateX(' + inX + ')';
+      row.style.opacity    = '0';
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          row.style.transition = 'transform 0.42s cubic-bezier(0.22,1,0.36,1), opacity 0.34s ease';
+          row.style.transform  = 'translateX(0)';
+          row.style.opacity    = '1';
+          setTimeout(function() {
+            row.style.transition = row.style.transform = row.style.opacity = row.style.overflow = '';
+          }, 460);
+        });
+      });
+    }, 310);
+  }
+
+  function wireClicks(row) {
+    row.querySelectorAll('.cert-item-admin').forEach(function(item) {
+      item.style.cursor = 'pointer';
+      item.addEventListener('click', function() { fireModal(item); });
+      item.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fireModal(item); }
+      });
+    });
+  }
+
+  function wireStaticClicks(section) {
+    section.querySelectorAll('.cert-item[data-cert-title]').forEach(function(item) {
+      if (item._wired) return;
+      item._wired = true;
+      item.addEventListener('click', function() { fireModal(item); });
+      item.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fireModal(item); }
+      });
+    });
+  }
+
+  function fireModal(item) {
+    if (!window.openCertModal) return;
+    var imagesJson = item.getAttribute('data-cert-images') || '';
+    var images = [];
+    try { if (imagesJson) images = JSON.parse(imagesJson); } catch(e) {}
+    var singleImg = item.getAttribute('data-cert-img') || '';
+    if (!images.length && singleImg) images = [singleImg];
+    window.openCertModal(
+      item.getAttribute('data-cert-title') || '',
+      item.getAttribute('data-cert-org')   || '',
+      item.getAttribute('data-cert-body')  || '',
+      images[0] || '',
+      item.getAttribute('data-cert-emoji') || '🎓',
+      images
+    );
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render);
+  else render();
+
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'portfolio-cert-tabs' || e.key === 'portfolio-certificates') {
+      activeTabId = null;
+      render();
+    }
+  });
+
+  window.__renderCerts = render;
+
+})();
+</script>
+
+<script>
+/* ── Order Restore — applies saved section + subsection order on every page load ──
+   Runs before admin.js so the layout is correct even for regular visitors.
+   Keys written by admin.js drag system:
+     "portfolio-section-order"    → ["about","skills","projects",...]
+     "portfolio-subsection-order" → { skills:[...], projects:[...], ... }
+   "adm-portfolio-data"           → skills / projects / journey arrays
+   "portfolio-certificates"       → certificates array
+──────────────────────────────────────────────────────────────────────────── */
+(function restoreOrder() {
+
+  /* ── helpers ── */
+  function load(key) {
+    try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }
+  }
+  function esc(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function reorderByKey(arr, savedKeys, keyFn) {
+    if (!arr || !savedKeys || !savedKeys.length) return arr;
+    const map = new Map(arr.map(item => [keyFn(item), item]));
+    const out = [];
+    savedKeys.forEach(k => { if (map.has(k)) { out.push(map.get(k)); map.delete(k); } });
+    map.forEach(v => out.push(v));
+    return out;
+  }
+
+  /* ══ LEVEL 1 — SECTION ORDER ══════════════════════════════════
+     Move <section> nodes in <body> to match saved order.
+     "home" and structural non-section nodes are untouched.
+  ═══════════════════════════════════════════════════════════════ */
+  function applySectionOrder() {
+    const order = load('portfolio-section-order');
+    if (!order || !order.length) return;
+    order.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el && el.tagName === 'SECTION') document.body.appendChild(el);
+    });
+  }
+
+  /* ══ LEVEL 2 — SUBSECTION ORDER ═══════════════════════════════
+     Re-render skills, projects, journey, certs grids in saved order.
+  ═══════════════════════════════════════════════════════════════ */
+  function applySubOrder() {
+    const sub  = load('portfolio-subsection-order');
+    const data = load('adm-portfolio-data') || {};
+    if (!sub) return;
+
+    /* ── Skills ── */
+    if (sub.skills && data.skills) {
+      const skills = reorderByKey(data.skills, sub.skills, s => s.name);
+      const grid   = document.querySelector('.sk-grid');
+      if (grid) {
+        grid.innerHTML = skills.map(function(s, i) {
+          return '<div class="sk-card reveal in" style="transition-delay:' + (i * 0.05) + 's">' +
+            '<div class="sk-top">' +
+              '<div class="sk-left"><span class="sk-ic">' + (s.ico || '⚙️') + '</span>' +
+              '<span class="sk-nm">' + esc(s.name) + '</span></div>' +
+              (s.locked
+                ? '<span class="sk-lock">🔒 Learning Soon</span>'
+                : '<span class="sk-pc">' + s.level + '%</span>') +
+            '</div>' +
+            '<div class="bar-bg"><div class="bar-fill" data-p="' + (s.locked ? 0 : s.level) + '" style="width:' + (s.locked ? 0 : s.level) + '%"></div></div>' +
+          '</div>';
+        }).join('');
+      }
+    }
+
+    /* ── Projects ── */
+    if (sub.projects && data.projects) {
+      const projs = reorderByKey(data.projects, sub.projects, p => p.title);
+      const grid  = document.querySelector('.projects-grid');
+      if (grid) {
+        grid.innerHTML = projs.map(function(p, i) {
+          return '<div class="pj reveal in" style="transition-delay:' + (i * 0.06) + 's">' +
+            '<div class="pj-top"><span class="pj-ic">' + (p.ico || '📁') + '</span></div>' +
+            '<div class="pj-title">' + esc(p.title) + '</div>' +
+            '<div class="pj-desc">' + esc(p.desc) + '</div>' +
+            '<div class="pj-tags">' + (p.tags || []).map(function(t) { return '<span class="ptag">' + esc(t) + '</span>'; }).join('') + '</div>' +
+            '<div class="pj-actions">' +
+              '<a href="' + esc(p.github || '#') + '" target="_blank" class="pj-btn-gh">⎇ GitHub</a>' +
+              '<a href="' + esc(p.live || '#') + '" target="_blank" class="pj-btn-live">↗ Live</a>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      }
+    }
+
+    /* ── Journey / Timeline ── */
+    if (sub.journey && data.journey) {
+      const items = reorderByKey(data.journey, sub.journey, j => j.title);
+      const vtl   = document.querySelector('.vtl');
+      if (vtl) {
+        var line  = vtl.querySelector('.vtl-line');
+        var ghost = vtl.querySelector('.vtl-line-ghost');
+        var dot   = vtl.querySelector('.vtl-scroll-dot');
+        vtl.innerHTML = '';
+        if (ghost) vtl.appendChild(ghost);
+        if (line)  vtl.appendChild(line);
+        items.forEach(function(j, i) {
+          var div = document.createElement('div');
+          div.className = 'vtl-item reveal in sd-' + Math.min(i + 1, 7);
+          div.innerHTML =
+            '<div class="vtl-dot"></div>' +
+            '<div class="vtl-card">' +
+              '<div class="vtl-meta"><span class="vtl-date">' + esc(j.date) + '</span>' +
+              '<span class="vtl-badge">' + j.badge + '</span></div>' +
+              '<div class="vtl-title">' + esc(j.title) + '</div>' +
+              '<div class="vtl-desc">' + esc(j.desc) + '</div>' +
+            '</div>';
+          vtl.appendChild(div);
+        });
+        if (dot) vtl.appendChild(dot);
+      }
+    }
+
+    /* ── Certificates ── */
+    if (sub.certs) {
+      var rawCerts = load('portfolio-certificates');
+      if (rawCerts && rawCerts.length) {
+        var certs = reorderByKey(rawCerts, sub.certs, function(c) { return c.title; });
+        /* Save the reordered array so cert renderer picks it up */
+        try { localStorage.setItem('portfolio-certificates', JSON.stringify(certs)); } catch(e) {}
+        /* CertSectionRenderer above will pick this up on its storage event,
+           or we rebuild the row directly here for immediate effect */
+        var row = document.querySelector('.cert-row');
+        if (row) {
+          row.innerHTML = certs.map(function(c) {
+            var hasLink = c.link && c.link !== '#';
+            var btn = c.image
+              ? '<img src="' + c.image + '" alt="' + esc(c.title) + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>'
+              : esc(c.ico || '🎓');
+            return '<div class="cert-c">' +
+              '<button class="cert-ring-btn" onclick="openCertModal()">' + btn + '</button>' +
+              '<div class="cert-nm">' + esc(c.title) + '</div>' +
+              (hasLink
+                ? '<a class="cert-vl" href="' + esc(c.link) + '" target="_blank">' + esc(c.issuer) + ' ↗</a>'
+                : '<div class="cert-pl">' + esc(c.issuer) + '</div>') +
+            '</div>';
+          }).join('');
+        }
+      }
+    }
+  }
+
+  /* ══ BOOT — run after DOM is ready ════════════════════════════ */
+  function run() {
+    applySectionOrder();
+    applySubOrder();
+    /* Re-apply whenever admin saves in another tab */
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'portfolio-section-order')    applySectionOrder();
+      if (e.key === 'portfolio-subsection-order') applySubOrder();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
+  } else {
+    run();
+  }
+
+})();
+</script>
+
+<script>
+/* ── Profile Image Loader — handled by CloudinaryMedia system ──
+   CloudinaryMedia.applyProfileImage() is called by admin-controller.js
+   on DOMContentLoaded. This shim provides a fast synchronous fallback
+   for the first paint using any previously saved URL.
+────────────────────────────────────────────────────────────────── */
+(function loadProfileImageFallback() {
+  function apply() {
+    var img = document.getElementById('himg');
+    if (!img) return;
+    /* Read from cl-media-registry (CM store) first */
+    try {
+      var reg = JSON.parse(localStorage.getItem('cl-media-registry') || '{}');
+      if (reg.profile) { img.src = reg.profile; return; }
+    } catch(e) {}
+    /* Legacy fallback: base64 or URL in adm-portfolio-data */
+    try {
+      var b64 = localStorage.getItem('portfolio-profile-image') || '';
+      if (b64) { img.src = b64; return; }
+    } catch(e) {}
+    try {
+      var data = JSON.parse(localStorage.getItem('adm-portfolio-data') || '{}');
+      if (data && data.heroImg) img.src = data.heroImg;
+    } catch(e) {}
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', apply);
+  } else {
+    apply();
+  }
+})();
+</script>
+
+<script>
+/* ── HERO TEXT SAFETY NET ──────────────────────────────────────────
+   Belt-and-suspenders: forces .h-name and its children visible on
+   window load regardless of CSS animation state or class presence.
+   Runs after all other scripts have executed.
+──────────────────────────────────────────────────────────────────── */
+window.addEventListener('load', function() {
+  var el = document.querySelector('.h-name');
+  if (!el) return;
+  el.style.opacity    = '1';
+  el.style.visibility = 'visible';
+  el.style.transform  = 'none';
+  el.style.animation  = 'none';
+  /* Force every child visible too */
+  el.querySelectorAll('*').forEach(function(child) {
+    child.style.opacity    = '1';
+    child.style.visibility = 'visible';
+    child.style.transform  = 'none';
+    child.style.animation  = 'none';
+  });
+});
+/* Also fire at DOMContentLoaded for fastest possible paint */
+document.addEventListener('DOMContentLoaded', function() {
+  var el = document.querySelector('.h-name');
+  if (!el) return;
+  el.style.opacity    = '1';
+  el.style.visibility = 'visible';
+  el.style.transform  = 'none';
+  el.style.animation  = 'none';
+  el.querySelectorAll('*').forEach(function(child) {
+    child.style.opacity    = '1';
+    child.style.visibility = 'visible';
+    child.style.transform  = 'none';
+    child.style.animation  = 'none';
+  });
+});
+</script>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════
+   PORTFOLIO-SYNC.JS — Inline v1.0
+   ────────────────────────────────────────────────────────────────────
+   ROOT CAUSE FIX: admin.html and index.html are separate pages.
+   Admin saves to localStorage but index.html previously only read:
+     • adminEmail (email only)
+     • portfolio-section-order (section order)
+     • portfolio-subsection-order (item order)
+     • portfolio-profile-image (profile pic)
+   
+   ALL other admin changes (name, bio, about text, skills, projects,
+   journey, certs, hero badge, buttons, CV URL, contact, socials)
+   were NEVER applied back to the live page.
+
+   This script reads ALL adm-portfolio-data fields and applies them
+   on DOMContentLoaded AND on every storage event (cross-tab live sync).
+   ════════════════════════════════════════════════════════════════════ */
+(function PortfolioSync() {
+  'use strict';
+
+  function esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function load(key) {
+    try { return JSON.parse(localStorage.getItem(key)); } catch(e) { return null; }
+  }
+
+  /* ── Apply ALL admin data fields to the live page ── */
+  function applyAll() {
+    const D = load('adm-portfolio-data');
+    if (!D) return;
+
+    /* ══ HERO ════════════════════════════════════════════════════ */
+    if (D.firstName) {
+      const el = document.querySelector('.h-name .acc');
+      if (el) el.textContent = D.firstName;
+    }
+    if (D.lastName) {
+      const el = document.querySelector('.h-name .c-white');
+      if (el) el.textContent = D.lastName;
+    }
+    if (D.greetText) {
+      const el = document.getElementById('greet-txt');
+      if (el) el.textContent = D.greetText;
+    }
+    if (D.heroDesc) {
+      const el = document.querySelector('.h-desc');
+      if (el) el.textContent = D.heroDesc;
+    }
+    if (D.badgeText) {
+      const el = document.querySelector('.h-badge strong');
+      if (el) el.textContent = D.badgeText;
+    }
+    if (D.btn1Text) {
+      const el = document.querySelector('.h-btns .btn-p');
+      if (el) el.textContent = D.btn1Text;
+    }
+    if (D.btn2Text) {
+      const el = document.querySelector('.h-btns .btn-o');
+      if (el) el.textContent = D.btn2Text;
+    }
+    if (D.cvUrl) {
+      const el = document.querySelector('.h-btns .btn-o');
+      if (el) { el.href = D.cvUrl; el.removeAttribute('onclick'); }
+    }
+
+    /* ══ ABOUT ═══════════════════════════════════════════════════ */
+    if (D.aboutSub) {
+      const el = document.querySelector('.about-sub-h');
+      if (el) el.textContent = D.aboutSub;
+    }
+    if (D.aboutP1) {
+      const ps = document.querySelectorAll('.about-left > p');
+      if (ps[0]) ps[0].textContent = D.aboutP1;
+    }
+    if (D.aboutP2) {
+      const ps = document.querySelectorAll('.about-left > p');
+      if (ps[1]) ps[1].textContent = D.aboutP2;
+    }
+    if (D.aboutCards && D.aboutCards.length) {
+      const icons  = document.querySelectorAll('.about-card-icon');
+      const titles = document.querySelectorAll('.about-card-text strong');
+      const vals   = document.querySelectorAll('.about-card-text span');
+      D.aboutCards.forEach(function(c, i) {
+        if (icons[i])  icons[i].textContent  = c.ico   || icons[i].textContent;
+        if (titles[i]) titles[i].textContent = c.title || titles[i].textContent;
+        if (vals[i])   vals[i].textContent   = c.val   || vals[i].textContent;
+      });
+    }
+
+    /* ══ SKILLS ══════════════════════════════════════════════════ */
+    if (D.skills && D.skills.length) {
+      const grid = document.querySelector('.sk-grid');
+      if (grid) {
+        grid.innerHTML = D.skills.map(function(s, i) {
+          return '<div class="sk-card reveal in" style="transition-delay:' + (i * 0.05) + 's">' +
+            '<div class="sk-top">' +
+              '<div class="sk-left">' +
+                '<span class="sk-ic">' + esc(s.ico || '⚙️') + '</span>' +
+                '<span class="sk-nm">' + esc(s.name) + '</span>' +
+              '</div>' +
+              (s.locked
+                ? '<span class="sk-lock">🔒 Learning Soon</span>'
+                : '<span class="sk-pc">' + s.level + '%</span>') +
+            '</div>' +
+            '<div class="bar-bg"><div class="bar-fill" data-p="' + (s.locked ? 0 : s.level) +
+              '" style="width:' + (s.locked ? 0 : s.level) + '%"></div></div>' +
+          '</div>';
+        }).join('');
+      }
+    }
+
+    /* ══ PROJECTS ════════════════════════════════════════════════ */
+    if (D.projects && D.projects.length) {
+      const grid = document.querySelector('.projects-grid');
+      if (grid) {
+        grid.innerHTML = D.projects.map(function(p, i) {
+          return '<div class="pj reveal in" style="transition-delay:' + (i * 0.06) + 's">' +
+            '<div class="pj-top">' +
+              '<span class="pj-ic">' + esc(p.ico || '📁') + '</span>' +
+            '</div>' +
+            '<div class="pj-title">' + esc(p.title) + '</div>' +
+            '<div class="pj-desc">' + esc(p.desc) + '</div>' +
+            '<div class="pj-tags">' +
+              (p.tags || []).map(function(t) { return '<span class="ptag">' + esc(t) + '</span>'; }).join('') +
+            '</div>' +
+            '<div class="pj-actions">' +
+              '<a href="' + esc(p.github || '#') + '" target="_blank" class="pj-btn-gh">⎇ GitHub</a>' +
+              '<a href="' + esc(p.live || '#') + '" target="_blank" class="pj-btn-live">↗ Live</a>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      }
+    }
+
+    /* ══ JOURNEY / TIMELINE ══════════════════════════════════════ */
+    if (D.journey && D.journey.length) {
+      const vtl = document.querySelector('.vtl');
+      if (vtl) {
+        const line  = vtl.querySelector('.vtl-line');
+        const ghost = vtl.querySelector('.vtl-line-ghost');
+        const dot   = vtl.querySelector('.vtl-scroll-dot');
+        vtl.innerHTML = '';
+        if (ghost) vtl.appendChild(ghost);
+        if (line)  vtl.appendChild(line);
+        D.journey.forEach(function(j, i) {
+          const div = document.createElement('div');
+          div.className = 'vtl-item reveal in sd-' + Math.min(i + 1, 7);
+          div.innerHTML =
+            '<div class="vtl-dot"></div>' +
+            '<div class="vtl-card">' +
+              '<div class="vtl-meta">' +
+                '<span class="vtl-date">' + esc(j.date) + '</span>' +
+                '<span class="vtl-badge">' + (j.badge || '') + '</span>' +
+              '</div>' +
+              '<div class="vtl-title">' + esc(j.title) + '</div>' +
+              '<div class="vtl-desc">'  + esc(j.desc)  + '</div>' +
+            '</div>';
+          vtl.appendChild(div);
+        });
+        if (dot) vtl.appendChild(dot);
+      }
+    }
+
+    /* ══ ACHIEVEMENTS ════════════════════════════════════════════ */
+    if (D.achievements && D.achievements.length) {
+      const grid = document.querySelector('.ach-grid');
+      if (grid) {
+        grid.innerHTML = D.achievements.map(function(a) {
+          return '<div class="ach-card reveal in">' +
+            '<span class="ach-ic">' + esc(a.ico || '🏅') + '</span>' +
+            '<div class="ach-t">' + esc(a.title) + '</div>' +
+            '<div class="ach-d">' + esc(a.desc)  + '</div>' +
+          '</div>';
+        }).join('');
+      }
+    }
+
+    /* ══ CERTIFICATES — delegated to CertSectionRenderer (inline script above) ══ */
+    if (window.__renderCerts) window.__renderCerts();
+
+    /* ══ CONTACT ══════════════════════════════════════════════════ */
+    if (D.email) {
+      /* #contact-email — the primary display element */
+      const ceEl = document.getElementById('contact-email');
+      if (ceEl) {
+        ceEl.innerHTML = '<a href="mailto:' + D.email + '" class="email-link">' + D.email + '</a>';
+      }
+      /* All mailto: hrefs */
+      document.querySelectorAll('a[href^="mailto:"]').forEach(function(a) {
+        a.href = 'mailto:' + D.email;
+        if (a.textContent.includes('@')) a.textContent = D.email;
+      });
+      /* .ct-val slots that look like emails */
+      document.querySelectorAll('.ct-val').forEach(function(el) {
+        if (el.textContent.trim().includes('@')) el.textContent = D.email;
+      });
+      localStorage.setItem('adminEmail', D.email);
+    }
+
+    if (D.location) {
+      document.querySelectorAll('.ct-val').forEach(function(el) {
+        const t = el.textContent.trim().toLowerCase();
+        if (t.includes('india') || t.includes('hyderabad') || t === '') return;
+        /* Match location slot by checking it's not email */
+        if (!t.includes('@')) {
+          /* Only replace the location .ct-val which contains a city/country */
+          const parent = el.closest('.ct-row, .ct-item, li');
+          if (parent) {
+            const lbl = parent.querySelector('.ct-lbl');
+            if (lbl && lbl.textContent.toLowerCase().includes('loc')) {
+              el.textContent = D.location;
+            }
+          }
+        }
+      });
+      /* Also directly select the location element by structure */
+      const ctVals = document.querySelectorAll('.ct-val');
+      ctVals.forEach(function(el) {
+        const t = el.textContent.trim().toLowerCase();
+        if (t.includes('india') || t.includes('hyderabad') || t.includes('telangana')) {
+          el.textContent = D.location;
+        }
+      });
+    }
+
+    if (D.github)    document.querySelectorAll('a[href*="github.com"]').forEach(function(a)    { a.href = D.github; });
+    if (D.linkedin)  document.querySelectorAll('a[href*="linkedin.com"]').forEach(function(a)  { a.href = D.linkedin; });
+    if (D.instagram) document.querySelectorAll('a[href*="instagram.com"]').forEach(function(a) { a.href = D.instagram; });
+
+    /* ══ THEME ════════════════════════════════════════════════════ */
+    // Custom accent takes full priority — remove preset, inject style
+    const savedCustom = D.customAccent || localStorage.getItem('adm-custom-accent') || '';
+    if (savedCustom && /^#[0-9a-fA-F]{6}$/.test(savedCustom)) {
+      let styleEl = document.getElementById('admin-theme-override');
+      if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = 'admin-theme-override';
+        document.head.appendChild(styleEl);
+      }
+      styleEl.textContent = ':root{--acc:' + savedCustom + ';--acc2:' + savedCustom + '26;--glow:' + savedCustom + '80;}';
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('adm-custom-accent', savedCustom);
+      // Tell ThemeCycle not to override this
+      if (window.__themeCycleOverride) window.__themeCycleOverride(savedCustom);
+    } else if (D.theme) {
+      // Remove custom and apply preset
+      const ov = document.getElementById('admin-theme-override');
+      if (ov) ov.remove();
+      localStorage.removeItem('adm-custom-accent');
+      document.documentElement.setAttribute('data-theme', D.theme);
+      localStorage.setItem('user-theme', D.theme);
+      if (window.__themeCycleSync) window.__themeCycleSync(D.theme);
+    }
+
+    /* ══ ROLES (typed text) ═══════════════════════════════════════ */
+    if (D.roles && D.roles.length && window.__typedRoles) {
+      window.__typedRoles = D.roles;
+    }
+
+    /* ══ SECTION BACKGROUND IMAGES ═══════════════════════════════ */
+    try {
+      const sectionImgs = JSON.parse(localStorage.getItem('portfolio-section-images') || '{}');
+      Object.keys(sectionImgs).forEach(function(id) {
+        const sec = document.getElementById(id);
+        if (!sec) return;
+        sec.style.position = 'relative';
+        let bg = sec.querySelector('.section-bg-img');
+        if (sectionImgs[id]) {
+          if (!bg) {
+            bg = document.createElement('img');
+            bg.className = 'section-bg-img';
+            bg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.08;pointer-events:none;z-index:0;';
+            sec.insertBefore(bg, sec.firstChild);
+          }
+          bg.src = sectionImgs[id];
+        } else if (bg) {
+          bg.remove();
+        }
+      });
+    } catch(e) {}
+  }
+
+  /* ── Run on load ── */
+  function run() {
+    applyAll();
+
+    /* ── Live cross-tab sync: fires when admin saves in another tab ── */
+    window.addEventListener('storage', function(e) {
+      const WATCHED = [
+        'adm-portfolio-data',
+        'adminEmail',
+        'portfolio-certificates',
+        'portfolio-cert-tabs',
+        'portfolio-section-images',
+        'user-theme',
+        'adm-custom-accent'
+      ];
+      if (WATCHED.indexOf(e.key) !== -1) applyAll();
+    });
+
+    /* ── BroadcastChannel for same-tab admin overlay saves ── */
+    if (typeof BroadcastChannel !== 'undefined') {
+      try {
+        const bc = new BroadcastChannel('portfolio-admin-sync');
+        bc.addEventListener('message', function(e) {
+          if (!e.data) return;
+          if (e.data.type === 'save') {
+            applyAll();
+            if (window.__renderCerts) window.__renderCerts();
+          } else if (e.data.type === 'theme') {
+            var custom = e.data.custom || '';
+            var preset = e.data.theme  || '';
+            if (custom && /^#[0-9a-fA-F]{6}$/.test(custom)) {
+              var s = document.getElementById('admin-theme-override');
+              if (!s) { s = document.createElement('style'); s.id = 'admin-theme-override'; document.head.appendChild(s); }
+              s.textContent = ':root{--acc:'+custom+';--acc2:'+custom+'26;--glow:'+custom+'80;}';
+              document.documentElement.removeAttribute('data-theme');
+            } else if (preset) {
+              var ov = document.getElementById('admin-theme-override');
+              if (ov) ov.remove();
+              document.documentElement.setAttribute('data-theme', preset);
+              if (window.__themeCycleSync) window.__themeCycleSync(preset);
+            }
+          }
+        });
+        window.__adminSyncChannel = bc;
+      } catch(e) {}
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
+  } else {
+    run();
+  }
+
+  console.log('%c✦ Portfolio Sync v1.0 — All admin fields now live', 'color:#22d3ee;font-family:monospace;font-weight:bold');
+
+})();
+</script>
+
+<!-- ═══ DYNAMIC SECTIONS RENDERER ═══════════════════════════════
+     Reads 'dynamic-sections' from localStorage and renders each
+     visible section into #dynamic-sections-mount.
+     Listens for BroadcastChannel updates from the admin panel.
+════════════════════════════════════════════════════════════════ -->
+<script>
+(function DynSectionsRenderer() {
+  'use strict';
+  var KEY = 'dynamic-sections';
+  function loadSections() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e) { return []; } }
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  var RENDERERS = {
+    'text': function(sec) {
+      return '<div class="dyn-text-body">' + esc(sec.content||'').replace(/\n/g,'<br>') + '</div>';
+    },
+    'cards': function(sec) {
+      return '<div class="dyn-cards-grid">' + (sec.items||[]).map(function(c) {
+        return '<div class="dyn-card reveal"><div class="dyn-card-ico">' + esc(c.ico||'✦') + '</div>'
+          + '<div class="dyn-card-title">' + esc(c.title||'') + '</div>'
+          + '<div class="dyn-card-desc">' + esc(c.desc||'') + '</div></div>';
+      }).join('') + '</div>';
+    },
+    'image-text': function(sec) {
+      var imgHtml = sec.image
+        ? '<img src="' + esc(sec.image) + '" alt="' + esc(sec.imageAlt||sec.title) + '" loading="lazy"/>'
+        : '<div style="aspect-ratio:4/3;background:rgba(255,255,255,.04);border-radius:16px;display:flex;align-items:center;justify-content:center;opacity:.3;font-size:2rem">🖼</div>';
+      return '<div class="dyn-img-text-wrap">' + imgHtml
+        + '<div class="dyn-img-text-body reveal">' + esc(sec.content||'').replace(/\n/g,'<br>') + '</div></div>';
+    },
+    'timeline': function(sec) {
+      return '<div class="dyn-timeline">' + (sec.items||[]).map(function(it) {
+        return '<div class="dyn-tl-item reveal"><div class="dyn-tl-dot"></div>'
+          + '<div class="dyn-tl-date">' + esc(it.date||'') + '</div>'
+          + '<div class="dyn-tl-title">' + esc(it.title||'') + '</div>'
+          + '<div class="dyn-tl-desc">' + esc(it.desc||'') + '</div></div>';
+      }).join('') + '</div>';
+    },
+    'gallery': function(sec) {
+      var items = sec.items||[];
+      if (!items.length) return '<p style="color:rgba(255,255,255,.25);font-size:.8rem">No images added yet.</p>';
+      return '<div class="dyn-gallery-grid">' + items.map(function(it) {
+        return '<div class="dyn-gallery-item">'
+          + (it.src ? '<img src="' + esc(it.src) + '" alt="' + esc(it.alt||'') + '" loading="lazy"/>'
+                    : '<div class="dyn-gallery-placeholder">🖼</div>') + '</div>';
+      }).join('') + '</div>';
+    },
+    'testimonials': function(sec) {
+      return '<div class="dyn-testimonials-grid">' + (sec.items||[]).map(function(it) {
+        return '<div class="dyn-testimonial reveal">'
+          + '<div class="dyn-testimonial-text">' + esc(it.text||'') + '</div>'
+          + '<div class="dyn-testimonial-author">' + esc(it.author||'') + '</div>'
+          + '<div class="dyn-testimonial-role">' + esc(it.role||'') + '</div></div>';
+      }).join('') + '</div>';
+    },
+    'skills-cards': function(sec) {
+      return '<div class="dyn-skills-grid">' + (sec.items||[]).map(function(it) {
+        var pct = Math.min(100, Math.max(0, parseInt(it.level)||0));
+        return '<div class="dyn-skill-card reveal">'
+          + '<div class="dyn-skill-ico">' + esc(it.ico||'⚙️') + '</div>'
+          + '<div class="dyn-skill-name">' + esc(it.name||'') + '</div>'
+          + '<div class="dyn-skill-bar"><div class="dyn-skill-fill" data-p="' + pct + '" style="width:0"></div></div></div>';
+      }).join('') + '</div>';
+    },
+    'faq': function(sec) {
+      return '<div class="dyn-faq">' + (sec.items||[]).map(function(it, i) {
+        return '<div class="dyn-faq-item" data-faq="' + i + '">'
+          + '<div class="dyn-faq-q">' + esc(it.q||'') + '<span class="dyn-faq-arrow">▾</span></div>'
+          + '<div class="dyn-faq-a">' + esc(it.a||'').replace(/\n/g,'<br>') + '</div></div>';
+      }).join('') + '</div>';
+    }
+  };
+
+  function renderAll() {
+    var mount = document.getElementById('dynamic-sections-mount');
+    if (!mount) return;
+    var sections = loadSections().filter(function(s) { return s.visible !== false; });
+    mount.innerHTML = '';
+    sections.forEach(function(sec) {
+      var renderer = RENDERERS[sec.type]; if (!renderer) return;
+      var el = document.createElement('section');
+      el.id = sec.id; el.className = 'dyn-section';
+      var inner = document.createElement('div');
+      inner.className = 'ct-inner';
+      if (sec.tag) { var tag = document.createElement('div'); tag.className = 'stag'; tag.textContent = sec.tag; inner.appendChild(tag); }
+      var h2 = document.createElement('h2'); h2.className = 'stit'; h2.textContent = sec.title||''; inner.appendChild(h2);
+      var body = document.createElement('div'); body.innerHTML = renderer(sec); inner.appendChild(body);
+      el.appendChild(inner); mount.appendChild(el);
+    });
+    /* Skill bar animation */
+    setTimeout(function() {
+      mount.querySelectorAll('.dyn-skill-fill[data-p]').forEach(function(bar) { bar.style.width = bar.dataset.p + '%'; });
+    }, 300);
+    /* FAQ accordion */
+    mount.querySelectorAll('.dyn-faq-item').forEach(function(item) {
+      item.querySelector('.dyn-faq-q').addEventListener('click', function() { item.classList.toggle('open'); });
+    });
+    /* Scroll reveal */
+    if (window.IntersectionObserver) {
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) { if (entry.isIntersecting) { entry.target.classList.add('in'); io.unobserve(entry.target); } });
+      }, { threshold: 0.1 });
+      mount.querySelectorAll('.reveal').forEach(function(el) { io.observe(el); });
+    } else {
+      mount.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('in'); });
+    }
+  }
+
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', renderAll); }
+  else { renderAll(); }
+
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      var bc = new BroadcastChannel('portfolio-admin-sync');
+      bc.addEventListener('message', function(e) {
+        if (e.data && (e.data.type === 'dyn-sections-updated' || e.data.type === 'save')) renderAll();
+      });
+    }
+  } catch(e) {}
+})();
+</script>
+
+</div><!-- /#main-site -->
+
+</html>

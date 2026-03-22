@@ -1,0 +1,1345 @@
+/* ═══════════════════════════════════════════════════════════════════
+   AWWWARDS-POLISH.CSS — Final Premium Refinement Layer
+   Load LAST in <head>, after all other stylesheets.
+   Pure spacing · typography · visual hierarchy. Zero structure changes.
+   ═══════════════════════════════════════════════════════════════════ */
+
+
+/* ══ 0. GLOBAL TOKENS — override base values ═══════════════════════ */
+:root {
+  /* Spacing scale */
+  --space-xs:   8px;
+  --space-sm:  16px;
+  --space-md:  32px;
+  --space-lg:  64px;
+  --space-xl: 120px;
+  --space-2xl:160px;
+
+  /* Typography */
+  --lh-tight:  1.10;
+  --lh-snug:   1.30;
+  --lh-normal: 1.65;
+  --lh-relaxed:1.85;
+  --lh-loose:  2.00;
+
+  /* Muted text — slightly more transparent for premium depth */
+  --muted: rgba(148, 155, 185, 0.72);
+
+  /* Card border — subtler */
+  --border: rgba(255,255,255,0.055);
+
+  /* Easing */
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+
+/* ══ 1. BASE TYPOGRAPHY — body, paragraphs, shared text ════════════ */
+
+body {
+  font-size: 16px;
+  line-height: var(--lh-relaxed);
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+p {
+  line-height: var(--lh-relaxed);
+  color: var(--muted);
+}
+
+/* Section tag label — breathing room */
+.stag {
+  font-size: 0.58rem;
+  letter-spacing: 5px;
+  margin-bottom: 14px;
+  opacity: 0.75;
+}
+
+/* Section title — larger, more dominant */
+.stit {
+  font-size: clamp(2.0rem, 4vw, 3.2rem);
+  font-weight: 800;
+  line-height: var(--lh-tight);
+  margin-bottom: 18px;
+  letter-spacing: -0.02em;
+}
+
+/* Section subtitle */
+.ssub {
+  font-size: 0.92rem;
+  line-height: var(--lh-loose);
+  color: var(--muted);
+  max-width: 560px;
+  margin: 0 auto;
+  opacity: 0.85;
+}
+
+/* Section header block spacing */
+.ta-center.mb-52 {
+  margin-bottom: 72px;
+}
+.mb-52 {
+  margin-bottom: 72px;
+}
+
+
+/* ══ 2. SECTION SPACING — generous vertical rhythm ═════════════════ */
+
+/* All main sections */
+#about,
+#skills,
+#projects,
+#journey,
+#certs,
+#contact {
+  padding-top:    var(--space-2xl);
+  padding-bottom: var(--space-2xl);
+}
+
+/* Section dividers — softer, wider fade */
+section:not(#contact)::after {
+  left: 4%;
+  right: 4%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.04) 30%,
+    rgba(255,255,255,0.04) 70%,
+    transparent
+  );
+}
+
+
+/* ══ 3. HERO — strong, spacious, dominant ══════════════════════════ */
+
+#home {
+  padding: 80px 7% 0;
+  gap: 80px;
+  min-height: 100vh;
+}
+
+.h-left {
+  max-width: 620px;
+}
+
+/* Greeting — more breathing room */
+.h-greet {
+  font-size: 0.78rem;
+  letter-spacing: 1px;
+  margin-bottom: 28px;
+  opacity: 0.8;
+}
+
+/* Name — significantly larger, dominant */
+.h-name {
+  font-size: clamp(2.6rem, 6.5vw, 5.2rem);
+  font-weight: 900;
+  line-height: 1.0;
+  margin-bottom: 28px;
+  letter-spacing: -0.03em;
+}
+
+/* Typed subtitle */
+.h-typed {
+  font-size: 1.0rem;
+  margin-bottom: 28px;
+  min-height: 28px;
+  opacity: 0.9;
+  letter-spacing: 0.02em;
+}
+
+/* Description */
+.h-desc {
+  font-size: 0.90rem;
+  line-height: var(--lh-loose);
+  color: var(--muted);
+  margin-bottom: 36px;
+  max-width: 480px;
+}
+
+/* Badge */
+.h-badge {
+  margin-bottom: 44px;
+  padding: 10px 18px;
+  font-size: 0.63rem;
+  letter-spacing: 0.5px;
+  border-color: rgba(255,255,255,0.07);
+  border-radius: 8px;
+}
+
+/* Buttons */
+.h-btns {
+  gap: 16px;
+}
+
+.btn-p {
+  padding: 14px 32px;
+  font-size: 0.60rem;
+  letter-spacing: 2.5px;
+  border-radius: 6px;
+}
+
+.btn-o {
+  padding: 14px 32px;
+  font-size: 0.60rem;
+  letter-spacing: 2.5px;
+  border-radius: 6px;
+  border-color: rgba(255,255,255,0.10);
+}
+
+/* Ring — proportionally bigger */
+.h-ring {
+  width: 400px;
+  height: 400px;
+}
+
+
+/* ══ 4. ABOUT SECTION ══════════════════════════════════════════════ */
+
+#about {
+  padding-left: 7%;
+  padding-right: 7%;
+}
+
+.about-inner {
+  gap: 90px;
+  max-width: 1140px;
+}
+
+.about-sub-h {
+  font-size: 1.20rem;
+  font-weight: 700;
+  line-height: var(--lh-snug);
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
+}
+
+.about-left p {
+  font-size: 0.88rem;
+  line-height: var(--lh-loose);
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.about-right {
+  gap: 16px;
+}
+
+/* About cards */
+.about-card {
+  padding: 20px 22px;
+  gap: 16px;
+  border-radius: 14px;
+  border-color: var(--border);
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.about-card:hover {
+  border-color: rgba(255,255,255,0.12);
+  transform: translateY(-2px);
+}
+
+.about-card-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  font-size: 1.0rem;
+  flex-shrink: 0;
+}
+
+.about-card-text strong {
+  font-size: 0.68rem;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
+}
+
+.about-card-text span {
+  font-size: 0.80rem;
+  line-height: var(--lh-normal);
+  color: var(--muted);
+}
+
+
+/* ══ 5. SKILLS SECTION ════════════════════════════════════════════ */
+
+#skills {
+  padding-left: 7%;
+  padding-right: 7%;
+}
+
+/* Skills header group */
+#skills > .reveal {
+  margin-bottom: 60px;
+}
+
+.sk-grid {
+  gap: 18px;
+  max-width: 900px;
+  margin-top: 0;
+}
+
+.sk-card {
+  padding: 24px 26px;
+  border-radius: 14px;
+  border-color: var(--border);
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.sk-card:hover {
+  border-color: rgba(255,255,255,0.12);
+  transform: translateY(-3px);
+}
+
+.sk-top {
+  margin-bottom: 16px;
+}
+
+.sk-left {
+  gap: 12px;
+}
+
+.sk-ic {
+  font-size: 1.35rem;
+}
+
+.sk-nm {
+  font-size: 0.72rem;
+  letter-spacing: 0.6px;
+}
+
+.sk-pc {
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+}
+
+.bar-bg {
+  height: 3px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 2px;
+}
+
+
+/* ══ 6. PROJECTS SECTION ══════════════════════════════════════════ */
+
+#projects {
+  padding: var(--space-2xl) 7%;
+}
+
+/* Projects header group */
+#projects > .reveal {
+  margin-bottom: 60px;
+}
+
+.projects-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+  margin-top: 0;
+}
+
+.pj {\n  padding: 24px 22px;\n  border-radius: 14px;\n  border: 1px solid color-mix(in srgb, var(--acc) 25%, transparent);\n  transition: border-color 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;\n}\n\n.pj:hover {\n  border-color: var(--acc);\n  transform: translateY(-4px);\n  box-shadow:\n    0 10px 40px rgba(0,0,0,0.5),\n    0 0 25px color-mix(in srgb, var(--acc) 35%, transparent);\n}
+
+.pj-top {
+  margin-bottom: 14px;
+}
+
+.pj-ic {
+  font-size: 1.35rem;
+}
+
+.pj-links {
+  gap: 10px;
+}
+
+.pj-links a {
+  font-size: 1.0rem;
+  color: var(--muted);
+  opacity: 0.6;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.pj-links a:hover {
+  opacity: 1;
+  color: var(--acc);
+}
+
+.pj-title {
+  font-size: 0.78rem;
+  letter-spacing: 0.3px;
+  margin-bottom: 10px;
+  line-height: var(--lh-snug);
+}
+
+.pj-desc {
+  font-size: 0.76rem;
+  line-height: var(--lh-relaxed);
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.pj-tags {
+  gap: 6px;
+}
+
+.ptag {
+  font-size: 0.52rem;
+  padding: 3px 9px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  opacity: 0.75;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+
+/* ══ 7. JOURNEY / TIMELINE ════════════════════════════════════════ */
+
+#journey {
+  padding-left: 7%;
+  padding-right: 7%;
+}
+
+/* Journey header group */
+#journey > .reveal {
+  margin-bottom: 80px;
+}
+
+.vtl {
+  max-width: 720px;
+  margin-top: 0;
+}
+
+.vtl-item {
+  margin-bottom: 60px;
+}
+
+.vtl-card {
+  padding: 22px 24px;
+  border-radius: 14px;
+  border-color: var(--border);
+  max-width: calc(50% - 40px);
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.vtl-card:hover {
+  border-color: rgba(255,255,255,0.12);
+  transform: translateY(-2px) !important;
+}
+
+.vtl-meta {
+  margin-bottom: 8px;
+}
+
+.vtl-title {
+  font-size: 0.74rem;
+  margin-bottom: 8px;
+  line-height: var(--lh-snug);
+}
+
+.vtl-desc {
+  font-size: 0.78rem;
+  line-height: var(--lh-relaxed);
+  color: var(--muted);
+}
+
+.vtl-date {
+  font-size: 0.56rem;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+/* CG section — generous spacing */
+.cg-wrap {
+  margin-top: 100px;
+}
+
+.cg-h {
+  font-size: clamp(1.4rem, 2.8vw, 2.1rem);
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+
+.cg-sub {
+  font-size: 0.84rem;
+  line-height: var(--lh-relaxed);
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.cg-hint {
+  font-size: 0.55rem;
+  letter-spacing: 3px;
+  margin-bottom: 36px;
+  opacity: 0.4;
+}
+
+.cg-card {
+  padding: 22px;
+  border-radius: 14px;
+  border-color: var(--border);
+}
+
+.cg-card:hover {
+  border-color: rgba(255,255,255,0.12);
+  transform: translateY(-4px);
+}
+
+.cg-card-head {
+  margin-bottom: 14px;
+}
+
+.cg-title {
+  font-size: 0.76rem;
+  letter-spacing: 0.3px;
+  margin-bottom: 10px;
+  line-height: var(--lh-snug);
+}
+
+.cg-desc {
+  font-size: 0.76rem;
+  line-height: var(--lh-relaxed);
+  color: var(--muted);
+}
+
+
+/* ══ 8. CERTIFICATES SECTION ══════════════════════════════════════ */
+
+#certs {
+  padding-left: 7%;
+  padding-right: 7%;
+}
+
+/* Certs header group */
+#certs > .reveal:first-child {
+  margin-bottom: 60px;
+}
+
+.ach-grid {
+  gap: 18px;
+  max-width: 1080px;
+  margin-top: 0;
+}
+
+.ach-card {
+  padding: 32px 22px;
+  border-radius: 14px;
+  border-color: var(--border);
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.ach-card:hover {
+  border-color: rgba(255,255,255,0.12);
+  transform: translateY(-3px);
+}
+
+.ach-ic {
+  font-size: 1.6rem;
+  margin-bottom: 14px;
+}
+
+.ach-t {
+  font-size: 0.66rem;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+}
+
+.ach-d {
+  font-size: 0.78rem;
+  line-height: var(--lh-relaxed);
+  color: var(--muted);
+}
+
+/* My Certs circles */
+.mycert-wrap {
+  margin-top: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mycert-h {
+  font-size: clamp(1.3rem, 2.5vw, 1.9rem);
+  letter-spacing: -0.01em;
+  margin-bottom: 10px;
+}
+
+.mycert-sub {
+  font-size: 0.84rem;
+  color: var(--muted);
+  margin-bottom: 44px;
+}
+
+.cert-row {
+  gap: 36px;
+}
+
+.cert-nm {
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  margin-top: 12px;
+}
+
+.cert-pl {
+  font-size: 0.56rem;
+  letter-spacing: 1.5px;
+  opacity: 0.55;
+  margin-top: 4px;
+}
+
+/* Terminal */
+.term-wrap {
+  margin-top: 90px;
+}
+
+.term-h {
+  font-size: clamp(1.3rem, 2.5vw, 1.9rem);
+  letter-spacing: -0.01em;
+  margin-bottom: 28px;
+}
+
+.term-body {
+  font-size: 0.72rem;
+  line-height: 2.1;
+  padding: 28px 30px;
+}
+
+
+/* ══ 9. CONTACT SECTION ═══════════════════════════════════════════ */
+
+#contact {
+  padding: var(--space-2xl) 7%;
+}
+
+.ct-inner {
+  gap: 80px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.ct-left h2 {
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.02em;
+  margin-bottom: 18px;
+  font-weight: 800;
+}
+
+.ct-left > p {
+  font-size: 0.88rem;
+  line-height: var(--lh-loose);
+  color: var(--muted);
+  margin-bottom: 36px;
+}
+
+.ct-row {
+  margin-bottom: 18px;
+  gap: 16px;
+}
+
+.ct-ic {
+  font-size: 1.1rem;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ct-lbl {
+  font-size: 0.56rem;
+  letter-spacing: 2px;
+  color: var(--muted);
+  opacity: 0.6;
+  margin-bottom: 3px;
+  text-transform: uppercase;
+}
+
+.ct-val {
+  font-size: 0.84rem;
+  color: var(--text);
+}
+
+.socials {
+  margin-top: 36px;
+  display: flex;
+  gap: 14px;
+}
+
+.soc {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  transition: border-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+.soc:hover {
+  border-color: var(--acc);
+  color: var(--acc);
+  transform: translateY(-2px);
+}
+
+/* Contact form */
+.ct-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.fg {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fg label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.56rem;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.fg input,
+.fg textarea {
+  padding: 14px 18px;
+  font-size: 0.84rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--text);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  line-height: var(--lh-normal);
+}
+
+.fg input:focus,
+.fg textarea:focus {
+  border-color: rgba(255,255,255,0.15);
+  box-shadow: 0 0 0 3px var(--acc2), 0 4px 16px rgba(0,0,0,0.2);
+  outline: none;
+  transform: none;
+}
+
+.fg textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.btn-send {
+  padding: 15px;
+  font-size: 0.62rem;
+  letter-spacing: 2.5px;
+  border-radius: 8px;
+  margin-top: 4px;
+}
+
+
+/* ══ 10. FOOTER ════════════════════════════════════════════════════ */
+
+footer {
+  padding: 48px 7%;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.fc {
+  font-size: 0.64rem;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.fc span {
+  color: var(--acc);
+  opacity: 1;
+}
+
+.fs {
+  display: flex;
+  gap: 14px;
+}
+
+.fs a {
+  color: var(--muted);
+  opacity: 0.5;
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+.fs a:hover {
+  opacity: 1;
+  color: var(--acc);
+}
+
+
+/* ══ 11. NAVBAR REFINEMENT ════════════════════════════════════════ */
+
+#nav {
+  padding: 0 7%;
+}
+
+.nav-links {
+  gap: 36px;
+}
+
+.nav-links a {
+  font-size: 0.56rem;
+  letter-spacing: 2.5px;
+  opacity: 0.65;
+  transition: color 0.25s ease, opacity 0.25s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  opacity: 1;
+  color: var(--acc);
+}
+
+.nav-logo {
+  font-size: 1.25rem;
+  letter-spacing: 4px;
+}
+
+
+/* ══ 12. SHARED CARD SYSTEM — consistent radius + border ══════════ */
+
+.sk-card,
+.pj,
+.ach-card,
+.about-card,
+.vtl-card,
+.cg-card {
+  border-radius: 14px !important;
+  border-color: rgba(255,255,255,0.18) !important;
+}
+
+/* Hover state — minimal, elegant lift only */
+.sk-card:hover  { transform: translateY(-3px) !important; }
+.pj:hover       { transform: translateY(-4px) !important; }
+.ach-card:hover { transform: translateY(-3px) !important; }
+.cg-card:hover  { transform: translateY(-4px) !important; }
+
+/* Hover border — theme-dynamic for all cards */
+.pj:hover {
+  border-color: var(--acc) !important;
+}
+.sk-card:hover,
+.ach-card:hover,
+.about-card:hover {
+  border-color: color-mix(in srgb, var(--acc) 35%, transparent) !important;
+}
+
+
+/* ══ 13. VISUAL DEPTH — subtle background texture ═════════════════ */
+
+/* Faint radial gradient on hero for depth */
+#home::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 65% 50%, var(--acc2) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.35;
+}
+
+/* Section ambient glow — very subtle */
+#about::before,
+#skills::before,
+#certs::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--acc2), transparent);
+  pointer-events: none;
+}
+
+
+/* ══ 14. STAGGER DELAYS — tighter, snappier reveals ═══════════════ */
+
+.sd-1 { transition-delay: 0.07s; }
+.sd-2 { transition-delay: 0.12s; }
+.sd-3 { transition-delay: 0.17s; }
+.sd-4 { transition-delay: 0.22s; }
+.sd-5 { transition-delay: 0.28s; }
+.sd-6 { transition-delay: 0.34s; }
+.sd-7 { transition-delay: 0.40s; }
+
+
+/* ══ 15. RESPONSIVE ════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  #home    { gap: 60px; }
+  .h-ring  { width: 340px; height: 340px; }
+  .vtl-card { max-width: calc(50% - 36px); }
+}
+
+@media (max-width: 768px) {
+  #about, #skills, #projects, #journey, #certs, #contact {
+    padding-top: 110px;
+    padding-bottom: 110px;
+    padding-left: 6%;
+    padding-right: 6%;
+  }
+
+  #home { padding: 80px 6% 0; gap: 48px; flex-direction: column; align-items: flex-start; }
+  .h-ring { width: 280px; height: 280px; }
+  .h-name { font-size: clamp(2.2rem, 10vw, 3.2rem); }
+  .about-inner { gap: 48px; }
+  .ach-grid { grid-template-columns: repeat(2,1fr); gap: 14px; }
+  .projects-grid { grid-template-columns: 1fr; gap: 14px; }
+  .ct-inner { flex-direction: column; gap: 60px; }
+  footer { flex-direction: column; align-items: center; text-align: center; }
+}
+
+@media (max-width: 480px) {
+  #about, #skills, #projects, #journey, #certs, #contact {
+    padding-top: 90px;
+    padding-bottom: 90px;
+  }
+  .stit { font-size: clamp(1.7rem, 8vw, 2.4rem); }
+  .ach-grid { grid-template-columns: 1fr; }
+  .h-name  { font-size: clamp(2.0rem, 12vw, 2.8rem); }
+  .h-btns  { flex-direction: column; gap: 12px; }
+  .btn-p, .btn-o { text-align: center; }
+}
+
+
+/* ══ 16. REDUCED MOTION ════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   MICRO-POLISH — Final refinements. Appended last.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* FIX 1 — HERO IMAGE MICRO FLOAT
+   Subtle vertical breathing. JS parallax writes translateY via inline
+   style, so we composite float on top using a CSS animation on the
+   ::after pseudo — avoids fighting the JS transform on .h-ring itself.
+   Instead we wrap the animation on the img inside .h-ring so the JS
+   parallax transform on .h-ring stays untouched.                    */
+.h-ring img {
+  animation: heroFloat 6s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0px);   }
+  50%       { transform: translateY(-10px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .h-ring img { animation: none !important; }
+}
+
+
+/* FIX 2 — SECTION TRANSITION SMOOTHNESS
+   Opacity hint so browser pre-composites each section layer.
+   No visible animation — purely a rendering hint that prevents
+   repaints bleeding across section boundaries on scroll.           */
+section {
+  will-change: auto;         /* let browser decide — no forced GPU layer */
+  isolation: isolate;        /* new stacking context per section          */
+}
+/* Soften the section divider line so flow feels continuous           */
+section:not(#contact)::after {
+  transition: opacity 0.6s ease;
+  opacity: 0.6;
+}
+
+
+/* FIX 3 — NAVBAR HEIGHT REFINEMENT
+   72px → more breathing room, items stay centred via flex align.    */
+#nav {
+  height: 72px !important;
+}
+/* Scrolled compact state — still reduce but from 72 not 68          */
+#nav.scrolled {
+  height: 56px !important;
+}
+
+
+/* ══ CERTIFICATE GRID — portfolio display ════════════════════════
+   Replaces the old ring-card system with a clean flat image grid.
+   Scales from 2 → auto-fill columns across breakpoints.
+═════════════════════════════════════════════════════════════════ */
+
+/* ── CERT CIRCLES — centered flex row, equal spacing ── */
+.cert-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  gap: 48px !important;
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+  box-sizing: border-box;
+  /* Horizontal slide animation support */
+  will-change: transform, opacity;
+  min-height: 60px; /* prevent layout jump during slide */
+}
+
+.cert-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  text-align: center;
+  width: 140px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.cert-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--acc) 40%, transparent);
+  background: color-mix(in srgb, var(--acc) 6%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 0 auto;
+  transition: transform 0.4s cubic-bezier(0.22,1,0.36,1),
+              box-shadow 0.4s ease,
+              border-color 0.4s ease,
+              background 0.4s ease;
+  cursor: pointer;
+}
+.cert-circle svg {
+  stroke: var(--acc);
+  transition: stroke 0.4s ease;
+}
+.cert-item:hover .cert-circle {
+  transform: scale(1.07);
+  border-color: color-mix(in srgb, var(--acc) 60%, transparent);
+  /* background unchanged — no inside fill on hover */
+  box-shadow: 0 0 16px color-mix(in srgb, var(--glow) 35%, transparent);
+}
+
+.cert-item h3 { display: none; }
+.cert-item p  { display: none; }
+
+/* Cert label — subtle text below emoji circle */
+.cert-label {
+  display: block;
+  margin-top: 14px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  color: rgba(255,255,255,0.72);
+  text-transform: uppercase;
+  text-align: center;
+  max-width: 130px;
+  line-height: 1.45;
+  transition: color 0.28s ease;
+  pointer-events: none;
+}
+.cert-item:hover .cert-label {
+  color: rgba(255,255,255,0.9);
+}
+
+@media (max-width: 700px) {
+  .cert-row {
+    gap: 32px !important;
+  }
+  .cert-item { width: 110px; }
+  .cert-circle { width: 90px; height: 90px; }
+  .cert-circle svg { width: 24px; height: 24px; }
+}
+
+@media (max-width: 420px) {
+  .cert-row { gap: 24px !important; }
+  .cert-item { width: 100px; }
+  .cert-circle { width: 80px; height: 80px; }
+}
+
+
+/* ════════════════════════════════════════════════════════════════
+   CURSOR AUTHORITY BLOCK — loaded last, wins all specificity wars.
+   Removes every trace of the system cursor so the custom
+   #cur-dot / #cur-ring pair is the sole visible cursor.
+   Only inputs keep the system text cursor for usability.
+════════════════════════════════════════════════════════════════ */
+
+/* 1. Nuke system cursor on EVERYTHING */
+html,
+body,
+*,
+*::before,
+*::after {
+  cursor: none !important;
+}
+
+/* 2. Interactive elements — none, not pointer (custom cursor handles feedback) */
+a,
+button,
+label,
+summary,
+[role="button"],
+[role="link"],
+[role="tab"],
+[role="menuitem"],
+[tabindex]:not([tabindex="-1"]),
+.tsw,
+.cert-ring-btn,
+.cert-circle,
+.btn-p,
+.btn-o,
+.btn-send,
+.nav-cta,
+.nav-links a,
+.soc,
+.sk-card,
+.pj,
+.ach-card,
+.vtl-card,
+.cg-card,
+.about-card {
+  cursor: none !important;
+}
+
+/* 3. Drag contexts — none during drag too */
+.cg-rail-wrap,
+.cg-rail-wrap:active,
+.vb-grip,
+.vb-grip:active,
+body.vb-dragging,
+body.vb-dragging * {
+  cursor: none !important;
+}
+
+/* 4. Inputs ALWAYS get text cursor — non-negotiable for usability */
+input,
+textarea,
+select,
+[contenteditable] {
+  cursor: text !important;
+}
+
+/* 5. Admin panel — restore full native system (admin doesn't use custom cursor) */
+#adm-overlay,
+#adm-overlay *,
+#adm-login,
+#adm-login *,
+#adm-modal-ov,
+#adm-modal-ov * {
+  cursor: auto !important;
+}
+#adm-overlay input,
+#adm-overlay textarea,
+#adm-overlay select,
+#adm-login input {
+  cursor: text !important;
+}
+#adm-overlay button,
+#adm-overlay .adm-nav-item,
+#adm-overlay .adm-icon-btn,
+#adm-overlay .adm-add-btn,
+#adm-overlay .adm-btn-sm,
+#adm-login button {
+  cursor: pointer !important;
+}
+#adm-overlay [draggable="true"],
+#adm-overlay .adm-drag-handle,
+#adm-overlay .adm-cert-card-drag {
+  cursor: grab !important;
+}
+
+/* 6. Touch / mobile — restore auto, hide custom cursor elements */
+@media (hover: none) and (pointer: coarse) {
+  html, body, *, *::before, *::after {
+    cursor: auto !important;
+  }
+  #cur-dot, #cur-ring {
+    display: none !important;
+  }
+}
+
+/* ══ UPLOADED CERT IMAGE IN CIRCLE ═══════════════════════════════════ */
+.cert-uploaded-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+/* ══ CERT TABS BAR (on live portfolio) ═══════════════════════════════ */
+.cert-tabs-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0 auto 32px;
+  max-width: 800px;
+}
+.cert-tab-btn {
+  padding: 8px 20px;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.45);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s, transform 0.2s;
+}
+.cert-tab-btn:hover {
+  border-color: var(--acc);
+  color: rgba(255,255,255,0.8);
+  transform: translateY(-1px);
+}
+.cert-tab-btn.active {
+  border-color: var(--acc);
+  background: var(--acc2);
+  color: var(--acc);
+}
+
+/* ══ CERT EMPTY STATE ═════════════════════════════════════════════════ */
+.cert-empty-msg {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.25);
+  text-align: center;
+  padding: 40px 0;
+  width: 100%;
+}
+
+/* ══ CERT ITEM ADMIN — ensure pointer feedback on touch/fallback devices ══ */
+.cert-item-admin {
+  cursor: pointer;
+}
+.cert-item-admin .cert-circle {
+  cursor: pointer;
+}
+@media (hover: none) and (pointer: coarse) {
+  /* Touch devices: override cursor:none so items are clearly tappable */
+  .cert-item, .cert-item-admin, .cert-circle {
+    cursor: pointer !important;
+  }
+}
+
+/* ══ CERT CIRCLE — EMOJI GLOW RING ══════════════════════════════════ */
+/* When circle has no image — pulsing ring around it */
+.cert-circle-emoji {
+  position: relative;
+}
+.cert-circle-emoji::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--acc) 45%, transparent);
+  opacity: 1;
+  animation: cert-ring-pulse 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+.cert-circle-emoji::after {
+  content: '';
+  position: absolute;
+  inset: -13px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--acc) 20%, transparent);
+  opacity: 1;
+  animation: cert-ring-pulse 2.8s ease-in-out 0.6s infinite;
+  pointer-events: none;
+}
+@keyframes cert-ring-pulse {
+  0%, 100% { transform: scale(1);    opacity: 0.6; }
+  50%       { transform: scale(1.07); opacity: 0.2; }
+}
+.cert-item:hover .cert-circle-emoji::before {
+  animation: none;
+  opacity: 1;
+  border-color: color-mix(in srgb, var(--acc) 75%, transparent);
+  box-shadow: none;
+}
+.cert-item:hover .cert-circle-emoji::after {
+  animation: none;
+  opacity: 0.5;
+  border-color: color-mix(in srgb, var(--acc) 35%, transparent);
+}
+
+/* ══ CERT TAB COUNT BADGE ════════════════════════════════════════════ */
+.cert-tab-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.45);
+  font-size: 0.55rem;
+  font-weight: 700;
+  padding: 0 5px;
+  margin-left: 6px;
+  vertical-align: middle;
+  transition: background 0.2s, color 0.2s;
+}
+.cert-tab-btn.active .cert-tab-count-badge {
+  background: var(--acc);
+  color: #000;
+}
+
+/* ══ CERT ROW — smooth reveal animation ═════════════════════════════ */
+.cert-row {
+  transition: opacity 0.38s cubic-bezier(0.22,1,0.36,1),
+              transform 0.38s cubic-bezier(0.22,1,0.36,1);
+}
+
+/* Stagger each cert-item on entry */
+.cert-item-admin {
+  animation: cert-item-in 0.42s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes cert-item-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.92); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ══ CERT TAB BTN — click-to-reveal UX ══════════════════════════════ */
+.cert-tab-btn {
+  position: relative;
+  overflow: hidden;
+}
+.cert-tab-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--acc);
+  opacity: 0;
+  transform: scale(0);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  pointer-events: none;
+}
+.cert-tab-btn:active::after {
+  transform: scale(2.5);
+  opacity: 0.1;
+}
+
+/* tap-to-view hint removed */

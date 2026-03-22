@@ -1,0 +1,125 @@
+/* ═══════════════════════════════════════════════════════════════════
+   CG-HSCROLL.CSS  — Pinned horizontal scroll driver
+   Layers on top of existing CG styles. Never touches other sections.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Scroll-driver wrapper (injected by JS around .cg-wrap) ── */
+#cg-driver {
+  position: relative;
+  /* height is set dynamically by JS: scroll travel = rail width */
+}
+
+/* ── 2. Sticky viewport — pins at top while driver scrolls past ── */
+#cg-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ── 3. Inner wrapper — holds header + rail, full height ── */
+#cg-sticky-inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0 6%;
+  box-sizing: border-box;
+}
+
+/* ── 4. Override timeline-drag-fix.css !importants during pinned mode ──
+   Only active while data-hscroll="active" is set on the wrap.       */
+[data-hscroll="active"]#cg-rail-wrap {
+  overflow-x: hidden !important;  /* rail moves by transform, not scroll */
+  overflow-y: hidden !important;
+  transform: none !important;     /* wrap stays put, rail moves */
+  will-change: auto !important;
+  cursor: default !important;
+}
+
+/* ── 5. Rail: transform-driven in pinned mode ── */
+[data-hscroll="active"] #cg-rail {
+  transform: translate3d(0, 0, 0); /* baseline, JS updates this */
+  will-change: transform;
+  transition: none !important;     /* JS lerp handles easing */
+}
+
+/* ── 6. Progress bar repositioned to bottom of viewport ── */
+#cg-driver .cg-progress {
+  margin-top: 12px;
+}
+
+/* ── 7. Scroll hint — shows during pinned phase ── */
+#cg-scroll-hint {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.48rem;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,0.22);
+  text-transform: uppercase;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+#cg-scroll-hint.visible { opacity: 1; }
+#cg-scroll-hint svg {
+  animation: hint-bounce 1.4s ease-in-out infinite;
+}
+@keyframes hint-bounce {
+  0%, 100% { transform: translateY(0);  }
+  50%       { transform: translateY(4px); }
+}
+
+/* ── 8. Progress bar track — pinned mode makes it full-width ── */
+[data-hscroll="active"] .cg-track {
+  top: 28px !important;
+}
+
+/* ── 9. Section heading — tighter when pinned (viewport space) ── */
+#cg-driver .cg-wrap {
+  margin-top: 0;
+}
+#cg-driver .stag   { margin-bottom: 6px; }
+#cg-driver .cg-h   { margin-bottom: 4px; }
+#cg-driver .cg-sub { margin-bottom: 16px; }
+#cg-driver .cg-controls { margin-bottom: 16px; }
+
+/* ── 10. Edge fades — must clip to sticky container ── */
+#cg-driver .cg-fade-left,
+#cg-driver .cg-fade-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 10;
+}
+
+/* ── 11. Mobile — disable pinning, restore native drag ── */
+@media (max-width: 768px), (hover: none) {
+  #cg-driver        { height: auto !important; }
+  #cg-sticky        { position: relative !important; height: auto !important; overflow: visible !important; }
+  #cg-sticky-inner  { padding: 0 !important; }
+  [data-hscroll="active"]#cg-rail-wrap {
+    overflow-x: auto !important;
+    cursor: grab !important;
+  }
+  [data-hscroll="active"] #cg-rail {
+    transform: none !important;
+    will-change: auto !important;
+  }
+  #cg-scroll-hint { display: none !important; }
+}
+
+/* ── 12. Reduced motion — no lerp, instant jump ── */
+@media (prefers-reduced-motion: reduce) {
+  [data-hscroll="active"] #cg-rail {
+    transition: none !important;
+  }
+}

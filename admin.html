@@ -1,0 +1,3223 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="blue">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin Panel — Arrabola Srishanth</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --acc:#4f6ef5;--acc2:rgba(79,110,245,0.15);--glow:rgba(79,110,245,0.45);
+  --bg:#06060f;--bg2:#0a0a16;--bg3:#0f0f1e;--card:#0d0d1c;
+  --border:rgba(255,255,255,0.18);--text:#dde0f0;--muted:rgba(148,155,185,0.72);
+}
+[data-theme="blue"]  {--acc:#4f6ef5;--acc2:rgba(79,110,245,0.15);--glow:rgba(79,110,245,0.45)}
+[data-theme="pink"]  {--acc:#e91e8c;--acc2:rgba(233,30,140,0.15);--glow:rgba(233,30,140,0.45)}
+[data-theme="green"] {--acc:#00ff88;--acc2:rgba(0,255,136,0.12);--glow:rgba(0,255,136,0.4)}
+[data-theme="yellow"]{--acc:#e5c62a;--acc2:rgba(229,198,42,0.12);--glow:rgba(229,198,42,0.4)}
+[data-theme="purple"]{--acc:#a855f7;--acc2:rgba(168,85,247,0.15);--glow:rgba(168,85,247,0.45)}
+[data-theme="orange"]{--acc:#f97316;--acc2:rgba(249,115,22,0.15);--glow:rgba(249,115,22,0.4)}
+[data-theme="cyan"]  {--acc:#22d3ee;--acc2:rgba(34,211,238,0.12);--glow:rgba(34,211,238,0.4)}
+
+/* ══ EXTENDED THEME DEFS (matching enhancements.css) ══════════════ */
+[data-theme="rose"]    {--acc:#f43f5e;--acc2:rgba(244,63,94,0.15);--glow:rgba(244,63,94,0.45)}
+[data-theme="emerald"] {--acc:#10b981;--acc2:rgba(16,185,129,0.14);--glow:rgba(16,185,129,0.42)}
+[data-theme="gold"]    {--acc:#f5c518;--acc2:rgba(245,197,24,0.14);--glow:rgba(245,197,24,0.42)}
+[data-theme="sunset"]  {--acc:#fb7185;--acc2:rgba(251,113,133,0.15);--glow:rgba(251,113,133,0.45)}
+[data-theme="ocean"]   {--acc:#38bdf8;--acc2:rgba(56,189,248,0.14);--glow:rgba(56,189,248,0.44)}
+[data-theme="rainbow"] {--acc:#a78bfa;--acc2:rgba(167,139,250,0.15);--glow:rgba(167,139,250,0.45)}
+
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+a{text-decoration:none;color:inherit}
+button{border:none;cursor:pointer;font-family:inherit}
+input,textarea,select{font-family:inherit}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+#login-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 40%,var(--acc2) 0%,transparent 70%);pointer-events:none}
+.login-box{position:relative;background:rgba(13,13,28,0.95);border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:52px 44px;width:min(420px,94vw);box-shadow:0 40px 100px rgba(0,0,0,0.7)}
+.login-logo{font-family:'Orbitron',sans-serif;font-size:1.15rem;font-weight:900;letter-spacing:5px;color:rgba(255,255,255,0.12);text-align:center;margin-bottom:8px}
+.login-logo span{color:var(--acc)}
+.login-subtitle{font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:4px;color:rgba(255,255,255,0.25);text-transform:uppercase;text-align:center;margin-bottom:44px}
+.login-field{margin-bottom:16px}
+.login-field label{display:block;font-family:'Space Mono',monospace;font-size:0.54rem;letter-spacing:2.5px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:8px}
+.login-field input{width:100%;padding:13px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:var(--text);font-size:0.90rem;font-family:'Space Mono',monospace;outline:none;transition:border-color .25s,box-shadow .25s}
+.login-field input:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc2)}
+.login-error{font-size:0.72rem;color:#f87171;text-align:center;min-height:22px;margin:10px 0;opacity:0;transition:opacity .2s}
+.login-error.show{opacity:1}
+.login-btn{width:100%;padding:14px;margin-top:4px;background:var(--acc);color:#000;border-radius:10px;font-family:'Orbitron',sans-serif;font-size:0.62rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;transition:opacity .2s,transform .2s}
+.login-btn:hover{opacity:.88;transform:translateY(-1px)}
+.login-hint{font-family:'Space Mono',monospace;font-size:0.50rem;color:rgba(255,255,255,0.15);text-align:center;margin-top:20px;letter-spacing:1px}
+
+/* ── SHELL ── */
+#admin-shell{display:none;height:100vh;flex-direction:row}
+#admin-shell.visible{display:flex}
+
+/* ── SIDEBAR ── */
+.adm-sidebar{width:230px;flex-shrink:0;background:rgba(6,6,14,0.98);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;padding:28px 0 20px}
+.adm-logo{font-family:'Orbitron',sans-serif;font-size:0.80rem;font-weight:800;letter-spacing:4px;color:rgba(255,255,255,0.12);padding:0 24px 24px;border-bottom:1px solid var(--border);margin-bottom:18px}
+.adm-logo span{color:var(--acc)}
+.adm-logo small{display:block;font-family:'Space Mono',monospace;font-size:0.48rem;letter-spacing:3px;color:rgba(255,255,255,0.2);margin-top:4px;font-weight:400}
+.adm-nav-group{margin-bottom:6px}
+.adm-nav-label{font-family:'Space Mono',monospace;font-size:0.48rem;letter-spacing:3px;color:rgba(255,255,255,0.2);text-transform:uppercase;padding:8px 24px 5px}
+.adm-nav-item{display:flex;align-items:center;gap:11px;padding:10px 24px;font-size:0.80rem;font-weight:600;color:rgba(255,255,255,0.38);letter-spacing:.3px;border-left:2px solid transparent;cursor:pointer;transition:color .2s,background .2s,border-color .2s;user-select:none}
+.adm-nav-item:hover{color:rgba(255,255,255,0.72);background:rgba(255,255,255,0.03)}
+.adm-nav-item.active{color:var(--acc);border-left-color:var(--acc);background:rgba(79,110,245,0.06)}
+.adm-nav-ico{font-size:0.85rem;width:18px;text-align:center}
+.adm-sidebar-foot{margin-top:auto;padding:20px 16px 0;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px}
+
+/* ── MAIN ── */
+.adm-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.adm-topbar{height:58px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px;border-bottom:1px solid var(--border);background:rgba(6,6,14,0.7);backdrop-filter:blur(12px)}
+.adm-topbar-left{display:flex;align-items:center;gap:16px}
+.adm-page-title{font-family:'Orbitron',sans-serif;font-size:0.70rem;letter-spacing:2px;color:rgba(255,255,255,0.5);text-transform:uppercase}
+.adm-breadcrumb{font-family:'Space Mono',monospace;font-size:0.52rem;color:rgba(255,255,255,0.2);letter-spacing:1px}
+.adm-topbar-right{display:flex;align-items:center;gap:10px}
+.adm-status-dot{display:flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:0.52rem;color:#4ade80;letter-spacing:1px}
+.adm-status-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:#4ade80;animation:dp 2s ease-in-out infinite}
+@keyframes dp{0%,100%{opacity:1}50%{opacity:.35}}
+.adm-content{flex:1;overflow-y:auto;padding:32px 36px}
+
+/* ── BUTTONS ── */
+.btn-primary{padding:10px 22px;background:var(--acc);color:#000;border-radius:8px;font-family:'Orbitron',sans-serif;font-size:0.58rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:opacity .2s,transform .2s}
+.btn-primary:hover{opacity:.85;transform:translateY(-1px)}
+.btn-secondary{padding:10px 20px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.55);border-radius:8px;font-family:'Orbitron',sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;transition:background .2s,color .2s}
+.btn-secondary:hover{background:rgba(255,255,255,0.09);color:rgba(255,255,255,0.8)}
+.btn-danger{padding:10px 20px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#f87171;border-radius:8px;font-family:'Orbitron',sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;transition:background .2s}
+.btn-danger:hover{background:rgba(239,68,68,0.18)}
+.btn-success{padding:10px 20px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);color:#4ade80;border-radius:8px;font-family:'Orbitron',sans-serif;font-size:0.58rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;transition:background .2s}
+.btn-success:hover{background:rgba(34,197,94,0.18)}
+.btn-sm{padding:8px 16px;border-radius:7px;font-family:'Orbitron',sans-serif;font-size:0.55rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;transition:opacity .2s,transform .2s}
+.btn-sm:hover{opacity:.82;transform:translateY(-1px)}
+
+/* ── PANEL CHROME ── */
+.panel-title{font-family:'Orbitron',sans-serif;font-size:0.80rem;font-weight:700;letter-spacing:2.5px;color:rgba(255,255,255,0.65);text-transform:uppercase;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.form-group{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px}
+.form-group-title{font-family:'Space Mono',monospace;font-size:0.55rem;letter-spacing:3px;color:rgba(255,255,255,0.25);text-transform:uppercase;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-grid.cols-3{grid-template-columns:1fr 1fr 1fr}
+.form-grid.cols-1{grid-template-columns:1fr}
+.form-col{display:flex;flex-direction:column;gap:7px}
+.full-width{grid-column:1/-1}
+.lbl{font-family:'Space Mono',monospace;font-size:0.53rem;letter-spacing:2px;color:rgba(255,255,255,0.28);text-transform:uppercase}
+.inp,.ta,.sel{width:100%;padding:11px 14px;background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);border-radius:9px;color:var(--text);font-size:0.84rem;outline:none;transition:border-color .22s,box-shadow .22s}
+.inp:focus,.ta:focus,.sel:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc2)}
+.ta{min-height:90px;resize:vertical;line-height:1.65}
+.sel{cursor:pointer;background-color:rgba(8,8,20,0.9)}
+.sel option{background:#0d0d1a}
+
+/* ── TOGGLE ── */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-label{font-size:0.80rem;font-weight:600;color:rgba(255,255,255,0.6)}
+.toggle{position:relative;width:42px;height:23px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;background:rgba(255,255,255,0.1);border-radius:12px;cursor:pointer;transition:background .25s}
+.toggle-track::after{content:'';position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:rgba(255,255,255,0.45);transition:transform .25s,background .25s}
+.toggle input:checked + .toggle-track{background:var(--acc)}
+.toggle input:checked + .toggle-track::after{transform:translateX(19px);background:#000}
+
+/* ── CARD LIST (shared) ── */
+.card-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.card-item{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px;transition:border-color .2s;cursor:default}
+.card-item:hover{border-color:rgba(255,255,255,0.12)}
+.drag-handle{flex-shrink:0;font-size:1.1rem;color:rgba(255,255,255,0.18);cursor:grab;padding-right:4px;user-select:none;transition:color .2s}
+.card-item:hover .drag-handle{color:rgba(255,255,255,0.45)}
+.card-item.dragging{opacity:.4;transform:scale(.98)}
+.card-item.drag-over{border:1px dashed var(--acc)!important;background:rgba(79,110,245,0.05)}
+.card-body{flex:1;min-width:0}
+.card-name{font-size:0.84rem;font-weight:700;color:rgba(255,255,255,0.8);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-meta{font-size:0.68rem;color:rgba(255,255,255,0.32);line-height:1.4}
+.card-actions{display:flex;gap:6px;flex-shrink:0}
+.icon-btn{width:32px;height:32px;border-radius:7px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.38);font-size:0.78rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .2s,color .2s,background .2s}
+.icon-btn:hover{border-color:var(--acc);color:var(--acc);background:rgba(79,110,245,0.06)}
+.icon-btn.del:hover{border-color:#ef4444;color:#ef4444;background:rgba(239,68,68,0.06)}
+.add-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:rgba(79,110,245,0.06);border:1px dashed rgba(79,110,245,0.28);border-radius:10px;color:var(--acc);font-size:0.72rem;font-weight:600;letter-spacing:1px;cursor:pointer;transition:background .2s,border-color .2s}
+.add-btn:hover{background:rgba(79,110,245,0.12);border-color:rgba(79,110,245,0.48)}
+
+/* ── THEME SWATCHES ── */
+.theme-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.swatch{width:38px;height:38px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:transform .2s,border-color .2s}
+.swatch:hover{transform:scale(1.18)}
+.swatch.active{border-color:#fff}
+
+/* ── PROFILE IMAGE ── */
+.profile-drop-zone{border:2px dashed rgba(255,255,255,0.1);border-radius:14px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:border-color .25s,background .25s;min-height:120px;justify-content:center}
+.profile-drop-zone.drop-active{border-color:var(--acc);background:var(--acc2)}
+.profile-preview{width:90px;height:90px;border-radius:50%;border:2px solid rgba(255,255,255,0.08);object-fit:cover;object-position:top;display:none;background:rgba(255,255,255,0.03);margin-bottom:8px}
+.profile-placeholder{display:flex;flex-direction:column;align-items:center;gap:6px}
+
+/* ── CERT ADMIN GRID ── */
+.adm-cert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:16px}
+.adm-cert-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:12px;position:relative;cursor:grab;transition:border-color .2s,opacity .2s}
+.adm-cert-card:hover{border-color:rgba(255,255,255,0.15)}
+.adm-cert-card.adm-cert-card-dragging{opacity:.4}
+.adm-cert-card.adm-cert-card-over{border:2px dashed var(--acc)!important;background:var(--acc2)}
+.adm-cert-card-drag{font-size:1.1rem;color:rgba(255,255,255,0.25);text-align:center;margin-bottom:6px;cursor:grab}
+.adm-cert-card-img-wrap{width:100%;aspect-ratio:4/3;border-radius:7px;overflow:hidden;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.adm-cert-card-img{width:100%;height:100%;object-fit:cover}
+.adm-cert-card-placeholder{font-size:2rem;opacity:.35}
+.adm-cert-card-title{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,0.1);color:var(--text);font-size:0.72rem;padding:4px 2px;outline:none;font-family:'Rajdhani',sans-serif;transition:border-color .2s}
+.adm-cert-card-title:focus{border-bottom-color:var(--acc)}
+.adm-cert-card-del{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;font-size:0.65rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s}
+.adm-cert-card-del:hover{background:rgba(239,68,68,0.35)}
+.adm-certs-drop-zone{border:2px dashed rgba(255,255,255,0.1);border-radius:12px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:border-color .25s,background .25s}
+.adm-certs-drop-zone.adm-certs-drop-active{border-color:var(--acc);background:var(--acc2)}
+
+/* ── CREDENTIALS ── */
+.cred-box{background:rgba(239,68,68,0.04);border:1px solid rgba(239,68,68,0.14);border-radius:14px;padding:22px}
+.cred-warn{font-size:0.70rem;color:rgba(239,68,68,0.7);margin-bottom:16px;line-height:1.6}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;z-index:9999;background:rgba(4,4,10,0.82);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{background:rgba(13,13,28,0.98);border:1px solid rgba(255,255,255,0.09);border-radius:20px;padding:32px 28px;width:min(560px,94vw);max-height:86vh;overflow-y:auto;transform:translateY(14px);transition:transform .25s}
+.modal-overlay.open .modal-box{transform:translateY(0)}
+.modal-title{font-family:'Orbitron',sans-serif;font-size:0.70rem;letter-spacing:2.5px;color:rgba(255,255,255,0.55);text-transform:uppercase;margin-bottom:24px}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.06)}
+
+
+/* ── CONFIRM DELETE DIALOG ─────────────────────────────────────────────────
+   Smooth animated confirmation popup.
+   Backdrop: opacity 0→1 with blur.
+   Box: scale(0.88)+translateY(16px) → scale(1)+translateY(0).
+   All transitions use transform+opacity only — no layout properties.
+──────────────────────────────────────────────────────────────────────────── */
+.adm-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: rgba(4, 4, 10, 0.80);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  /* Entry state */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.adm-confirm-overlay.adm-confirm-open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* The dialog box */
+.adm-confirm-box {
+  background: rgba(12, 12, 22, 0.99);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 32px 28px 24px;
+  width: min(360px, 94vw);
+  text-align: center;
+  position: relative;
+  /* Entry state: shrunk + shifted down */
+  opacity: 0;
+  transform: scale(0.86) translateY(18px);
+  transition:
+    opacity   0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow:
+    0 32px 64px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 0 60px rgba(239, 68, 68, 0.05);
+}
+.adm-confirm-overlay.adm-confirm-open .adm-confirm-box {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* Exit animation — JS adds .adm-confirm-closing for reverse */
+.adm-confirm-overlay.adm-confirm-closing {
+  opacity: 0;
+}
+.adm-confirm-overlay.adm-confirm-closing .adm-confirm-box {
+  opacity: 0;
+  transform: scale(0.92) translateY(10px);
+}
+
+/* Warning icon */
+.adm-confirm-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.10);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+  font-size: 1.3rem;
+  line-height: 1;
+  animation: adm-confirm-icon-pulse 2.4s ease-in-out infinite;
+}
+@keyframes adm-confirm-icon-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.25); }
+  50%       { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+}
+
+/* Title */
+.adm-confirm-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 10px;
+}
+
+/* Item name highlight */
+.adm-confirm-item-name {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--acc, #4f6ef5);
+  background: rgba(79, 110, 245, 0.08);
+  border: 1px solid rgba(79, 110, 245, 0.15);
+  border-radius: 6px;
+  padding: 6px 14px;
+  display: inline-block;
+  margin: 4px 0 14px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Message */
+.adm-confirm-msg {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.80rem;
+  color: rgba(255, 255, 255, 0.38);
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+/* Footer buttons */
+.adm-confirm-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Cancel button */
+.adm-confirm-cancel-btn {
+  flex: 1;
+  padding: 10px 18px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.55);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.18s;
+}
+.adm-confirm-cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.20);
+  color: rgba(255, 255, 255, 0.80);
+  transform: translateY(-1px);
+}
+.adm-confirm-cancel-btn:active { transform: translateY(0); }
+
+/* Delete/confirm button */
+.adm-confirm-delete-btn {
+  flex: 1;
+  padding: 10px 18px;
+  border-radius: 9px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.18s,
+              box-shadow 0.2s;
+}
+.adm-confirm-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.24);
+  border-color: rgba(239, 68, 68, 0.60);
+  color: #fca5a5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.20);
+}
+.adm-confirm-delete-btn:active { transform: translateY(0); box-shadow: none; }
+
+/* Keyboard focus rings */
+.adm-confirm-cancel-btn:focus-visible,
+.adm-confirm-delete-btn:focus-visible {
+  outline: 2px solid var(--acc, #4f6ef5);
+  outline-offset: 2px;
+}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(13,13,28,0.97);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 26px;font-size:0.76rem;color:rgba(255,255,255,0.8);letter-spacing:.5px;z-index:99999;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.ok{border-color:rgba(34,197,94,0.4);color:#86efac}
+#toast.err{border-color:rgba(239,68,68,0.4);color:#fca5a5}
+
+/* ── PANELS ── */
+.panel{display:none}
+.panel.active{display:block}
+
+/* ════════════════════════════════════════════
+   SECTION MANAGER
+════════════════════════════════════════════ */
+.sec-manager{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.sec-row{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;transition:border-color .2s,background .2s;user-select:none}
+.sec-row:hover{border-color:rgba(255,255,255,0.12)}
+.sec-row.dragging{opacity:.4;transform:scale(.98)}
+.sec-row.drag-over{border:1px dashed var(--acc)!important;background:rgba(79,110,245,0.05)}
+.sec-drag{font-size:1.2rem;color:rgba(255,255,255,0.2);cursor:grab;padding-right:4px;transition:color .2s}
+.sec-row:hover .sec-drag{color:rgba(255,255,255,0.5)}
+.sec-info{flex:1;min-width:0}
+.sec-name{font-size:0.84rem;font-weight:700;color:rgba(255,255,255,0.8)}
+.sec-type{font-size:0.62rem;color:rgba(255,255,255,0.3);font-family:'Space Mono',monospace;letter-spacing:1px;margin-top:2px}
+.sec-controls{display:flex;align-items:center;gap:8px}
+.sec-vis-toggle{position:relative;width:38px;height:20px;flex-shrink:0}
+.sec-vis-toggle input{opacity:0;width:0;height:0}
+.sec-vis-track{position:absolute;inset:0;background:rgba(255,255,255,0.1);border-radius:10px;cursor:pointer;transition:background .25s}
+.sec-vis-track::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.45);transition:transform .25s,background .25s}
+.sec-vis-toggle input:checked + .sec-vis-track{background:var(--acc)}
+.sec-vis-toggle input:checked + .sec-vis-track::after{transform:translateX(18px);background:#000}
+
+/* ── PRESET PICKER ── */
+.preset-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.preset-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 12px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s}
+.preset-card:hover{border-color:var(--acc);background:var(--acc2)}
+.preset-card-ico{font-size:1.6rem;margin-bottom:8px}
+.preset-card-name{font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.8);letter-spacing:.3px}
+.preset-card-desc{font-size:0.60rem;color:rgba(255,255,255,0.35);margin-top:4px;line-height:1.4}
+
+/* ── SECTION EDITOR (inline sub-editor) ── */
+.sec-editor-badge{display:inline-flex;align-items:center;gap:6px;font-family:'Space Mono',monospace;font-size:0.52rem;letter-spacing:2px;color:var(--acc);background:var(--acc2);border:1px solid rgba(79,110,245,0.3);border-radius:6px;padding:4px 10px;margin-bottom:20px;text-transform:uppercase}
+
+/* ── SUBSECTION DRAG HINT ── */
+.drag-hint{font-family:'Space Mono',monospace;font-size:0.52rem;color:rgba(255,255,255,0.2);letter-spacing:1px;margin-bottom:10px;padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:6px;text-align:center}
+
+@media(max-width:700px){
+  .adm-sidebar{width:64px}
+  .adm-logo small,.adm-nav-label,.adm-nav-item span:not(.adm-nav-ico){display:none}
+  .adm-nav-item{justify-content:center;padding:12px}
+  .adm-content{padding:20px 16px}
+  .form-grid{grid-template-columns:1fr}
+  .preset-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ════════════════════════════════════════════════════════
+   ADMIN ANIMATIONS v1.0
+════════════════════════════════════════════════════════ */
+
+/* ── Login entrance ── */
+@keyframes login-float-in {
+  0%   { opacity:0; transform: translateY(32px) scale(0.96); }
+  100% { opacity:1; transform: translateY(0)    scale(1); }
+}
+.login-box {
+  animation: login-float-in 0.55s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+/* ── Login background pulse ── */
+@keyframes bg-breathe {
+  0%,100% { opacity:0.6; transform: scale(1); }
+  50%      { opacity:1;   transform: scale(1.08); }
+}
+#login-screen::before {
+  animation: bg-breathe 5s ease-in-out infinite;
+}
+
+/* ── Shell slide in from left ── */
+@keyframes sidebar-enter {
+  from { transform: translateX(-100%); opacity:0; }
+  to   { transform: translateX(0);      opacity:1; }
+}
+#admin-shell.visible .adm-sidebar {
+  animation: sidebar-enter 0.42s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+/* ── Topbar drop in ── */
+@keyframes topbar-drop {
+  from { transform: translateY(-100%); opacity:0; }
+  to   { transform: translateY(0);      opacity:1; }
+}
+#admin-shell.visible .adm-topbar {
+  animation: topbar-drop 0.38s 0.12s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+/* ── Panel fade+slide up ── */
+@keyframes panel-reveal {
+  from { opacity:0; transform: translateY(18px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.panel.active {
+  animation: panel-reveal 0.35s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+/* ── Nav items stagger in ── */
+@keyframes nav-item-in {
+  from { opacity:0; transform: translateX(-14px); }
+  to   { opacity:1; transform: translateX(0); }
+}
+#admin-shell.visible .adm-nav-item:nth-child(1) { animation: nav-item-in 0.3s 0.18s both; }
+#admin-shell.visible .adm-nav-item:nth-child(2) { animation: nav-item-in 0.3s 0.22s both; }
+#admin-shell.visible .adm-nav-item:nth-child(3) { animation: nav-item-in 0.3s 0.26s both; }
+#admin-shell.visible .adm-nav-item:nth-child(4) { animation: nav-item-in 0.3s 0.30s both; }
+#admin-shell.visible .adm-nav-item:nth-child(5) { animation: nav-item-in 0.3s 0.34s both; }
+#admin-shell.visible .adm-nav-item:nth-child(6) { animation: nav-item-in 0.3s 0.38s both; }
+#admin-shell.visible .adm-nav-item:nth-child(7) { animation: nav-item-in 0.3s 0.42s both; }
+#admin-shell.visible .adm-nav-item:nth-child(8) { animation: nav-item-in 0.3s 0.46s both; }
+#admin-shell.visible .adm-nav-item:nth-child(9) { animation: nav-item-in 0.3s 0.50s both; }
+#admin-shell.visible .adm-nav-item:nth-child(10){ animation: nav-item-in 0.3s 0.54s both; }
+
+/* ── Form group stagger ── */
+@keyframes form-group-in {
+  from { opacity:0; transform: translateY(12px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+.panel.active .form-group:nth-child(1) { animation: form-group-in 0.4s 0.08s cubic-bezier(0.22,1,0.36,1) both; }
+.panel.active .form-group:nth-child(2) { animation: form-group-in 0.4s 0.16s cubic-bezier(0.22,1,0.36,1) both; }
+.panel.active .form-group:nth-child(3) { animation: form-group-in 0.4s 0.24s cubic-bezier(0.22,1,0.36,1) both; }
+.panel.active .form-group:nth-child(4) { animation: form-group-in 0.4s 0.32s cubic-bezier(0.22,1,0.36,1) both; }
+.panel.active .form-group:nth-child(5) { animation: form-group-in 0.4s 0.40s cubic-bezier(0.22,1,0.36,1) both; }
+.panel.active .drag-hint               { animation: form-group-in 0.4s 0.06s cubic-bezier(0.22,1,0.36,1) both; }
+.panel.active .panel-title             { animation: form-group-in 0.35s 0.02s cubic-bezier(0.22,1,0.36,1) both; }
+.panel.active .card-list               { animation: form-group-in 0.4s 0.12s cubic-bezier(0.22,1,0.36,1) both; }
+.panel.active .add-btn                 { animation: form-group-in 0.4s 0.20s cubic-bezier(0.22,1,0.36,1) both; }
+.panel.active .cred-box                { animation: form-group-in 0.4s 0.10s cubic-bezier(0.22,1,0.36,1) both; }
+.panel.active .sec-manager             { animation: form-group-in 0.4s 0.12s cubic-bezier(0.22,1,0.36,1) both; }
+.panel.active .preset-grid             { animation: form-group-in 0.4s 0.22s cubic-bezier(0.22,1,0.36,1) both; }
+
+/* ── Card item pop in ── */
+@keyframes card-pop {
+  from { opacity:0; transform: scale(0.95) translateY(8px); }
+  to   { opacity:1; transform: scale(1)    translateY(0); }
+}
+.card-item {
+  animation: card-pop 0.28s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+/* ── Nav active indicator pulse ── */
+.adm-nav-item.active {
+  position: relative;
+}
+.adm-nav-item.active::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 50%;
+  width: 3px; height: 60%;
+  transform: translateY(-50%);
+  background: var(--acc);
+  border-radius: 0 3px 3px 0;
+  box-shadow: 0 0 8px var(--glow);
+  animation: none;
+}
+
+/* ── Sidebar accent bar animate on switch ── */
+@keyframes indicator-grow {
+  from { height:0; opacity:0; }
+  to   { height:60%; opacity:1; }
+}
+.adm-nav-item.active::after {
+  animation: indicator-grow 0.25s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+/* ── Input focus lift ── */
+.inp:focus, .ta:focus, .sel:focus {
+  transform: translateY(-1px);
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+}
+.inp, .ta, .sel {
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+}
+
+/* ── Button hover micro-bounce ── */
+.btn-primary, .btn-secondary, .btn-danger, .btn-success {
+  transition: opacity .18s, transform .18s, background .2s, box-shadow .2s;
+}
+.btn-primary:hover  { transform: translateY(-2px); box-shadow: 0 6px 20px var(--glow); }
+.btn-secondary:hover{ transform: translateY(-1px); }
+.btn-danger:hover   { transform: translateY(-1px); }
+.btn-success:hover  { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(34,197,94,0.3); }
+.btn-primary:active, .btn-danger:active, .btn-success:active { transform: translateY(0) scale(0.98); }
+
+/* ── Icon button hover spin ── */
+.icon-btn {
+  transition: border-color .18s, color .18s, background .18s, transform .18s;
+}
+.icon-btn:hover { transform: scale(1.15) rotate(3deg); }
+.icon-btn.del:hover { transform: scale(1.15) rotate(-5deg); }
+
+/* ── Swatch hover bounce ── */
+.swatch {
+  transition: transform .2s cubic-bezier(0.22,1,0.36,1), border-color .2s, box-shadow .2s;
+}
+.swatch:hover   { transform: scale(1.22) translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.4); }
+.swatch.active  { transform: scale(1.12); box-shadow: 0 0 0 2px #fff, 0 0 12px var(--glow); }
+
+/* ── Toast slide up ── */
+@keyframes toast-in {
+  from { opacity:0; transform: translateX(-50%) translateY(20px) scale(0.95); }
+  to   { opacity:1; transform: translateX(-50%) translateY(0)     scale(1); }
+}
+#toast.show {
+  animation: toast-in 0.3s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+/* ── Modal entrance ── */
+@keyframes modal-enter {
+  from { opacity:0; transform: scale(0.92) translateY(16px); }
+  to   { opacity:1; transform: scale(1)    translateY(0); }
+}
+.modal-overlay.open .modal-box {
+  animation: modal-enter 0.3s cubic-bezier(0.22,1,0.36,1) both;
+}
+
+/* ── Drop zone pulse border on active ── */
+@keyframes drop-pulse {
+  0%,100% { border-color: var(--acc); box-shadow: 0 0 0 0   var(--glow); }
+  50%      { border-color: var(--acc); box-shadow: 0 0 0 6px transparent; }
+}
+.profile-drop-zone.drop-active,
+.adm-certs-drop-zone.adm-certs-drop-active {
+  animation: drop-pulse 1s ease-in-out infinite;
+}
+
+/* ── Cert card hover lift ── */
+.adm-cert-card {
+  transition: border-color .2s, transform .22s cubic-bezier(0.22,1,0.36,1), box-shadow .22s;
+}
+.adm-cert-card:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  border-color: rgba(255,255,255,0.2);
+}
+
+/* ── Card item drag hover ── */
+.card-item {
+  transition: border-color .18s, background .18s, transform .18s;
+}
+.card-item:hover {
+  border-color: rgba(255,255,255,0.14);
+  transform: translateX(3px);
+}
+.card-item.dragging {
+  opacity: 0.45;
+  transform: scale(0.97);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.card-item.drag-over {
+  border-color: var(--acc) !important;
+  background: var(--acc2) !important;
+  transform: scale(1.01);
+}
+
+/* ── Sec row hover ── */
+.sec-row {
+  transition: border-color .18s, background .18s, transform .18s;
+}
+.sec-row:hover { transform: translateX(3px); }
+.sec-row.dragging { opacity:.4; transform: scale(0.97); }
+.sec-row.drag-over { border-color: var(--acc) !important; background: var(--acc2) !important; }
+
+/* ── Preset card hover ── */
+.preset-card {
+  transition: border-color .2s, background .2s, transform .22s cubic-bezier(0.22,1,0.36,1);
+}
+.preset-card:hover { transform: translateY(-4px) scale(1.02); }
+.preset-card:active { transform: scale(0.98); }
+
+/* ── Sidebar footer buttons ── */
+.adm-sidebar-foot .btn-primary,
+.adm-sidebar-foot .btn-secondary,
+.adm-sidebar-foot .btn-danger {
+  width: 100%;
+}
+
+/* ── Scrollbar animated thumb ── */
+::-webkit-scrollbar-thumb {
+  transition: background .2s;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--acc) !important;
+}
+
+/* ── Status dot pulse ── */
+.adm-status-dot {
+  position: relative;
+  padding-left: 14px;
+}
+.adm-status-dot::before {
+  animation: dp 1.8s ease-in-out infinite;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ══ CERT TABS ══════════════════════════════════════════════════════ */
+.cert-tabs-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.cert-tab-btn{display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.025);color:rgba(255,255,255,0.4);font-size:0.72rem;font-weight:600;letter-spacing:.4px;cursor:pointer;transition:border-color .2s,color .2s,background .2s,transform .18s;}
+.cert-tab-btn:hover{border-color:rgba(255,255,255,0.18);color:rgba(255,255,255,0.75);background:rgba(255,255,255,0.05);transform:translateY(-1px);}
+.cert-tab-btn.active{border-color:var(--acc);color:var(--acc);background:var(--acc2);}
+.cert-tab-name-inp{background:transparent;border:none;color:inherit;font-size:0.72rem;font-weight:600;letter-spacing:.4px;outline:none;width:auto;min-width:50px;max-width:110px;cursor:text;font-family:'Rajdhani',sans-serif;padding:0;}
+.cert-tab-name-inp::placeholder{opacity:.4;}
+.cert-tab-x{width:16px;height:16px;border-radius:50%;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);color:#f87171;font-size:.55rem;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .18s;line-height:1;}
+.cert-tab-x:hover{background:rgba(239,68,68,0.35);}
+.cert-tab-add-btn{padding:7px 14px;border-radius:8px;border:1px dashed rgba(79,110,245,0.35);background:rgba(79,110,245,0.05);color:var(--acc);font-size:.70rem;font-weight:600;cursor:pointer;transition:background .2s,border-color .2s,transform .18s;}
+.cert-tab-add-btn:hover{background:rgba(79,110,245,0.12);border-color:var(--acc);transform:translateY(-1px);}
+
+/* ══ CERT CARD GRID ═════════════════════════════════════════════════ */
+.cert-card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-top:14px;}
+.cert-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:12px;position:relative;cursor:default;transition:border-color .2s,transform .22s,box-shadow .22s;}
+.cert-card:hover{border-color:rgba(255,255,255,0.18);transform:translateY(-3px) scale(1.015);box-shadow:0 10px 28px rgba(0,0,0,.45);}
+.cert-card-grip{text-align:center;font-size:1rem;color:rgba(255,255,255,.22);cursor:grab;margin-bottom:6px;transition:color .18s;}
+.cert-card:hover .cert-card-grip{color:var(--acc);}
+.cert-card-img-wrap{width:100%;aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;margin-bottom:10px;position:relative;cursor:pointer;}
+.cert-card-img-wrap:hover .cert-card-img-overlay{opacity:1;}
+.cert-card-img{width:100%;height:100%;object-fit:cover;}
+.cert-card-img-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:0;transition:opacity .2s;}
+.cert-card-img-overlay span{font-size:.60rem;letter-spacing:1px;color:#fff;text-transform:uppercase;}
+.cert-card-placeholder{font-size:2.2rem;opacity:.25;flex-direction:column;gap:6px;display:flex;align-items:center;}
+.cert-card-placeholder small{font-size:.58rem;letter-spacing:.8px;color:rgba(255,255,255,.3);text-transform:uppercase;}
+.cert-card-title-inp{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.1);color:var(--text);font-size:.73rem;font-weight:600;padding:4px 2px;outline:none;font-family:'Rajdhani',sans-serif;transition:border-color .2s;margin-bottom:6px;}
+.cert-card-title-inp:focus{border-bottom-color:var(--acc);}
+.cert-card-org-inp{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.45);font-size:.63rem;padding:3px 2px;outline:none;font-family:'Rajdhani',sans-serif;transition:border-color .2s;}
+.cert-card-org-inp:focus{border-bottom-color:var(--acc);}
+.cert-card-actions{display:flex;gap:5px;margin-top:8px;}
+.cert-card-btn{flex:1;padding:5px 4px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:rgba(255,255,255,.4);font-size:.58rem;font-weight:600;letter-spacing:.5px;cursor:pointer;transition:border-color .18s,color .18s,background .18s,transform .18s;text-transform:uppercase;}
+.cert-card-btn:hover{transform:translateY(-1px);}
+.cert-card-btn.edit-img:hover{border-color:var(--acc);color:var(--acc);background:var(--acc2);}
+.cert-card-btn.preview:hover{border-color:#a78bfa;color:#a78bfa;background:rgba(167,139,250,.08);}
+.cert-card-btn.del-cert:hover{border-color:#ef4444;color:#f87171;background:rgba(239,68,68,.08);}
+.cert-card.dragging-cert{opacity:.35;transform:scale(.96);}
+.cert-card.over-cert{border:2px dashed var(--acc)!important;background:var(--acc2)!important;transform:scale(1.02);}
+
+/* ══ CERT PREVIEW MODAL ══════════════════════════════════════════════ */
+#cert-preview-modal{position:fixed;inset:0;z-index:9999;background:rgba(4,4,10,.88);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+#cert-preview-modal.open{opacity:1;pointer-events:all;}
+.cert-preview-box{background:rgba(13,13,28,.98);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:28px;width:min(680px,94vw);max-height:90vh;overflow-y:auto;transform:scale(.93);transition:transform .25s;position:relative;display:flex;flex-direction:column;gap:14px;}
+#cert-preview-modal.open .cert-preview-box{transform:scale(1);}
+.cert-preview-title{font-family:'Orbitron',sans-serif;font-size:.68rem;letter-spacing:2px;color:var(--acc);text-transform:uppercase;}
+.cert-preview-org{font-size:.62rem;color:rgba(255,255,255,.35);font-family:'Space Mono',monospace;letter-spacing:1px;}
+.cert-preview-img{width:100%;border-radius:10px;object-fit:contain;max-height:500px;background:rgba(255,255,255,.03);}
+.cert-preview-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);font-size:.8rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .18s,color .18s,transform .18s;}
+.cert-preview-close:hover{background:rgba(239,68,68,.2);color:#f87171;border-color:rgba(239,68,68,.3);transform:scale(1.1);}
+
+/* ══ UPLOAD ZONE ═════════════════════════════════════════════════════ */
+.cert-upload-zone{border:2px dashed rgba(255,255,255,.1);border-radius:12px;padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:border-color .25s,background .25s;}
+.cert-upload-zone:hover,.cert-upload-zone.dropping{border-color:var(--acc);background:var(--acc2);}
+.cert-upload-zone .uz-ico{font-size:1.8rem;opacity:.35;}
+.cert-upload-zone .uz-label{font-size:.64rem;letter-spacing:1px;color:rgba(255,255,255,.28);text-transform:uppercase;}
+.cert-upload-zone .uz-hint{font-size:.55rem;opacity:.4;}
+.cert-tab-count{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:9px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.5);font-size:.55rem;font-weight:700;padding:0 5px;}
+.cert-tab-btn.active .cert-tab-count{background:var(--acc);color:#000;}
+
+/* ══ LIVE PREVIEW STRIP ═══════════════════════════════════════════ */
+.live-preview-strip {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.live-preview-strip::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--acc), transparent);
+  border-radius: 3px 0 0 3px;
+}
+.lp-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--acc);
+  box-shadow: 0 0 8px var(--glow);
+  flex-shrink: 0;
+  animation: lp-pulse 2s ease-in-out infinite;
+}
+@keyframes lp-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+.lp-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.48rem;
+  letter-spacing: 2.5px;
+  color: var(--acc);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.lp-text {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+/* ══ INLINE EDITABLE HEADING PREVIEW ════════════════════════════ */
+.heading-preview-wrap {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 18px;
+  position: relative;
+}
+.heading-preview-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.46rem;
+  letter-spacing: 2.5px;
+  color: rgba(255,255,255,0.25);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.heading-preview-label::after {
+  content: 'LIVE EDIT';
+  background: var(--acc2);
+  border: 1px solid var(--acc);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--acc);
+  font-size: 0.42rem;
+  letter-spacing: 1px;
+}
+.heading-editable {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: rgba(255,255,255,0.75);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.90rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  width: 100%;
+  padding: 4px 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.12);
+  transition: border-color 0.2s, color 0.2s;
+  cursor: text;
+}
+.heading-editable:focus {
+  border-bottom-color: var(--acc);
+  color: #fff;
+}
+.sub-editable {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: rgba(255,255,255,0.35);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.72rem;
+  width: 100%;
+  padding: 4px 0;
+  border-bottom: 1px dashed rgba(255,255,255,0.06);
+  transition: border-color 0.2s, color 0.2s;
+  margin-top: 6px;
+  cursor: text;
+}
+.sub-editable:focus {
+  border-bottom-color: var(--acc);
+  color: rgba(255,255,255,0.6);
+}
+
+/* ══ CERT EMOJI FIELD ════════════════════════════════════════════ */
+.cert-emoji-inp {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  color: var(--text);
+  font-size: 1.2rem;
+  padding: 4px 2px;
+  outline: none;
+  font-family: 'Rajdhani', sans-serif;
+  transition: border-color 0.2s;
+  text-align: center;
+}
+.cert-emoji-inp:focus { border-bottom-color: var(--acc); }
+
+/* ══ CERT CARD ENHANCED ══════════════════════════════════════════ */
+.cert-card-emoji-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.cert-card-emoji-preview {
+  width: 36px; height: 36px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  transition: border-color 0.2s, background 0.2s;
+}
+.cert-card:hover .cert-card-emoji-preview {
+  border-color: var(--acc);
+  background: var(--acc2);
+}
+
+/* ══ CERT MULTI-IMAGE EDITOR ═════════════════════════════════════ */
+.cert-img-editor {
+  margin-top: 8px;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.02);
+}
+.cert-img-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.cert-img-editor-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.46rem;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.25);
+  text-transform: uppercase;
+}
+.cert-img-add-btn {
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: 1px dashed rgba(79,110,245,0.4);
+  background: rgba(79,110,245,0.06);
+  color: var(--acc);
+  font-size: 0.55rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s;
+  letter-spacing: 0.5px;
+}
+.cert-img-add-btn:hover {
+  background: rgba(79,110,245,0.15);
+  border-color: var(--acc);
+}
+.cert-img-thumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+}
+.cert-img-thumb {
+  position: relative;
+  width: 60px; height: 60px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+  cursor: grab;
+  transition: border-color 0.18s, transform 0.18s;
+}
+.cert-img-thumb:hover { border-color: rgba(255,255,255,0.28); transform: scale(1.06); }
+.cert-img-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cert-img-thumb-del {
+  position: absolute;
+  top: 2px; right: 2px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: rgba(239,68,68,0.85);
+  border: none;
+  color: #fff;
+  font-size: 0.50rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+  line-height: 1;
+}
+.cert-img-thumb:hover .cert-img-thumb-del { opacity: 1; }
+.cert-img-thumb-badge {
+  position: absolute;
+  bottom: 2px; left: 2px;
+  background: rgba(0,0,0,0.65);
+  color: rgba(255,255,255,0.75);
+  font-size: 0.38rem;
+  padding: 1px 4px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+}
+.cert-img-empty {
+  padding: 14px;
+  text-align: center;
+  font-size: 0.58rem;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 0.5px;
+  width: 100%;
+}
+.cert-img-thumb.dragging-thumb { opacity: 0.35; transform: scale(0.94); }
+.cert-img-thumb.over-thumb {
+  border-color: var(--acc) !important;
+  box-shadow: 0 0 0 2px var(--acc2);
+}
+
+/* ══ CERT CARD AS DROP TARGET ════════════════════════════════════ */
+.cert-card-droptarget {
+  position: relative;
+}
+.cert-card-drop-hint {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: var(--acc2);
+  border: 2px dashed var(--acc);
+  color: var(--acc);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s;
+  z-index: 10;
+}
+.cert-card-droptarget.img-dragover .cert-card-drop-hint {
+  opacity: 1;
+}
+.cert-card-droptarget.img-dragover {
+  transform: scale(1.03);
+  box-shadow: 0 0 0 2px var(--acc), 0 12px 32px rgba(0,0,0,0.4);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   ADMIN SMOOTH TRANSITIONS v2.0
+   Theme changes animate smoothly in admin too.
+   All inputs, cards, and UI elements respond fluidly.
+════════════════════════════════════════════════════════════════ */
+
+/* Global color transitions in admin */
+*, *::before, *::after {
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: 0.28s;
+  transition-timing-function: cubic-bezier(0.22,1,0.36,1);
+}
+
+/* Preserve transform transitions separately */
+.adm-nav-item, .btn-primary, .btn-secondary, .btn-danger, .btn-success,
+.swatch, .preset-card, .cert-card, .card-item, .sec-row, .icon-btn {
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-duration: 0.25s;
+  transition-timing-function: cubic-bezier(0.22,1,0.36,1);
+}
+
+/* Theme switch: acc color spreads instantly across entire admin */
+.adm-logo span, .adm-nav-item.active,
+.btn-primary, .inp:focus, .ta:focus,
+.add-btn, .cert-tab-btn.active {
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: 0.35s;
+  transition-timing-function: ease;
+}
+
+/* Input focus lift */
+.inp, .ta, .sel {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+              transform 0.18s cubic-bezier(0.22,1,0.36,1),
+              background-color 0.28s ease !important;
+}
+.inp:focus, .ta:focus {
+  transform: translateY(-1px) !important;
+}
+
+/* Admin topbar smooth */
+.adm-topbar {
+  transition: background 0.35s ease, border-color 0.35s ease,
+              box-shadow 0.35s ease !important;
+}
+
+/* Sidebar smooth */
+.adm-sidebar {
+  transition: background 0.35s ease, border-color 0.35s ease !important;
+}
+
+/* Swatch active ring smooth */
+.swatch.active {
+  transition: border-color 0.3s ease, transform 0.25s cubic-bezier(0.22,1,0.36,1),
+              box-shadow 0.3s ease !important;
+}
+
+/* Cert card glow on hover */
+.cert-card {
+  transition: border-color 0.22s ease, transform 0.25s cubic-bezier(0.22,1,0.36,1),
+              box-shadow 0.25s ease, background-color 0.28s ease !important;
+}
+
+/* Nav active indicator grows on switch */
+.adm-nav-item {
+  transition: color 0.22s ease, background-color 0.22s ease,
+              border-left-color 0.22s ease !important;
+}
+
+/* ══ CERT PANEL 2-COLUMN LAYOUT ═════════════════════════════════ */
+.cert-panel-cols {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 20px;
+  align-items: start;
+}
+.cert-panel-edit {
+  min-width: 0;
+}
+.cert-panel-preview {
+  position: sticky;
+  top: 20px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.cert-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02);
+}
+.cert-preview-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.48rem;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.55);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+}
+.cert-preview-hint {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.42rem;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.18);
+  text-transform: uppercase;
+}
+.cert-preview-viewport {
+  padding: 18px 12px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.cert-preview-empty {
+  font-size: 0.60rem;
+  color: rgba(255,255,255,0.18);
+  text-align: center;
+  padding: 24px 0;
+  letter-spacing: 0.5px;
+}
+
+/* Preview cert circles — mirrors portfolio exactly */
+.cert-preview-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  width: 100%;
+}
+.cert-preview-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  cursor: default;
+}
+.cert-preview-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.22);
+  background: rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  position: relative;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.cert-preview-circle:hover {
+  transform: scale(1.1);
+  border-color: rgba(255,255,255,0.5);
+  box-shadow: 0 0 16px rgba(255,255,255,0.12);
+}
+.cert-preview-circle.has-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+/* Pulse ring on emoji circles */
+.cert-preview-circle.no-image::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2);
+  animation: cert-ring-pulse 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+.cert-preview-lbl {
+  margin-top: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.40rem;
+  letter-spacing: 1.2px;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  text-align: center;
+  max-width: 68px;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .cert-panel-cols { grid-template-columns: 1fr; }
+  .cert-panel-preview { position: static; }
+}
+</style>
+<link rel="stylesheet" href="cloudinary-media.css"/>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">A<span>S</span> ADMIN</div>
+    <div class="login-subtitle">// Portfolio Control Panel</div>
+    <div class="login-field"><label>Admin ID</label><input type="text" id="l-id" placeholder="Enter admin ID" autocomplete="off"/></div>
+    <div class="login-field"><label>Password</label><input type="password" id="l-pass" placeholder="Enter password"/></div>
+    <div class="login-error" id="l-err">Incorrect credentials. Try again.</div>
+    <button class="login-btn" id="l-btn">Access Panel</button>
+    <div class="login-hint">Press Enter to login · Ctrl+S to save</div>
+  </div>
+</div>
+
+<!-- ADMIN SHELL -->
+<div id="admin-shell">
+  <aside class="adm-sidebar">
+    <div class="adm-logo">A<span>S</span><small>Admin CMS v3.0</small></div>
+    <div class="adm-nav-group">
+      <div class="adm-nav-label">Content</div>
+      <div class="adm-nav-item active" data-panel="hero"><span class="adm-nav-ico">◈</span><span>Hero</span></div>
+      <div class="adm-nav-item" data-panel="about"><span class="adm-nav-ico">◉</span><span>About</span></div>
+      <div class="adm-nav-item" data-panel="skills"><span class="adm-nav-ico">◎</span><span>Skills</span></div>
+      <div class="adm-nav-item" data-panel="projects"><span class="adm-nav-ico">◫</span><span>Projects</span></div>
+      <div class="adm-nav-item" data-panel="journey"><span class="adm-nav-ico">◷</span><span>Journey</span></div>
+      <div class="adm-nav-item" data-panel="certs"><span class="adm-nav-ico">◈</span><span>Certificates</span></div>
+      <div class="adm-nav-item" data-panel="contact"><span class="adm-nav-ico">◌</span><span>Contact</span></div>
+    </div>
+    <div class="adm-nav-group">
+      <div class="adm-nav-label">System</div>
+      <div class="adm-nav-item" data-panel="theme"><span class="adm-nav-ico">◑</span><span>Theme</span></div>
+      <div class="adm-nav-item" data-panel="sections"><span class="adm-nav-ico">▤</span><span>Sections</span></div>
+      <div class="adm-nav-item" data-panel="account"><span class="adm-nav-ico">◐</span><span>Account</span></div>
+    </div>
+    <div class="adm-sidebar-foot">
+      <button class="btn-primary btn-sm" id="save-all-btn">💾 Save All</button>
+      <a href="index.html" target="_blank"><button class="btn-secondary btn-sm" style="width:100%">↗ View Portfolio</button></a>
+      <button class="btn-danger btn-sm" id="logout-btn">✕ Logout</button>
+    </div>
+  </aside>
+
+  <div class="adm-main">
+    <div class="adm-topbar">
+      <div class="adm-topbar-left">
+        <div class="adm-page-title" id="page-title">Hero Editor</div>
+        <div class="adm-breadcrumb">admin / <span id="breadcrumb-sub">hero</span></div>
+      </div>
+      <div class="adm-topbar-right">
+        <div class="adm-status-dot">LIVE STORAGE</div>
+        <button class="btn-secondary btn-sm" id="preview-portfolio-btn" style="display:flex;align-items:center;gap:5px;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Preview
+        </button>
+        <button class="btn-primary btn-sm" id="save-top-btn">💾 Save</button>
+      </div>
+    </div>
+
+    <div class="adm-content" id="adm-content">
+
+      <!-- ── HERO ── -->
+      <div class="panel active" id="p-hero">
+        <div class="panel-title">Hero Editor</div>
+        <div class="form-group">
+          <div class="form-group-title">Profile Image</div>
+          <div id="profile-drop-zone" class="profile-drop-zone">
+            <img id="hero-img-preview" class="profile-preview" src="" alt="Profile"/>
+            <div id="profile-placeholder" class="profile-placeholder">
+              <span style="font-size:2rem;opacity:.35">👤</span>
+              <span style="font-size:.65rem;letter-spacing:1px;color:rgba(255,255,255,.28);text-transform:uppercase">Drop image or click to upload</span>
+            </div>
+            <input type="file" id="profile-file-input" accept="image/jpeg,image/png" style="display:none"/>
+          </div>
+          <div id="profile-img-err" style="font-size:.65rem;color:#f87171;min-height:18px;margin-top:6px"></div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button type="button" class="btn-secondary btn-sm" id="profile-browse-btn" style="flex:1">📁 Browse</button>
+            <button type="button" class="btn-danger btn-sm" id="profile-clear-btn" style="flex:1">✕ Remove</button>
+          </div>
+          <div style="margin-top:14px"><label class="lbl">Or paste image URL</label><input class="inp" id="h-img" type="url" placeholder="https://..."/></div>
+        </div>
+        <div class="form-group">
+          <div class="form-group-title">Name & Identity</div>
+          <div class="form-grid">
+            <div class="form-col"><label class="lbl">First Name</label><input class="inp" id="h-fname" type="text" placeholder="Arrabola"/></div>
+            <div class="form-col"><label class="lbl">Last Name</label><input class="inp" id="h-lname" type="text" placeholder="Srishanth"/></div>
+          </div>
+          <div class="form-col" style="margin-top:14px"><label class="lbl">Greeting Text</label><input class="inp" id="h-greet" type="text" placeholder="Good Morning"/></div>
+        </div>
+        <div class="form-group">
+          <div class="form-group-title">Typed Roles <span style="opacity:.5;font-size:.85em">(one per line)</span></div>
+          <textarea class="ta" id="h-roles" placeholder="AI & ML Engineer&#10;Python Developer&#10;Problem Solver"></textarea>
+        </div>
+        <div class="form-group">
+          <div class="form-group-title">Description & Badge</div>
+          <div class="form-col" style="margin-bottom:14px"><label class="lbl">Hero Description</label><textarea class="ta" id="h-desc"></textarea></div>
+          <div class="form-col"><label class="lbl">Status Badge (Currently working on...)</label><input class="inp" id="h-badge" type="text" placeholder="Data Structures & Algorithms"/></div>
+        </div>
+        <div class="form-group">
+          <div class="form-group-title">Buttons & CV</div>
+          <div class="form-grid">
+            <div class="form-col"><label class="lbl">Primary Button</label><input class="inp" id="h-btn1" type="text" placeholder="Hire Me"/></div>
+            <div class="form-col"><label class="lbl">Secondary Button</label><input class="inp" id="h-btn2" type="text" placeholder="Download CV"/></div>
+            <div class="form-col full-width"><label class="lbl">CV / Resume URL</label><input class="inp" id="h-cv" type="url" placeholder="https://..."/></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ABOUT ── -->
+      <div class="panel" id="p-about">
+        <div class="panel-title">About Editor</div>
+        <div class="form-group">
+          <div class="form-group-title">Main Text</div>
+          <div class="form-col" style="margin-bottom:14px"><label class="lbl">Sub Heading</label><input class="inp" id="a-sub" type="text" placeholder="Aspiring AI & Software Developer"/></div>
+          <div class="form-col" style="margin-bottom:14px"><label class="lbl">Paragraph 1</label><textarea class="ta" id="a-p1"></textarea></div>
+          <div class="form-col"><label class="lbl">Paragraph 2</label><textarea class="ta" id="a-p2"></textarea></div>
+        </div>
+        <div class="form-group">
+          <div class="form-group-title">Info Cards <span style="opacity:.5;font-size:.85em">— drag to reorder</span></div>
+          <div class="drag-hint">⠿ drag rows to reorder</div>
+          <div class="card-list" id="about-cards-list"></div>
+          <button class="add-btn" id="about-card-add-btn">＋ Add Info Card</button>
+        </div>
+      </div>
+
+      <!-- ── SKILLS ── -->
+      <div class="panel" id="p-skills">
+        <div class="panel-title">Skills Editor</div>
+        <div class="drag-hint">⠿ drag rows to reorder</div>
+        <div class="card-list" id="skills-list"></div>
+        <button class="add-btn" id="skill-add-btn">＋ Add Skill</button>
+      </div>
+
+      <!-- ── PROJECTS ── -->
+      <div class="panel" id="p-projects">
+        <div class="panel-title">Projects Editor</div>
+        <div class="drag-hint">⠿ drag rows to reorder</div>
+        <div class="card-list" id="projects-list"></div>
+        <button class="add-btn" id="proj-add-btn">＋ Add Project</button>
+      </div>
+
+      <!-- ── JOURNEY ── -->
+      <div class="panel" id="p-journey">
+        <div class="panel-title">Journey Editor</div>
+        <div class="drag-hint">⠿ drag rows to reorder</div>
+        <div class="card-list" id="journey-list"></div>
+        <button class="add-btn" id="journey-add-btn">＋ Add Milestone</button>
+      </div>
+
+      <!-- ── CERTIFICATES ── -->
+      <div class="panel" id="p-certs">
+        <div class="panel-title">Certificates &amp; Achievements</div>
+
+        <!-- ── SECTION HEADING LIVE EDIT ── -->
+        <div class="form-group">
+          <div class="form-group-title">Section Heading <span style="opacity:.5;font-size:.85em">— edits live on portfolio</span></div>
+          <div class="heading-preview-wrap">
+            <div class="heading-preview-label">Section Title</div>
+            <input class="heading-editable" id="cert-section-title" value="My Certificates" placeholder="My Certificates" maxlength="60"/>
+            <input class="sub-editable" id="cert-section-sub" value="Verified certifications from top platforms." placeholder="Sub-heading..." maxlength="120"/>
+          </div>
+        </div>
+
+        <!-- ── Achievement Cards ── -->
+        <div class="form-group">
+          <div class="form-group-title">Achievement Cards <span style="opacity:.5;font-size:.85em">— drag to reorder</span></div>
+          <div class="drag-hint">⠿ drag rows to reorder</div>
+          <div class="card-list" id="ach-list"></div>
+          <button class="add-btn" id="ach-add-btn">＋ Add Achievement</button>
+        </div>
+
+        <!-- ── My Certificates (tabbed) — 2-column layout ── -->
+        <div class="form-group" id="cert-section-group">
+          <div class="form-group-title" style="display:flex;align-items:center;justify-content:space-between;">
+            <span>My Certificates</span>
+            <button class="btn-secondary btn-sm" id="cert-add-tab-btn" style="font-size:.55rem;">＋ New Tab</button>
+          </div>
+
+          <!-- 2-column wrapper -->
+          <div class="cert-panel-cols">
+
+            <!-- LEFT: edit area -->
+            <div class="cert-panel-edit">
+              <div class="live-preview-strip" id="cert-live-strip">
+                <div class="lp-dot"></div>
+                <span class="lp-label">Now showing</span>
+                <span class="lp-text" id="cert-live-text">Loading...</span>
+              </div>
+              <p style="font-size:.68rem;color:rgba(255,255,255,.26);margin-bottom:12px;line-height:1.6;">
+                Upload images, set emoji, edit title &amp; org. Drag to reorder.
+              </p>
+              <div class="cert-tabs-nav" id="cert-tabs-nav"></div>
+              <div id="cert-tab-content">
+                <div class="cert-upload-zone" id="cert-upload-zone">
+                  <span class="uz-ico">🖼</span>
+                  <span class="uz-label">Drop images here or click to upload</span>
+                  <span class="uz-hint">Any image format · unlimited · auto-compressed</span>
+                  <input type="file" id="cert-file-inp" accept="image/*" multiple style="display:none"/>
+                </div>
+                <div id="cert-upload-err" style="font-size:.65rem;color:#f87171;min-height:14px;margin:4px 0;"></div>
+                <div class="cert-card-grid" id="cert-card-grid"></div>
+                <button class="add-btn" id="cert-manual-btn" style="margin-top:12px;">＋ Add Manually</button>
+              </div>
+            </div>
+
+            <!-- RIGHT: live preview -->
+            <div class="cert-panel-preview">
+              <div class="cert-preview-header">
+                <span class="cert-preview-label">
+                  <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 6px #4ade80;margin-right:6px;animation:dp 2s ease-in-out infinite;"></span>
+                  Portfolio Preview
+                </span>
+                <span class="cert-preview-hint">as viewers see it</span>
+              </div>
+              <div class="cert-preview-viewport" id="cert-preview-viewport">
+                <!-- Live preview rendered here by JS -->
+                <p class="cert-preview-empty">Add certificates to see the preview</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CONTACT ── -->
+      <div class="panel" id="p-contact">
+        <div class="panel-title">Contact Editor</div>
+        <div class="form-group">
+          <div class="form-group-title">Contact Details</div>
+          <div class="form-grid">
+            <div class="form-col"><label class="lbl">Email Address</label><input class="inp" id="c-email" type="email" placeholder="you@email.com"/></div>
+            <div class="form-col"><label class="lbl">Location</label><input class="inp" id="c-loc" type="text" placeholder="Hyderabad, India"/></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-group-title">Social Links</div>
+          <div class="form-col" style="margin-bottom:12px"><label class="lbl">GitHub URL</label><input class="inp" id="c-gh" type="url" placeholder="https://github.com/username"/></div>
+          <div class="form-col" style="margin-bottom:12px"><label class="lbl">LinkedIn URL</label><input class="inp" id="c-li" type="url" placeholder="https://linkedin.com/in/username"/></div>
+          <div class="form-col"><label class="lbl">Instagram URL</label><input class="inp" id="c-ig" type="url" placeholder="https://instagram.com/username"/></div>
+        </div>
+      </div>
+
+      <!-- ── THEME ── -->
+      <div class="panel" id="p-theme">
+        <div class="panel-title">Theme Settings</div>
+        <div class="form-group">
+          <div class="form-group-title">Preset Accent Colors</div>
+          <div class="theme-grid" id="theme-grid">
+            <div class="swatch" data-theme="blue"    style="background:#4f6ef5" title="Blue"></div>
+            <div class="swatch" data-theme="pink"    style="background:#e91e8c" title="Pink"></div>
+            <div class="swatch" data-theme="green"   style="background:#00ff88" title="Green"></div>
+            <div class="swatch" data-theme="yellow"  style="background:#e5c62a" title="Yellow"></div>
+            <div class="swatch" data-theme="purple"  style="background:#a855f7" title="Purple"></div>
+            <div class="swatch" data-theme="orange"  style="background:#f97316" title="Orange"></div>
+            <div class="swatch" data-theme="cyan"    style="background:#22d3ee" title="Cyan"></div>
+            <div class="swatch" data-theme="rose"    style="background:#f43f5e" title="Rose"></div>
+            <div class="swatch" data-theme="emerald" style="background:#10b981" title="Emerald"></div>
+            <div class="swatch" data-theme="gold"    style="background:#f5c518" title="Gold"></div>
+            <div class="swatch" data-theme="sunset"  style="background:linear-gradient(135deg,#f97316,#fb7185)" title="Sunset"></div>
+            <div class="swatch" data-theme="ocean"   style="background:linear-gradient(135deg,#2563eb,#38bdf8)" title="Ocean"></div>
+            <div class="swatch" data-theme="rainbow" style="background:linear-gradient(135deg,#f43f5e,#a78bfa,#38bdf8)" title="Rainbow"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-group-title">Custom Hex Color</div>
+          <div style="display:flex;gap:12px;align-items:center">
+            <input class="inp" id="custom-hex" type="text" placeholder="#4f6ef5" style="flex:1"/>
+            <input type="color" id="color-picker" value="#4f6ef5" style="width:44px;height:44px;border:none;background:none;cursor:pointer;border-radius:8px;overflow:hidden;flex-shrink:0;padding:0"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTIONS ── -->
+      <div class="panel" id="p-sections">
+        <div class="panel-title">Section Manager</div>
+
+        <div class="form-group">
+          <div class="form-group-title">Visibility & Order <span style="opacity:.5;font-size:.85em">— drag to reorder sections</span></div>
+          <div class="drag-hint">⠿ drag to reorder · toggle to show/hide</div>
+          <div class="sec-manager" id="sec-manager"></div>
+        </div>
+
+        <div class="form-group">
+          <div class="form-group-title">Add New Section from Preset</div>
+          <p style="font-size:.72rem;color:rgba(255,255,255,.3);margin-bottom:4px;line-height:1.6">Choose a preset template to add a new section to your portfolio.</p>
+          <div class="preset-grid" id="preset-grid">
+            <div class="preset-card" data-preset="hero">
+              <div class="preset-card-ico">◈</div>
+              <div class="preset-card-name">Hero</div>
+              <div class="preset-card-desc">Name, roles, bio & CTA buttons</div>
+            </div>
+            <div class="preset-card" data-preset="about">
+              <div class="preset-card-ico">◉</div>
+              <div class="preset-card-name">About</div>
+              <div class="preset-card-desc">Bio text with info cards</div>
+            </div>
+            <div class="preset-card" data-preset="skills">
+              <div class="preset-card-ico">◎</div>
+              <div class="preset-card-name">Skills</div>
+              <div class="preset-card-desc">Skill bars with levels</div>
+            </div>
+            <div class="preset-card" data-preset="projects">
+              <div class="preset-card-ico">◫</div>
+              <div class="preset-card-name">Projects</div>
+              <div class="preset-card-desc">Project card grid</div>
+            </div>
+            <div class="preset-card" data-preset="journey">
+              <div class="preset-card-ico">◷</div>
+              <div class="preset-card-name">Journey</div>
+              <div class="preset-card-desc">Timeline & growth rail</div>
+            </div>
+            <div class="preset-card" data-preset="certs">
+              <div class="preset-card-ico">◈</div>
+              <div class="preset-card-name">Certificates</div>
+              <div class="preset-card-desc">Achievements & cert circles</div>
+            </div>
+            <div class="preset-card" data-preset="contact">
+              <div class="preset-card-ico">◌</div>
+              <div class="preset-card-name">Contact</div>
+              <div class="preset-card-desc">Email form & social links</div>
+            </div>
+            <div class="preset-card" data-preset="custom">
+              <div class="preset-card-ico">✦</div>
+              <div class="preset-card-name">Custom</div>
+              <div class="preset-card-desc">Blank section with custom label</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="form-group-title">Danger Zone</div>
+          <p style="font-size:.76rem;color:rgba(255,255,255,.35);margin-bottom:16px;line-height:1.6">Reset all portfolio content to original defaults. This cannot be undone.</p>
+          <button class="btn-danger" id="reset-btn">⚠ Reset All Data</button>
+        </div>
+      </div>
+
+      <!-- ── ACCOUNT ── -->
+      <div class="panel" id="p-account">
+        <div class="panel-title">Account Settings</div>
+        <div class="cred-box">
+          <div class="cred-warn">⚠ Changing credentials will lock the old login. Store new values safely before saving.</div>
+          <div class="form-col" style="margin-bottom:14px"><label class="lbl">New Admin ID</label><input class="inp" id="new-id" type="text" placeholder="Enter new admin ID" autocomplete="off"/></div>
+          <div class="form-col" style="margin-bottom:14px"><label class="lbl">New Password</label><input class="inp" id="new-pass" type="password" placeholder="Enter new password"/></div>
+          <div class="form-col" style="margin-bottom:20px"><label class="lbl">Confirm Password</label><input class="inp" id="new-pass2" type="password" placeholder="Confirm new password"/></div>
+          <button class="btn-primary" id="save-creds-btn">Update Credentials</button>
+        </div>
+        <div class="form-group" style="margin-top:20px">
+          <div class="form-group-title">Current Session</div>
+          <div class="toggle-row">
+            <span class="toggle-label">Logged in as: <span id="logged-in-as" style="color:var(--acc)">—</span></span>
+            <button class="btn-danger btn-sm" id="logout-btn2">Logout</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /adm-content -->
+  </div><!-- /adm-main -->
+</div><!-- /admin-shell -->
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-ov">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title">Edit Item</div>
+    <div id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn-secondary" id="modal-cancel">Cancel</button>
+      <button class="btn-primary" id="modal-save">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function AdminPanel() {
+  'use strict';
+
+
+  /* ── admConfirmDelete — wraps the custom confirm dialog ──────────────────
+     Delegates to confirmDelete() from admin.js if loaded; falls back to
+     building the overlay itself. Call this from ALL delete actions in this
+     file so no native browser confirm() is ever used.
+  ──────────────────────────────────────────────────────────────────────────── */
+  function admConfirmDelete(type, itemName, onConfirm) {
+    /* Delegate to admin.js if it's already loaded */
+    if (typeof confirmDelete === 'function') {
+      confirmDelete(type, itemName, onConfirm);
+      return;
+    }
+
+    /* Self-contained fallback — builds the overlay if missing */
+    let ov = document.getElementById('adm-confirm-ov');
+    if (!ov) {
+      ov = document.createElement('div');
+      ov.id = 'adm-confirm-ov';
+      ov.className = 'adm-confirm-overlay';
+      ov.setAttribute('role', 'dialog');
+      ov.setAttribute('aria-modal', 'true');
+      ov.innerHTML =
+        '<div class="adm-confirm-box">' +
+          '<div class="adm-confirm-icon">🗑</div>' +
+          '<div class="adm-confirm-title" id="adm-confirm-title">Delete?</div>' +
+          '<div class="adm-confirm-item-name" id="adm-confirm-item"></div>' +
+          '<p class="adm-confirm-msg">This action cannot be undone.</p>' +
+          '<div class="adm-confirm-footer">' +
+            '<button class="adm-confirm-cancel-btn" id="adm-confirm-cancel">Cancel</button>' +
+            '<button class="adm-confirm-delete-btn" id="adm-confirm-ok">Delete</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(ov);
+      ov.addEventListener('click', e => { if (e.target === ov) _closeAdmConfirm(); });
+      document.getElementById('adm-confirm-cancel').addEventListener('click', _closeAdmConfirm);
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && ov.classList.contains('adm-confirm-open')) _closeAdmConfirm();
+      });
+    }
+
+    document.getElementById('adm-confirm-title').textContent = 'Delete ' + type + '?';
+    document.getElementById('adm-confirm-item').textContent  = itemName || '';
+
+    /* Clone button to clear previous event listeners */
+    const oldBtn = document.getElementById('adm-confirm-ok');
+    const freshBtn = oldBtn.cloneNode(true);
+    oldBtn.parentNode.replaceChild(freshBtn, oldBtn);
+    freshBtn.addEventListener('click', () => {
+      _closeAdmConfirm();
+      setTimeout(onConfirm, 200);
+    });
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      ov.classList.add('adm-confirm-open');
+      document.getElementById('adm-confirm-cancel')?.focus();
+    }));
+  }
+
+  function _closeAdmConfirm() {
+    const ov = document.getElementById('adm-confirm-ov');
+    if (!ov || !ov.classList.contains('adm-confirm-open')) return;
+    ov.classList.add('adm-confirm-closing');
+    setTimeout(() => ov.classList.remove('adm-confirm-open', 'adm-confirm-closing'), 300);
+  }
+
+  /* ── Cloudinary ── */
+  const CLOUD_NAME    = (function(){ try { return JSON.parse(localStorage.getItem('cl-admin-config')||'{}').cloudName || 'YOUR_CLOUD_NAME'; } catch(e){ return 'YOUR_CLOUD_NAME'; } })();
+  const UPLOAD_PRESET = (function(){ try { return JSON.parse(localStorage.getItem('cl-admin-config')||'{}').uploadPreset || 'portfolio_upload'; } catch(e){ return 'portfolio_upload'; } })();
+
+  async function uploadToCloudinary(file) {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', UPLOAD_PRESET);
+    const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {method:'POST',body:fd});
+    const data = await res.json();
+    if (!data.secure_url) throw new Error(data.error?.message || 'Upload failed');
+    return data.secure_url;
+  }
+
+  async function handleImageUpload(file, errElId, callback) {
+    if (!file) return;
+    const errEl = document.getElementById(errElId);
+    function showErr(m) { if(errEl){errEl.textContent=m;setTimeout(()=>{if(errEl)errEl.textContent=''},4000);} }
+    if (!['image/jpeg','image/png','image/webp','image/gif'].includes(file.type)) {
+      showErr('Only image files allowed (JPG, PNG, WebP, GIF).'); return;
+    }
+    // Auto-compress then store — no hard size limit
+    compressImage(file, url => {
+      if (CLOUD_NAME && CLOUD_NAME !== 'YOUR_CLOUD_NAME') {
+        // Try Cloudinary with the compressed blob
+        fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+          method: 'POST',
+          body: (() => { const fd = new FormData(); fd.append('file', url); fd.append('upload_preset', UPLOAD_PRESET); return fd; })()
+        }).then(r => r.json()).then(d => {
+          if (d.secure_url) callback(d.secure_url);
+          else callback(url); // fallback to local base64
+        }).catch(() => callback(url));
+      } else {
+        callback(url);
+      }
+    });
+  }
+
+  /* compressImage — resizes to max 1600px wide, quality 0.82 JPEG
+     Handles any file size with no rejection */
+  function compressImage(file, callback) {
+    const MAX_W = 1600;
+    const MAX_H = 2400;
+    const QUALITY = 0.82;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const img = new Image();
+      img.onload = function() {
+        let w = img.width, h = img.height;
+        if (w <= MAX_W && h <= MAX_H) {
+          // Already small enough — return original base64
+          callback(ev.target.result);
+          return;
+        }
+        // Scale down proportionally
+        const ratio = Math.min(MAX_W / w, MAX_H / h);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        callback(canvas.toDataURL('image/jpeg', QUALITY));
+      };
+      img.onerror = function() { callback(ev.target.result); };
+      img.src = ev.target.result;
+    };
+    reader.onerror = function() { callback(''); };
+    reader.readAsDataURL(file);
+  }
+
+  /* ── Storage keys ── */
+  const KEY_AUTH  = 'adm-auth-v2';
+  const KEY_DATA  = 'adm-portfolio-data';
+  const KEY_SEC   = 'adm-sections';
+  const KEY_CERTS = 'portfolio-certificates';
+  const PROFILE_KEY = 'portfolio-profile-image';
+
+  const DEFAULT_CREDS = { id:'srishanth', pass:'srishanth@portfolio' };
+
+  /* ── State ── */
+  let D  = {};
+  let SC = [];  // [{id, label, type, visible}]
+  let currentTheme = 'blue';
+  let modalSaveFn  = null;
+
+  /* ── Helpers ── */
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function v(id){ const e=document.getElementById(id); return e?e.value:''; }
+  function sv(id,val){ const e=document.getElementById(id); if(e) e.value=val||''; }
+  function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+  function loadCreds(){ try{return JSON.parse(localStorage.getItem(KEY_AUTH))||DEFAULT_CREDS;}catch{return DEFAULT_CREDS;} }
+  function saveCreds(c){ localStorage.setItem(KEY_AUTH,JSON.stringify(c)); }
+  function loadData(){ try{return JSON.parse(localStorage.getItem(KEY_DATA))||{};}catch{return {};} }
+  function saveData(d){ localStorage.setItem(KEY_DATA,JSON.stringify(d)); }
+  function loadSecs(){ try{return JSON.parse(localStorage.getItem(KEY_SEC))||defaultSections();}catch{return defaultSections();} }
+  function saveSecs(s){ localStorage.setItem(KEY_SEC,JSON.stringify(s)); }
+  function loadCertsStore(){ try{return JSON.parse(localStorage.getItem(KEY_CERTS))||[];}catch{return [];} }
+  function saveCertsStore(a){ try{localStorage.setItem(KEY_CERTS,JSON.stringify(a));}catch{toast('Storage full','err');} }
+  function loadProfileImg(){ try{return localStorage.getItem(PROFILE_KEY)||'';}catch{return '';} }
+  function saveProfileImg(b){ try{localStorage.setItem(PROFILE_KEY,b);}catch{toast('Storage full — try smaller image','err');} }
+
+  function defaultSections(){
+    return [
+      {id:'about',   label:'About',        type:'about',    visible:true},
+      {id:'skills',  label:'Skills',        type:'skills',   visible:true},
+      {id:'projects',label:'Projects',      type:'projects', visible:true},
+      {id:'journey', label:'Journey',       type:'journey',  visible:true},
+      {id:'certs',   label:'Certificates',  type:'certs',    visible:true},
+      {id:'contact', label:'Contact',       type:'contact',  visible:true},
+    ];
+  }
+
+  /* ── Toast ── */
+  let toastT=null;
+  function toast(msg,type='ok'){
+    const el=document.getElementById('toast');
+    el.textContent=msg; el.className='show '+type;
+    clearTimeout(toastT); toastT=setTimeout(()=>el.className='',2500);
+  }
+
+  /* ════════════════ LOGIN ════════════════ */
+  function attemptLogin(){
+    const id=document.getElementById('l-id').value.trim();
+    const pass=document.getElementById('l-pass').value;
+    const creds=loadCreds();
+    if(id===creds.id && pass===creds.pass){
+      document.getElementById('login-screen').style.display='none';
+      document.getElementById('admin-shell').classList.add('visible');
+      document.getElementById('logged-in-as').textContent=id;
+      init();
+    } else {
+      document.getElementById('l-err').classList.add('show');
+      document.getElementById('l-pass').value='';
+      document.getElementById('l-pass').focus();
+    }
+  }
+  function logout(){
+    document.getElementById('admin-shell').classList.remove('visible');
+    document.getElementById('login-screen').style.display='flex';
+    document.getElementById('l-id').value='';
+    document.getElementById('l-pass').value='';
+    document.getElementById('l-err').classList.remove('show');
+    setTimeout(()=>document.getElementById('l-id').focus(),100);
+  }
+  // Listen for theme changes from main portfolio page (ThemeCycle)
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      const adminBC = new BroadcastChannel('portfolio-admin-sync');
+      adminBC.addEventListener('message', function(e) {
+        if (!e.data || e.data.type !== 'theme') return;
+        var custom = e.data.custom || '';
+        var preset = e.data.theme  || '';
+        if (custom && /^#[0-9a-fA-F]{6}$/.test(custom)) {
+          applyCustomHex && applyCustomHex(custom);
+        } else if (preset) {
+          currentTheme = preset;
+          document.documentElement.setAttribute('data-theme', preset);
+          document.querySelectorAll('.swatch').forEach(function(s) {
+            s.classList.toggle('active', s.dataset.theme === preset);
+          });
+          var ov = document.getElementById('custom-theme-vars');
+          if (ov) ov.remove();
+        }
+      });
+    }
+  } catch(e) {}
+
+  // Real-time theme sync: listen for theme changes from main portfolio page
+  (function(){
+    try {
+      if(typeof BroadcastChannel==='undefined') return;
+      const adminBC=new BroadcastChannel('portfolio-admin-sync');
+      adminBC.addEventListener('message',function(e){
+        if(!e.data||e.data.type!=='theme') return;
+        var custom=e.data.custom||'', preset=e.data.theme||'';
+        if(custom&&/^#[0-9a-fA-F]{6}$/.test(custom)){
+          if(typeof applyCustomHex!=='undefined') applyCustomHex(custom);
+        } else if(preset){
+          currentTheme=preset;
+          document.documentElement.setAttribute('data-theme',preset);
+          document.querySelectorAll('.swatch').forEach(function(s){s.classList.toggle('active',s.dataset.theme===preset);});
+          var ov=document.getElementById('custom-theme-vars'); if(ov) ov.remove();
+        }
+      });
+    }catch(e){}
+  })();
+
+  document.getElementById('l-btn').onclick=attemptLogin;
+  document.getElementById('l-pass').addEventListener('keydown',e=>{if(e.key==='Enter')attemptLogin();});
+  document.getElementById('logout-btn').onclick=logout;
+  document.getElementById('logout-btn2').onclick=logout;
+
+  /* ════════════════ PANELS ════════════════ */
+  const LABELS={
+    hero:'Hero Editor',about:'About Editor',skills:'Skills Editor',
+    projects:'Projects Editor',journey:'Journey Editor',certs:'Certificates Editor',
+    contact:'Contact Editor',theme:'Theme Settings',sections:'Section Manager',
+    account:'Account Settings'
+  };
+  function switchPanel(id){
+    document.querySelectorAll('.adm-nav-item').forEach(n=>n.classList.toggle('active',n.dataset.panel===id));
+    document.querySelectorAll('.panel').forEach(p=>{
+      if(p.id==='p-'+id){
+        // Force animation re-trigger: remove then re-add active
+        p.classList.remove('active');
+        void p.offsetWidth; // reflow
+        p.classList.add('active');
+      } else {
+        p.classList.remove('active');
+      }
+    });
+    document.getElementById('page-title').textContent=LABELS[id]||id;
+    document.getElementById('breadcrumb-sub').textContent=id;
+    document.getElementById('adm-content')?.scrollTo({top:0,behavior:'smooth'});
+  }
+  document.querySelectorAll('.adm-nav-item').forEach(item=>{
+    item.addEventListener('click',()=>switchPanel(item.dataset.panel));
+  });
+
+  /* ════════════════ INIT ════════════════ */
+  function init(){
+    D=loadData(); SC=loadSecs();
+    // Restore theme: custom accent takes priority, then user-theme preset
+    const customAccent = D.customAccent || localStorage.getItem('adm-custom-accent') || '';
+    if(customAccent && /^#[0-9a-fA-F]{6}$/.test(customAccent)){
+      currentTheme='';
+      let el=document.getElementById('custom-theme-vars');
+      if(!el){el=document.createElement('style');el.id='custom-theme-vars';document.head.appendChild(el);}
+      el.textContent=`:root{--acc:${customAccent};--acc2:${customAccent}26;--glow:${customAccent}80;}`;
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      currentTheme=D.theme||localStorage.getItem('user-theme')||document.documentElement.getAttribute('data-theme')||'blue';
+      document.documentElement.setAttribute('data-theme',currentTheme);
+    }
+    populateAll();
+  }
+  function populateAll(){
+    populateHero(); populateAbout(); populateSkills(); populateProjects();
+    populateJourney(); populateCerts(); populateCertRings();
+    initCertUploadZone(); populateContact(); populateTheme(); populateSections();
+  }
+
+  /* ════════════════ HERO ════════════════ */
+  function showProfilePreview(src){
+    const preview=document.getElementById('hero-img-preview');
+    const ph=document.getElementById('profile-placeholder');
+    if(!preview) return;
+    if(src){ preview.src=src; preview.style.display='block'; if(ph)ph.style.display='none'; }
+    else { preview.src=''; preview.style.display='none'; if(ph)ph.style.display='flex'; }
+  }
+  function processProfileFile(file){
+    handleImageUpload(file,'profile-img-err',url=>{ saveProfileImg(url); showProfilePreview(url); sv('h-img',''); toast('Profile image saved ✓'); });
+  }
+  function initProfileDrop(){
+    const zone=document.getElementById('profile-drop-zone');
+    const fi=document.getElementById('profile-file-input');
+    const bb=document.getElementById('profile-browse-btn');
+    const cb=document.getElementById('profile-clear-btn');
+    if(!zone||zone.__bound) return; zone.__bound=true;
+    zone.addEventListener('click',e=>{ if(e.target.closest('#profile-browse-btn,#profile-clear-btn')) return; fi.click(); });
+    bb?.addEventListener('click',e=>{ e.stopPropagation(); fi.click(); });
+    fi.addEventListener('change',e=>processProfileFile(e.target.files[0]));
+    zone.addEventListener('dragenter',e=>{e.preventDefault();zone.classList.add('drop-active');});
+    zone.addEventListener('dragover',e=>{e.preventDefault();e.stopPropagation();zone.classList.add('drop-active');});
+    zone.addEventListener('dragleave',e=>{if(!zone.contains(e.relatedTarget))zone.classList.remove('drop-active');});
+    zone.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();zone.classList.remove('drop-active');processProfileFile(e.dataTransfer.files[0]);});
+    cb?.addEventListener('click',e=>{ e.stopPropagation(); saveProfileImg(''); showProfilePreview(''); sv('h-img',''); toast('Profile image removed'); });
+  }
+  function populateHero(){
+    const img=loadProfileImg();
+    showProfilePreview(img||D.heroImg||'');
+    sv('h-img', img?'':(D.heroImg||''));
+    sv('h-fname',D.firstName||'Arrabola');
+    sv('h-lname',D.lastName||'Srishanth');
+    sv('h-greet',D.greetText||'');
+    sv('h-roles',(D.roles||['AI & ML Engineer','Python Developer','Problem Solver','B.Tech Student']).join('\n'));
+    sv('h-desc',D.heroDesc||'');
+    sv('h-badge',D.badgeText||'');
+    sv('h-btn1',D.btn1Text||'Hire Me');
+    sv('h-btn2',D.btn2Text||'Download CV');
+    sv('h-cv',D.cvUrl||'');
+    initProfileDrop();
+    document.getElementById('h-img').addEventListener('input',e=>{ showProfilePreview(e.target.value); if(e.target.value) saveProfileImg(''); });
+  }
+
+  /* ════════════════ ABOUT ════════════════ */
+  function getDefaultAboutCards(){
+    return [
+      {ico:'🎓',title:'Education',   val:'B.Tech CSE (AI & ML) – VITS (2025–2029)'},
+      {ico:'</>',title:'Focus Areas',val:'Python, Data Structures & Algorithms'},
+      {ico:'🤖',title:'Interests',   val:'Artificial Intelligence & Machine Learning'},
+    ];
+  }
+  function populateAbout(){
+    sv('a-sub',D.aboutSub||'');
+    sv('a-p1', D.aboutP1||'');
+    sv('a-p2', D.aboutP2||'');
+    renderAboutCards();
+  }
+  function renderAboutCards(){
+    const cards=D.aboutCards||getDefaultAboutCards();
+    const container=document.getElementById('about-cards-list');
+    container.innerHTML=cards.map((c,i)=>`
+      <div class="card-item" draggable="true" data-idx="${i}">
+        <span class="drag-handle">⠿</span>
+        <div class="card-body">
+          <div class="card-name">${esc(c.ico)} ${esc(c.title)}</div>
+          <div class="card-meta">${esc(c.val)}</div>
+        </div>
+        <div class="card-actions">
+          <button class="icon-btn" onclick="editAboutCard(${i})" title="Edit">✎</button>
+          <button class="icon-btn del" onclick="deleteAboutCard(${i})" title="Delete">✕</button>
+        </div>
+      </div>`).join('');
+    initDragList('about-cards-list',()=>{
+      const els=[...document.querySelectorAll('#about-cards-list .card-item')];
+      const cards=D.aboutCards||getDefaultAboutCards();
+      D.aboutCards=els.map(el=>cards[parseInt(el.dataset.idx)]).filter(Boolean);
+      saveData(D); renderAboutCards(); toast('Order saved');
+    });
+  }
+  window.editAboutCard=function(idx){
+    if(!D.aboutCards) D.aboutCards=getDefaultAboutCards();
+    const c=idx>=0?D.aboutCards[idx]:{ico:'📌',title:'',val:''};
+    openModal(idx>=0?'Edit Info Card':'Add Info Card',`
+      <div class="form-grid" style="margin-bottom:14px">
+        <div class="form-col"><label class="lbl">Icon (emoji)</label><input class="inp" id="m-ico" value="${esc(c.ico||'')}"/></div>
+        <div class="form-col"><label class="lbl">Title</label><input class="inp" id="m-title" value="${esc(c.title||'')}"/></div>
+      </div>
+      <div class="form-col"><label class="lbl">Value</label><input class="inp" id="m-val" value="${esc(c.val||'')}"/></div>
+    `,()=>{
+      const item={ico:v('m-ico'),title:v('m-title'),val:v('m-val')};
+      if(idx>=0) D.aboutCards[idx]=item; else { if(!D.aboutCards) D.aboutCards=getDefaultAboutCards(); D.aboutCards.push(item); }
+      saveData(D); renderAboutCards(); toast(idx>=0?'Card updated':'Card added');
+    });
+  };
+  window.deleteAboutCard=function(idx){
+    admConfirmDelete('about card', '', () => {
+      if(!D.aboutCards) D.aboutCards=getDefaultAboutCards();
+      D.aboutCards.splice(idx,1); saveData(D); renderAboutCards(); toast('Card deleted');
+    });
+  };
+  document.getElementById('about-card-add-btn').onclick=()=>editAboutCard(-1);
+
+  /* ════════════════ SKILLS ════════════════ */
+  function getDefaultSkills(){
+    return [
+      {ico:'⚙️',name:'C Programming',  level:90,locked:false},
+      {ico:'🐍',name:'Python',          level:50,locked:false},
+      {ico:'🗄️',name:'Data Structures', level:25,locked:false},
+      {ico:'🤖',name:'Machine Learning',level:10,locked:false},
+      {ico:'⚛️',name:'React',           level:0, locked:true},
+      {ico:'🔶',name:'Git',             level:0, locked:true},
+    ];
+  }
+  function populateSkills(){
+    const skills=D.skills||getDefaultSkills();
+    const list=document.getElementById('skills-list');
+    list.innerHTML=skills.map((s,i)=>`
+      <div class="card-item" draggable="true" data-idx="${i}">
+        <span class="drag-handle">⠿</span>
+        <div class="card-body">
+          <div class="card-name">${esc(s.ico)} ${esc(s.name)}</div>
+          <div class="card-meta">${s.locked?'🔒 Locked':s.level+'%'}</div>
+        </div>
+        <div class="card-actions">
+          <button class="icon-btn" onclick="editSkill(${i})" title="Edit">✎</button>
+          <button class="icon-btn del" onclick="deleteSkill(${i})" title="Delete">✕</button>
+        </div>
+      </div>`).join('');
+    initDragList('skills-list',()=>{
+      const els=[...document.querySelectorAll('#skills-list .card-item')];
+      const skills=D.skills||getDefaultSkills();
+      D.skills=els.map(el=>skills[parseInt(el.dataset.idx)]).filter(Boolean);
+      saveData(D); populateSkills(); toast('Order saved');
+    });
+  }
+  window.editSkill=function(idx){
+    const skills=D.skills||getDefaultSkills();
+    const s=idx>=0?skills[idx]:{ico:'',name:'',level:50,locked:false};
+    openModal(idx>=0?'Edit Skill':'Add Skill',`
+      <div class="form-grid" style="margin-bottom:14px">
+        <div class="form-col"><label class="lbl">Icon (emoji)</label><input class="inp" id="m-ico" value="${esc(s.ico||'')}"/></div>
+        <div class="form-col"><label class="lbl">Skill Name</label><input class="inp" id="m-name" value="${esc(s.name||'')}"/></div>
+      </div>
+      <div class="form-col" style="margin-bottom:14px"><label class="lbl">Proficiency %</label><input class="inp" id="m-level" type="number" min="0" max="100" value="${s.level||0}"/></div>
+      <div class="toggle-row"><span class="toggle-label">Locked (Coming Soon)</span><label class="toggle"><input type="checkbox" id="m-locked" ${s.locked?'checked':''}/><div class="toggle-track"></div></label></div>
+    `,()=>{
+      if(!D.skills) D.skills=getDefaultSkills();
+      const item={ico:v('m-ico'),name:v('m-name'),level:parseInt(v('m-level'))||0,locked:document.getElementById('m-locked').checked};
+      if(idx>=0) D.skills[idx]=item; else D.skills.push(item);
+      saveData(D); populateSkills(); toast(idx>=0?'Skill updated':'Skill added');
+    });
+  };
+  window.deleteSkill=function(idx){
+    const sk=D.skills&&D.skills[idx];
+    admConfirmDelete('skill', sk&&sk.name||'', () => {
+      if(!D.skills) D.skills=getDefaultSkills();
+      D.skills.splice(idx,1); saveData(D); populateSkills(); toast('Skill deleted');
+    });
+  };
+  document.getElementById('skill-add-btn').onclick=()=>editSkill(-1);
+
+  /* ════════════════ PROJECTS ════════════════ */
+  function getDefaultProjects(){
+    return [
+      {ico:'📁',title:'Python Calculator',        desc:'A feature-rich calculator.',        tags:['Python','CLI'],    github:'#',live:'#'},
+      {ico:'📁',title:'Student Management System',desc:'CRUD application.',                  tags:['Python','File I/O'],github:'#',live:'#'},
+      {ico:'📁',title:'Portfolio Website',        desc:'This portfolio.',                    tags:['HTML','CSS','JS'],  github:'#',live:'#'},
+      {ico:'📁',title:'DSA Practice Tracker',     desc:'Track DSA progress.',                tags:['Python','DSA'],    github:'#',live:'#'},
+    ];
+  }
+  function populateProjects(){
+    const projects=D.projects||getDefaultProjects();
+    const list=document.getElementById('projects-list');
+    list.innerHTML=projects.map((p,i)=>`
+      <div class="card-item" draggable="true" data-idx="${i}">
+        <span class="drag-handle">⠿</span>
+        <div class="card-body">
+          <div class="card-name">${esc(p.ico||'📁')} ${esc(p.title)}</div>
+          <div class="card-meta">${(p.tags||[]).join(', ')}</div>
+        </div>
+        <div class="card-actions">
+          <button class="icon-btn" onclick="editProj(${i})" title="Edit">✎</button>
+          <button class="icon-btn del" onclick="deleteProj(${i})" title="Delete">✕</button>
+        </div>
+      </div>`).join('');
+    initDragList('projects-list',()=>{
+      const els=[...document.querySelectorAll('#projects-list .card-item')];
+      const projects=D.projects||getDefaultProjects();
+      D.projects=els.map(el=>projects[parseInt(el.dataset.idx)]).filter(Boolean);
+      saveData(D); populateProjects(); toast('Order saved');
+    });
+  }
+  window.editProj=function(idx){
+    const projects=D.projects||getDefaultProjects();
+    const p=idx>=0?projects[idx]:{ico:'📁',title:'',desc:'',tags:[],github:'#',live:'#'};
+    openModal(idx>=0?'Edit Project':'Add Project',`
+      <div class="form-grid" style="margin-bottom:14px">
+        <div class="form-col"><label class="lbl">Icon</label><input class="inp" id="m-ico" value="${esc(p.ico||'📁')}"/></div>
+        <div class="form-col"><label class="lbl">Title</label><input class="inp" id="m-title" value="${esc(p.title||'')}"/></div>
+      </div>
+      <div class="form-col" style="margin-bottom:14px"><label class="lbl">Description</label><textarea class="ta" id="m-desc">${esc(p.desc||'')}</textarea></div>
+      <div class="form-col" style="margin-bottom:14px"><label class="lbl">Tags (comma separated)</label><input class="inp" id="m-tags" value="${esc((p.tags||[]).join(', '))}"/></div>
+      <div class="form-grid">
+        <div class="form-col"><label class="lbl">GitHub URL</label><input class="inp" id="m-gh" value="${esc(p.github||'#')}"/></div>
+        <div class="form-col"><label class="lbl">Live URL</label><input class="inp" id="m-live" value="${esc(p.live||'#')}"/></div>
+      </div>
+    `,()=>{
+      if(!D.projects) D.projects=getDefaultProjects();
+      const item={ico:v('m-ico'),title:v('m-title'),desc:v('m-desc'),tags:v('m-tags').split(',').map(t=>t.trim()).filter(Boolean),github:v('m-gh'),live:v('m-live')};
+      if(idx>=0) D.projects[idx]=item; else D.projects.push(item);
+      saveData(D); populateProjects(); toast(idx>=0?'Project updated':'Project added');
+    });
+  };
+  window.deleteProj=function(idx){
+    const pj=D.projects&&D.projects[idx];
+    admConfirmDelete('project', pj&&pj.title||'', () => {
+      if(!D.projects) D.projects=getDefaultProjects();
+      D.projects.splice(idx,1); saveData(D); populateProjects(); toast('Project deleted');
+    });
+  };
+  document.getElementById('proj-add-btn').onclick=()=>editProj(-1);
+
+  /* ════════════════ JOURNEY ════════════════ */
+  function getDefaultJourney(){
+    return [
+      {date:'2025',       badge:'🎓',title:'Started B.Tech CSE (AI & ML)',  desc:'Joined Vignan Institute of Technology and Science.'},
+      {date:'2025',       badge:'✅',title:'Started C Programming',          desc:'Began learning C language.'},
+      {date:'2025',       badge:'✅',title:'Completed C Programming',        desc:'Mastered C fundamentals.'},
+      {date:'27 Feb 2026',badge:'🏆',title:'Hackathon Debut — VHack',        desc:'Participated in my first hackathon.'},
+      {date:'2025',       badge:'🧠',title:'Exploring AI & ML',              desc:'Began studying neural networks.'},
+      {date:'2025',       badge:'💜',title:'Built This Portfolio',            desc:'Designed and developed this portfolio.'},
+      {date:'Future',     badge:'🚀',title:"What's Next?",                   desc:'Full-stack mastery and open source contributions.'},
+    ];
+  }
+  function populateJourney(){
+    const items=D.journey||getDefaultJourney();
+    const list=document.getElementById('journey-list');
+    list.innerHTML=items.map((j,i)=>`
+      <div class="card-item" draggable="true" data-idx="${i}">
+        <span class="drag-handle">⠿</span>
+        <div class="card-body">
+          <div class="card-name">${esc(j.badge)} ${esc(j.title)}</div>
+          <div class="card-meta">${esc(j.date)}</div>
+        </div>
+        <div class="card-actions">
+          <button class="icon-btn" onclick="editJourney(${i})" title="Edit">✎</button>
+          <button class="icon-btn del" onclick="deleteJourney(${i})" title="Delete">✕</button>
+        </div>
+      </div>`).join('');
+    initDragList('journey-list',()=>{
+      const els=[...document.querySelectorAll('#journey-list .card-item')];
+      const items=D.journey||getDefaultJourney();
+      D.journey=els.map(el=>items[parseInt(el.dataset.idx)]).filter(Boolean);
+      saveData(D); populateJourney(); toast('Order saved');
+    });
+  }
+  window.editJourney=function(idx){
+    const items=D.journey||getDefaultJourney();
+    const j=idx>=0?items[idx]:{date:'',badge:'📌',title:'',desc:''};
+    openModal(idx>=0?'Edit Milestone':'Add Milestone',`
+      <div class="form-grid" style="margin-bottom:14px">
+        <div class="form-col"><label class="lbl">Date / Year</label><input class="inp" id="m-date" value="${esc(j.date||'')}"/></div>
+        <div class="form-col"><label class="lbl">Badge Emoji</label><input class="inp" id="m-badge" value="${esc(j.badge||'📌')}"/></div>
+      </div>
+      <div class="form-col" style="margin-bottom:14px"><label class="lbl">Title</label><input class="inp" id="m-title" value="${esc(j.title||'')}"/></div>
+      <div class="form-col"><label class="lbl">Description</label><textarea class="ta" id="m-desc">${esc(j.desc||'')}</textarea></div>
+    `,()=>{
+      if(!D.journey) D.journey=getDefaultJourney();
+      const item={date:v('m-date'),badge:v('m-badge'),title:v('m-title'),desc:v('m-desc')};
+      if(idx>=0) D.journey[idx]=item; else D.journey.push(item);
+      saveData(D); populateJourney(); toast(idx>=0?'Milestone updated':'Milestone added');
+    });
+  };
+  window.deleteJourney=function(idx){
+    const jn=D.journey&&D.journey[idx];
+    admConfirmDelete('milestone', jn&&jn.title||'', () => {
+      if(!D.journey) D.journey=getDefaultJourney();
+      D.journey.splice(idx,1); saveData(D); populateJourney(); toast('Milestone deleted');
+    });
+  };
+  document.getElementById('journey-add-btn').onclick=()=>editJourney(-1);
+
+  /* ════════════════ CERTS / ACHIEVEMENTS ════════════════ */
+  function getDefaultAch(){
+    return [
+      {ico:'🎓',title:'B.Tech in Computer Science',desc:'Currently pursuing my degree.'},
+      {ico:'🏆',title:'Hackathon Finalist',         desc:'National-level hackathon finals.'},
+      {ico:'</>',title:'500+ GitHub Contributions', desc:'Consistent open-source commits.'},
+      {ico:'🥇',title:'Web Dev Certification',      desc:'Advanced full-stack web development certification.'},
+    ];
+  }
+  function populateCerts(){
+    const items=D.achievements||getDefaultAch();
+    const list=document.getElementById('ach-list');
+    list.innerHTML=items.map((a,i)=>`
+      <div class="card-item" draggable="true" data-idx="${i}">
+        <span class="drag-handle">⠿</span>
+        <div class="card-body">
+          <div class="card-name">${esc(a.ico)} ${esc(a.title)}</div>
+          <div class="card-meta">${esc(a.desc).slice(0,60)}${a.desc.length>60?'…':''}</div>
+        </div>
+        <div class="card-actions">
+          <button class="icon-btn" onclick="editAch(${i})" title="Edit">✎</button>
+          <button class="icon-btn del" onclick="deleteAch(${i})" title="Delete">✕</button>
+        </div>
+      </div>`).join('');
+    initDragList('ach-list',()=>{
+      const els=[...document.querySelectorAll('#ach-list .card-item')];
+      const items=D.achievements||getDefaultAch();
+      D.achievements=els.map(el=>items[parseInt(el.dataset.idx)]).filter(Boolean);
+      saveData(D); populateCerts(); toast('Order saved');
+    });
+  }
+  window.editAch=function(idx){
+    const items=D.achievements||getDefaultAch();
+    const a=idx>=0?items[idx]:{ico:'🏅',title:'',desc:''};
+    openModal(idx>=0?'Edit Achievement':'Add Achievement',`
+      <div class="form-grid" style="margin-bottom:14px">
+        <div class="form-col"><label class="lbl">Icon</label><input class="inp" id="m-ico" value="${esc(a.ico||'🏅')}"/></div>
+        <div class="form-col"><label class="lbl">Title</label><input class="inp" id="m-title" value="${esc(a.title||'')}"/></div>
+      </div>
+      <div class="form-col"><label class="lbl">Description</label><textarea class="ta" id="m-desc">${esc(a.desc||'')}</textarea></div>
+    `,()=>{
+      if(!D.achievements) D.achievements=getDefaultAch();
+      const item={ico:v('m-ico'),title:v('m-title'),desc:v('m-desc')};
+      if(idx>=0) D.achievements[idx]=item; else D.achievements.push(item);
+      saveData(D); populateCerts(); toast(idx>=0?'Achievement updated':'Achievement added');
+    });
+  };
+  window.deleteAch=function(idx){
+    const ah=D.achievements&&D.achievements[idx];
+    admConfirmDelete('achievement', ah&&ah.title||'', () => {
+      if(!D.achievements) D.achievements=getDefaultAch();
+      D.achievements.splice(idx,1); saveData(D); populateCerts(); toast('Achievement deleted');
+    });
+  };
+  document.getElementById('ach-add-btn').onclick=()=>editAch(-1);
+
+  /* ════════════════════════════════════════════════════════
+     CERTIFICATES — tabbed, multi-upload, edit, preview, drag
+     Storage: 'portfolio-cert-tabs' → [{id,name,certs:[{id,title,org,image}]}]
+     Falls back to 'portfolio-certificates' (flat) on first run.
+  ════════════════════════════════════════════════════════ */
+  const KEY_CERT_TABS = 'portfolio-cert-tabs';
+
+  function loadCertTabs(){
+    try{
+      const raw=localStorage.getItem(KEY_CERT_TABS);
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    // Migrate flat certs into a default tab
+    const flat=loadCertsStore();
+    return [{id:uid(),name:'All Certificates',certs:flat}];
+  }
+  function saveCertTabs(tabs){
+    try{
+      localStorage.setItem(KEY_CERT_TABS,JSON.stringify(tabs));
+      const flat=tabs.flatMap(t=>t.certs||[]);
+      localStorage.setItem(KEY_CERTS,JSON.stringify(flat));
+    }catch(e){ toast('Storage full — try smaller images','err'); return; }
+    // Refresh live preview on every cert data change
+    updateCertPreview && updateCertPreview();
+  }
+
+  let certTabs=[];
+  let certActiveTab=null; // id string
+
+  function populateCertRings(){ renderCertSection(); } // alias for init call
+
+  function renderCertSection(){
+    certTabs=loadCertTabs();
+    if(!certTabs.length) certTabs=[{id:uid(),name:'All Certificates',certs:[]}];
+    if(!certActiveTab || !certTabs.find(t=>t.id===certActiveTab)){
+      certActiveTab=certTabs[0].id;
+    }
+    renderCertTabNav();
+    renderCertTabContent();
+    updateCertPreview();
+  }
+
+  function renderCertTabNav(){
+    const nav=document.getElementById('cert-tabs-nav');
+    if(!nav) return;
+    nav.innerHTML='';
+    certTabs.forEach(tab=>{
+      const btn=document.createElement('div');
+      btn.className='cert-tab-btn'+(tab.id===certActiveTab?' active':'');
+      btn.dataset.id=tab.id;
+
+      const inp=document.createElement('input');
+      inp.className='cert-tab-name-inp';
+      inp.value=tab.name;
+      inp.placeholder='Tab name';
+      inp.addEventListener('click',e=>{
+        e.stopPropagation();
+        if(tab.id!==certActiveTab){ certActiveTab=tab.id; renderCertSection(); }
+      });
+      inp.addEventListener('input',e=>{
+        tab.name=e.target.value||'Tab';
+        saveCertTabs(certTabs);
+      });
+      inp.addEventListener('keydown',e=>{ if(e.key==='Enter') inp.blur(); });
+
+      const count=document.createElement('span');
+      count.className='cert-tab-count';
+      count.textContent=(tab.certs||[]).length;
+
+      const x=document.createElement('button');
+      x.className='cert-tab-x';
+      x.title='Delete tab';
+      x.textContent='✕';
+      x.addEventListener('click',e=>{
+        e.stopPropagation();
+        if(certTabs.length===1){ toast('Cannot delete the only tab','err'); return; }
+        admConfirmDelete('certificate tab', tab.name, () => {
+          certTabs=certTabs.filter(t=>t.id!==tab.id);
+          if(certActiveTab===tab.id) certActiveTab=certTabs[0].id;
+          saveCertTabs(certTabs);
+          renderCertSection();
+          broadcastSave();
+        });
+      });
+
+      btn.appendChild(inp);
+      btn.appendChild(count);
+      btn.appendChild(x);
+      btn.addEventListener('click',()=>{
+        if(certActiveTab!==tab.id){ certActiveTab=tab.id; renderCertSection(); }
+      });
+      nav.appendChild(btn);
+    });
+  }
+
+  function renderCertTabContent(){
+    const grid=document.getElementById('cert-card-grid');
+    const errEl=document.getElementById('cert-upload-err');
+    if(!grid) return;
+
+    const tab=certTabs.find(t=>t.id===certActiveTab);
+    if(!tab){ grid.innerHTML=''; return; }
+
+    // Bind upload zone (once per tab switch)
+    bindCertUploadZone(tab, errEl);
+
+    // Render cards
+    if(!tab.certs||!tab.certs.length){
+      grid.innerHTML='<p style="font-size:.68rem;color:rgba(255,255,255,.22);text-align:center;padding:24px 0;grid-column:1/-1;">No certificates yet — upload images above or add manually.</p>';
+      return;
+    }
+
+    // Build image thumbnails HTML for each cert
+    function buildImgThumbs(c,i){
+      const imgs=(c.images&&c.images.length)?c.images:(c.image?[c.image]:[]);
+      if(!imgs.length) return '<div class="cert-img-empty">No images yet — click ＋ to add</div>';
+      return imgs.map((src,j)=>`
+        <div class="cert-img-thumb" draggable="true" data-cert-idx="${i}" data-img-idx="${j}" title="Drag to reorder • Hover to delete">
+          <img src="${src}" alt="cert image ${j+1}" loading="lazy"/>
+          ${imgs.length>1?`<span class="cert-img-thumb-badge">${j+1}</span>`:''}
+          <button class="cert-img-thumb-del" data-cert-idx="${i}" data-img-idx="${j}" title="Remove this image">✕</button>
+        </div>`).join('');
+    }
+
+    grid.innerHTML=tab.certs.map((c,i)=>{
+      const imgs=(c.images&&c.images.length)?c.images:(c.image?[c.image]:[]);
+      return `
+      <div class="cert-card cert-card-droptarget" draggable="true" data-idx="${i}" data-id="${esc(c.id||'')}">
+        <div class="cert-card-grip" title="Drag to reorder">⠿</div>
+        <div class="cert-card-drop-hint">Drop image to add</div>
+
+        <!-- Emoji preview circle -->
+        <div class="cert-card-emoji-row">
+          <div class="cert-card-emoji-preview">${c.emoji||'🎓'}</div>
+          <input class="cert-emoji-inp" type="text" value="${esc(c.emoji||'🎓')}" placeholder="🎓" data-field="emoji" data-idx="${i}" maxlength="4" title="Emoji icon"/>
+        </div>
+
+        <!-- Title + Org -->
+        <input class="cert-card-title-inp" type="text" value="${esc(c.title||'')}" placeholder="Certificate title" data-field="title" data-idx="${i}"/>
+        <input class="cert-card-org-inp" type="text" value="${esc(c.org||'')}" placeholder="Issuer / Platform" data-field="org" data-idx="${i}"/>
+
+        <!-- Image count indicator (no thumbnails — just count) -->
+        <div class="cert-card-img-count" style="font-size:.58rem;color:rgba(255,255,255,.3);margin:6px 0 4px;font-family:'Space Mono',monospace;letter-spacing:1px;">
+          ${imgs.length ? imgs.length + ' image' + (imgs.length>1?'s':'') + ' attached' : 'No images yet'}
+        </div>
+
+        <!-- Actions -->
+        <div class="cert-card-actions">
+          <button class="cert-card-btn edit-img" data-action="add-img" data-idx="${i}" title="Add images">＋ Images</button>
+          <button class="cert-card-btn preview" data-action="preview" data-idx="${i}" title="Preview">${imgs.length?'👁 View':'👁 View'}</button>
+          <button class="cert-card-btn del-cert" data-action="del" data-idx="${i}" title="Delete">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    // Bind all card interactions
+    grid.querySelectorAll('.cert-card-title-inp,.cert-card-org-inp,.cert-emoji-inp').forEach(inp=>{
+      inp.addEventListener('input',e=>{
+        const idx=parseInt(e.target.dataset.idx);
+        const field=e.target.dataset.field;
+        const tab=certTabs.find(t=>t.id===certActiveTab);
+        if(tab&&tab.certs[idx]){
+          tab.certs[idx][field]=e.target.value;
+          saveCertTabs(certTabs);
+          // Live emoji preview update
+          if(field==='emoji'){
+            const preview=e.target.closest('.cert-card')?.querySelector('.cert-card-emoji-preview');
+            if(preview) preview.textContent=e.target.value||'🎓';
+            if(window.__renderCerts) window.__renderCerts();
+          }
+          if(field==='title'||field==='org'){ updateCertLiveStrip&&updateCertLiveStrip(); }
+        }
+      });
+    });
+
+    // Shared helpers for image management
+    function getCertImages(c){ return (c.images&&c.images.length)?c.images:(c.image?[c.image]:[]); }
+    function setCertImages(c,imgs){ c.images=imgs; c.image=imgs[0]||''; }
+
+    // ── Add image button (＋ Add image on each card)
+    grid.querySelectorAll('[data-action="add-img"]').forEach(btn=>{
+      btn.addEventListener('click',e=>{
+        e.stopPropagation();
+        const idx=parseInt(btn.dataset.idx);
+        const tab=certTabs.find(t=>t.id===certActiveTab); if(!tab) return;
+        const fi=document.createElement('input');
+        fi.type='file'; fi.accept='image/jpeg,image/png'; fi.multiple=true;
+        fi.addEventListener('change',ev=>{
+          const files=[...ev.target.files]; if(!files.length) return;
+          const c=tab.certs[idx];
+          const imgs=getCertImages(c);
+          let done=0;
+          files.forEach(file=>{
+            handleImageUpload(file,'cert-upload-err',url=>{
+              imgs.push(url); done++;
+              if(done===files.length){
+                setCertImages(c,imgs);
+                saveCertTabs(certTabs);
+                renderCertSection();
+                broadcastSave();
+                toast(files.length===1?'Image added':files.length+' images added');
+              }
+            });
+          });
+        });
+        fi.click();
+      });
+    });
+
+    // ── Thumbnail delete (✕ on each thumb)
+    grid.querySelectorAll('.cert-img-thumb-del').forEach(delBtn=>{
+      delBtn.addEventListener('click',e=>{
+        e.stopPropagation();
+        const certIdx=parseInt(delBtn.dataset.certIdx);
+        const imgIdx =parseInt(delBtn.dataset.imgIdx);
+        const tab=certTabs.find(t=>t.id===certActiveTab); if(!tab) return;
+        const c=tab.certs[certIdx]; if(!c) return;
+        const imgs=getCertImages(c);
+        imgs.splice(imgIdx,1);
+        setCertImages(c,imgs);
+        saveCertTabs(certTabs);
+        renderCertSection();
+        broadcastSave();
+        toast('Image removed');
+      });
+    });
+
+    // ── Thumbnail drag-to-reorder (within same cert)
+    let tDragCI=null,tDragII=null,tOverEl=null;
+    grid.querySelectorAll('.cert-img-thumb').forEach(thumb=>{
+      thumb.addEventListener('dragstart',e=>{
+        tDragCI=parseInt(thumb.dataset.certIdx);
+        tDragII=parseInt(thumb.dataset.imgIdx);
+        thumb.classList.add('dragging-thumb');
+        e.stopPropagation();
+        e.dataTransfer.effectAllowed='move';
+      });
+      thumb.addEventListener('dragend',()=>{
+        thumb.classList.remove('dragging-thumb');
+        if(tOverEl){tOverEl.classList.remove('over-thumb');tOverEl=null;}
+      });
+      thumb.addEventListener('dragover',e=>{
+        e.preventDefault();e.stopPropagation();
+        if(thumb===tOverEl) return;
+        if(tOverEl) tOverEl.classList.remove('over-thumb');
+        tOverEl=thumb; thumb.classList.add('over-thumb');
+      });
+      thumb.addEventListener('drop',e=>{
+        e.preventDefault();e.stopPropagation();
+        if(tOverEl){tOverEl.classList.remove('over-thumb');tOverEl=null;}
+        const dCI=parseInt(thumb.dataset.certIdx),dII=parseInt(thumb.dataset.imgIdx);
+        if(tDragCI===null||tDragCI!==dCI||tDragII===dII) return;
+        const tab=certTabs.find(t=>t.id===certActiveTab); if(!tab) return;
+        const c=tab.certs[dCI]; if(!c) return;
+        const imgs=getCertImages(c);
+        const[moved]=imgs.splice(tDragII,1);
+        imgs.splice(dII,0,moved);
+        setCertImages(c,imgs);
+        saveCertTabs(certTabs);
+        renderCertSection();
+        broadcastSave();
+        toast('Image order saved');
+      });
+    });
+
+    // ── Preview & Delete cert
+    grid.querySelectorAll('[data-action="preview"]').forEach(btn=>{
+      btn.addEventListener('click',e=>{
+        e.stopPropagation();
+        const idx=parseInt(btn.dataset.idx);
+        const tab=certTabs.find(t=>t.id===certActiveTab); if(!tab) return;
+        const c=tab.certs[idx]; if(!c) return;
+        const imgs=getCertImages(c);
+        if(imgs.length) openCertPreviewModal(c);
+        else toast('No images to preview','err');
+      });
+    });
+    grid.querySelectorAll('[data-action="del"]').forEach(btn=>{
+      btn.addEventListener('click',e=>{
+        e.stopPropagation();
+        const idx=parseInt(btn.dataset.idx);
+        const tab=certTabs.find(t=>t.id===certActiveTab); if(!tab) return;
+        const c=tab.certs[idx];
+        admConfirmDelete('certificate', c?.title||'', () => {
+          tab.certs.splice(idx,1);
+          saveCertTabs(certTabs);
+          renderCertSection();
+          broadcastSave();
+          toast('Certificate deleted');
+        });
+      });
+    });
+
+    // Drag-to-reorder cards
+    initCertCardDrag(grid, tab);
+  }
+
+  function initCertCardDrag(grid, tab){
+    // Clone to strip old listeners
+    const fresh=grid.cloneNode(true);
+    grid.parentNode.replaceChild(fresh,grid);
+    const g=document.getElementById('cert-card-grid');
+
+    // Re-bind all interactions on the fresh clone
+    // (renderCertTabContent already set innerHTML, so we only need drag here)
+    let dragIdx=null, overEl=null;
+    function clearOver(){ if(overEl){overEl.classList.remove('over-cert');overEl=null;} }
+
+    g.addEventListener('dragstart',e=>{
+      const card=e.target.closest('.cert-card'); if(!card) return;
+      dragIdx=parseInt(card.dataset.idx);
+      card.classList.add('dragging-cert');
+      e.dataTransfer.effectAllowed='move';
+      e.stopPropagation();
+    });
+    g.addEventListener('dragend',e=>{
+      e.target.closest('.cert-card')?.classList.remove('dragging-cert');
+      clearOver(); dragIdx=null;
+    });
+    g.addEventListener('dragover',e=>{
+      e.preventDefault(); e.stopPropagation();
+      const card=e.target.closest('.cert-card');
+      if(!card||card===overEl) return;
+      clearOver(); overEl=card; overEl.classList.add('over-cert');
+    });
+    g.addEventListener('dragleave',e=>{ if(!g.contains(e.relatedTarget)) clearOver(); });
+    g.addEventListener('drop',e=>{
+      e.preventDefault(); e.stopPropagation();
+      const dropCard=e.target.closest('.cert-card'); clearOver();
+      if(!dropCard||dragIdx===null) return;
+      const dropIdx=parseInt(dropCard.dataset.idx);
+      if(dragIdx===dropIdx) return;
+      const [moved]=tab.certs.splice(dragIdx,1);
+      tab.certs.splice(dropIdx,0,moved);
+      saveCertTabs(certTabs);
+      renderCertSection();
+      broadcastSave();
+      toast('Order saved');
+    });
+
+    // ── Wire cert cards as image drop targets (drop file = add page to that cert)
+    g.querySelectorAll('.cert-card-droptarget').forEach(card=>{
+      card.addEventListener('dragenter',e=>{
+        // Only highlight if dragging a file (not reordering cards)
+        if(e.dataTransfer.types && [...e.dataTransfer.types].includes('Files')){
+          e.preventDefault();
+          card.classList.add('img-dragover');
+        }
+      });
+      card.addEventListener('dragover',e=>{
+        if(e.dataTransfer.types && [...e.dataTransfer.types].includes('Files')){
+          e.preventDefault(); e.stopPropagation();
+          card.classList.add('img-dragover');
+        }
+      });
+      card.addEventListener('dragleave',e=>{
+        if(!card.contains(e.relatedTarget)) card.classList.remove('img-dragover');
+      });
+      card.addEventListener('drop',e=>{
+        card.classList.remove('img-dragover');
+        if(!e.dataTransfer.files||!e.dataTransfer.files.length) return;
+        e.preventDefault(); e.stopPropagation();
+        const certIdx=parseInt(card.dataset.idx);
+        const c=tab.certs[certIdx]; if(!c) return;
+        const files=[...e.dataTransfer.files].filter(f=>f.type.startsWith('image/'));
+        if(!files.length) return;
+        function getCertImgsLocal(c){ return (c.images&&c.images.length)?c.images:(c.image?[c.image]:[]); }
+        function setCertImgsLocal(c,imgs){ c.images=imgs; c.image=imgs[0]||''; }
+        const imgs=getCertImgsLocal(c);
+        let done=0;
+        files.forEach(file=>{
+          handleImageUpload(file,'cert-upload-err',url=>{
+            if(url) imgs.push(url);
+            done++;
+            if(done===files.length){
+              setCertImgsLocal(c,imgs);
+              saveCertTabs(certTabs);
+              renderCertSection();
+              broadcastSave();
+              toast(files.length===1?'Page added to certificate':files.length+' pages added');
+            }
+          });
+        });
+      });
+    });
+
+    // Re-bind interactions (since cloneNode strips them)
+    g.querySelectorAll('.cert-card-title-inp,.cert-card-org-inp').forEach(inp=>{
+      inp.addEventListener('input',e=>{
+        const idx=parseInt(e.target.dataset.idx);
+        const field=e.target.dataset.field;
+        if(tab.certs[idx]){
+          tab.certs[idx][field]=e.target.value;
+          saveCertTabs(certTabs);
+        }
+      });
+    });
+    // Re-bind the same interaction set on cloned grid
+    function getCertImgs(c){ return (c.images&&c.images.length)?c.images:(c.image?[c.image]:[]); }
+    function setCertImgs(c,imgs){ c.images=imgs; c.image=imgs[0]||''; }
+
+    g.querySelectorAll('[data-action="add-img"]').forEach(btn=>{
+      btn.addEventListener('click',e=>{
+        e.stopPropagation();
+        const idx=parseInt(btn.dataset.idx); const c=tab.certs[idx];
+        const fi=document.createElement('input'); fi.type='file'; fi.accept='image/jpeg,image/png'; fi.multiple=true;
+        fi.addEventListener('change',ev=>{
+          const files=[...ev.target.files]; if(!files.length) return;
+          const imgs=getCertImgs(c); let done=0;
+          files.forEach(file=>{ handleImageUpload(file,'cert-upload-err',url=>{ imgs.push(url); done++; if(done===files.length){ setCertImgs(c,imgs); saveCertTabs(certTabs); renderCertSection(); broadcastSave(); toast(files.length===1?'Image added':files.length+' images added'); } }); });
+        }); fi.click();
+      });
+    });
+    g.querySelectorAll('.cert-img-thumb-del').forEach(delBtn=>{
+      delBtn.addEventListener('click',e=>{
+        e.stopPropagation();
+        const ci=parseInt(delBtn.dataset.certIdx),ii=parseInt(delBtn.dataset.imgIdx);
+        const c=tab.certs[ci]; if(!c) return;
+        const imgs=getCertImgs(c); imgs.splice(ii,1); setCertImgs(c,imgs);
+        saveCertTabs(certTabs); renderCertSection(); broadcastSave(); toast('Image removed');
+      });
+    });
+    g.querySelectorAll('[data-action="preview"]').forEach(btn=>{
+      btn.addEventListener('click',e=>{
+        e.stopPropagation();
+        const c=tab.certs[parseInt(btn.dataset.idx)]; if(!c) return;
+        const imgs=getCertImgs(c);
+        if(imgs.length) openCertPreviewModal(c); else toast('No images to preview','err');
+      });
+    });
+    g.querySelectorAll('[data-action="del"]').forEach(btn=>{
+      btn.addEventListener('click',e=>{
+        e.stopPropagation();
+        const idx=parseInt(btn.dataset.idx); const c=tab.certs[idx];
+        admConfirmDelete('certificate', c?.title||'', () => {
+          tab.certs.splice(idx,1); saveCertTabs(certTabs); renderCertSection(); broadcastSave(); toast('Certificate deleted');
+        });
+      });
+    });
+  }
+
+  function bindCertUploadZone(tab, errEl){
+    const zone=document.getElementById('cert-upload-zone');
+    const fi=document.getElementById('cert-file-inp');
+    const lbl=zone?.querySelector('.uz-label');
+    if(!zone||!fi) return;
+    zone.__zone_tab=tab.id;
+    zone.onclick=()=>fi.click();
+    // Allow any image file type, no limit
+    fi.accept='image/*';
+    fi.multiple=true;
+    fi.onchange=e=>{
+      if(e.target.files.length) processCertUpload(e.target.files, tab, errEl);
+      fi.value=''; // reset so same file can be re-selected
+    };
+    zone.ondragenter=e=>{
+      e.preventDefault();
+      zone.classList.add('dropping');
+      const count=[...e.dataTransfer.items].filter(i=>i.kind==='file'&&i.type.startsWith('image/')).length;
+      if(lbl&&count>1) lbl.textContent=count+' images ready to drop';
+    };
+    zone.ondragover=e=>{e.preventDefault();e.stopPropagation();zone.classList.add('dropping');};
+    zone.ondragleave=e=>{
+      if(!zone.contains(e.relatedTarget)){
+        zone.classList.remove('dropping');
+        if(lbl) lbl.textContent='Drop images here or click to upload';
+      }
+    };
+    zone.ondrop=e=>{
+      e.preventDefault();e.stopPropagation();
+      zone.classList.remove('dropping');
+      if(lbl) lbl.textContent='Drop images here or click to upload';
+      processCertUpload(e.dataTransfer.files, tab, errEl);
+    };
+  }
+
+  function processCertUpload(files, tab, errEl){
+    // Accept all image types, auto-compress — no size limit
+    const valid=[...files].filter(f=> f.type.startsWith('image/'));
+    if(!valid.length){ if(errEl) errEl.textContent='No valid images found.'; return; }
+    let done=0;
+    valid.forEach(file=>{
+      handleImageUpload(file,'cert-upload-err',url=>{
+        if(!url){ done++; return; }
+        const title=file.name.replace(/\.[^.]+$/,'').replace(/[-_]+/g,' ').trim();
+        tab.certs.push({id:uid(),title,org:'',emoji:'🎓',image:url,images:[url]});
+        done++;
+        if(done===valid.length){
+          saveCertTabs(certTabs);
+          renderCertSection();
+          updateCertLiveStrip();
+          broadcastSave();
+          toast(valid.length===1?'Certificate added':`${valid.length} certificates added`);
+        }
+      });
+    });
+  }
+
+  // Add Tab button
+  document.getElementById('cert-add-tab-btn').addEventListener('click',()=>{
+    const tab={id:uid(),name:'New Tab',certs:[]};
+    certTabs.push(tab);
+    certActiveTab=tab.id;
+    saveCertTabs(certTabs);
+    renderCertSection();
+    // Focus the new tab's name input
+    setTimeout(()=>{
+      const btns=document.querySelectorAll('#cert-tabs-nav .cert-tab-btn');
+      const last=btns[btns.length-1];
+      last?.querySelector('.cert-tab-name-inp')?.select();
+    },80);
+  });
+
+  // Manual add button
+  document.getElementById('cert-manual-btn').addEventListener('click',()=>{
+    openModal('Add Certificate Manually',`
+      <div class="form-grid" style="margin-bottom:14px">
+        <div class="form-col"><label class="lbl">Certificate Title *</label><input class="inp" id="m-ct" placeholder="e.g. Python Basics"/></div>
+        <div class="form-col"><label class="lbl">Issuer / Platform</label><input class="inp" id="m-co" placeholder="e.g. Coursera"/></div>
+      </div>
+      <div class="form-grid" style="margin-bottom:14px">
+        <div class="form-col" style="align-items:center">
+          <label class="lbl">Emoji Icon (shown in circle)</label>
+          <input class="inp" id="m-ce" placeholder="🎓" style="font-size:1.2rem;text-align:center;" maxlength="4"/>
+          <small style="font-size:.55rem;color:rgba(255,255,255,.25);margin-top:3px">Used when no image uploaded</small>
+        </div>
+        <div class="form-col"><label class="lbl">Image URL (optional)</label><input class="inp" id="m-ci" type="url" placeholder="https://..."/></div>
+      </div>
+    `,()=>{
+      const title=v('m-ct').trim();
+      if(!title){toast('Title is required','err');return;}
+      const tab=certTabs.find(t=>t.id===certActiveTab);
+      if(!tab) return;
+      tab.certs.push({id:uid(),title,org:v('m-co'),emoji:v('m-ce')||'🎓',image:v('m-ci')});
+      saveCertTabs(certTabs);
+      renderCertSection();
+      updateCertLiveStrip();
+      broadcastSave();
+      toast('Certificate added');
+    });
+  });
+
+  /* ── Section Heading Live Edit ── */
+  (function bindCertHeadingEdit(){
+    function wireHeadingInput(inputId, selector, attr) {
+      var inp = document.getElementById(inputId);
+      if(!inp) return;
+      // Pre-fill from live page
+      var liveEl = document.querySelector(selector);
+      if(liveEl && !inp.value) inp.value = liveEl.textContent.trim();
+
+      inp.addEventListener('input', function(){
+        var els = document.querySelectorAll(selector);
+        els.forEach(function(el){ el.textContent = inp.value; });
+        // Persist to D
+        if(!window.D) return;
+        if(attr==='certSectionTitle') D.certSectionTitle=inp.value;
+        if(attr==='certSectionSub')   D.certSectionSub=inp.value;
+      });
+    }
+    wireHeadingInput('cert-section-title', '.mycert-h span, .mycert-h', 'certSectionTitle');
+    wireHeadingInput('cert-section-sub',   '.mycert-sub',                'certSectionSub');
+
+    // Special: mycert-h has "My <span>Certificates</span>" — update just the span
+    var titleInp = document.getElementById('cert-section-title');
+    if(titleInp){
+      titleInp.addEventListener('input', function(){
+        var span = document.querySelector('.mycert-h span');
+        if(span) span.textContent = titleInp.value;
+        var h = document.querySelector('.mycert-h');
+        if(h && !span) h.textContent = 'My ' + titleInp.value;
+      });
+    }
+  })();
+
+  /* ── Live Strip Update ── */
+  function updateCertLiveStrip(){
+    var strip = document.getElementById('cert-live-text');
+    if(!strip) return;
+    var tabs = loadCertTabs ? loadCertTabs() : [];
+    if(!tabs.length){ strip.textContent='No certificates yet'; return; }
+    var total = tabs.reduce(function(n,t){ return n+(t.certs?t.certs.length:0); },0);
+    var tabNames = tabs.map(function(t){ return t.name; }).join(', ');
+    strip.textContent = total + ' cert' + (total!==1?'s':'') + ' across ' + tabs.length + ' tab' + (tabs.length!==1?'s':'') + ' — ' + tabNames;
+  }
+  updateCertLiveStrip();
+
+  /* ── Cert Preview Modal ── */
+  (function buildCertPreviewModal(){
+    if(document.getElementById('cert-preview-modal')) return;
+    const m=document.createElement('div');
+    m.id='cert-preview-modal';
+    m.innerHTML=`
+      <div class="cert-preview-box">
+        <button class="cert-preview-close" id="cert-preview-close">✕</button>
+        <div class="cert-preview-title" id="cert-preview-title"></div>
+        <div class="cert-preview-org" id="cert-preview-org"></div>
+        <img class="cert-preview-img" id="cert-preview-img" src="" alt="Certificate"/>
+      </div>`;
+    document.body.appendChild(m);
+    document.getElementById('cert-preview-close').onclick=closeCertPreviewModal;
+    m.addEventListener('click',e=>{ if(e.target===m) closeCertPreviewModal(); });
+  })();
+
+  function openCertPreviewModal(c){
+    const imgs=(c.images&&c.images.length)?c.images:(c.image?[c.image]:[]);
+    document.getElementById('cert-preview-title').textContent=c.title||'Certificate';
+    document.getElementById('cert-preview-org').textContent=c.org?'Issued by '+c.org:'';
+    // Show all images stacked in preview
+    const imgEl=document.getElementById('cert-preview-img');
+    if(imgEl) imgEl.src=imgs[0]||'';
+    // If multi-image, inject extras
+    const box=document.querySelector('.cert-preview-box');
+    if(box){
+      box.querySelectorAll('.cert-preview-extra-img').forEach(el=>el.remove());
+      if(imgs.length>1){
+        imgs.slice(1).forEach(src=>{
+          const extra=document.createElement('img');
+          extra.className='cert-preview-img cert-preview-extra-img';
+          extra.src=src; extra.alt=c.title||'';
+          box.insertBefore(extra,box.querySelector('.cert-preview-close').nextSibling);
+        });
+      }
+    }
+    const m=document.getElementById('cert-preview-modal');
+    if(m){ m.classList.add('open'); }
+  }
+  function closeCertPreviewModal(){
+    const m=document.getElementById('cert-preview-modal');
+    if(m) m.classList.remove('open');
+  }
+  window.addEventListener('keydown',e=>{ if(e.key==='Escape') closeCertPreviewModal(); });
+
+  /* ── broadcastSave helper ── */
+  function broadcastSave(){
+    try{
+      if(typeof BroadcastChannel!=='undefined'){
+        const bc=new BroadcastChannel('portfolio-admin-sync');
+        bc.postMessage({type:'save',ts:Date.now()});
+        bc.close();
+      }
+    }catch(e){}
+  }
+
+  /* ── Live cert preview panel ───────────────────────────── */
+  function updateCertPreview(){
+    const vp=document.getElementById('cert-preview-viewport');
+    if(!vp) return;
+    const tab=certTabs.find(t=>t.id===certActiveTab);
+    const certs=tab?(tab.certs||[]):[];
+    if(!certs.length){
+      vp.innerHTML='<p class="cert-preview-empty">Add certificates to see the preview</p>';
+      return;
+    }
+    const row=document.createElement('div');
+    row.className='cert-preview-row';
+    certs.forEach(c=>{
+      const imgs=(c.images&&c.images.length)?c.images:(c.image?[c.image]:[]);
+      const emoji=c.emoji||'🎓';
+      const hasImg=imgs.length>0;
+      const item=document.createElement('div');
+      item.className='cert-preview-item';
+      item.title=c.title||'';
+      const circle=document.createElement('div');
+      circle.className='cert-preview-circle '+(hasImg?'has-image':'no-image');
+      if(hasImg){
+        const img=document.createElement('img');
+        img.src=imgs[0]; img.alt=c.title||'';
+        circle.appendChild(img);
+      } else {
+        circle.textContent=emoji;
+      }
+      const lbl=document.createElement('span');
+      lbl.className='cert-preview-lbl';
+      lbl.textContent=c.title||'Untitled';
+      item.appendChild(circle);
+      item.appendChild(lbl);
+      row.appendChild(item);
+    });
+    vp.innerHTML='';
+    vp.appendChild(row);
+  }
+
+  /* ════════════════ CONTACT ════════════════ */
+  /* ════════════════ CONTACT ════════════════ */
+  function populateContact(){
+    sv('c-email',D.email||'');
+    sv('c-loc',  D.location||'Hyderabad, India');
+    sv('c-gh',   D.github||'');
+    sv('c-li',   D.linkedin||'');
+    sv('c-ig',   D.instagram||'');
+  }
+
+  /* ════════════════ THEME ════════════════ */
+  function populateTheme(){
+    // Restore custom accent if saved
+    const savedCustom = D.customAccent || localStorage.getItem('adm-custom-accent') || '';
+    if(savedCustom && /^#[0-9a-fA-F]{6}$/.test(savedCustom)){
+      applyCustomHex(savedCustom);
+      sv('custom-hex', savedCustom);
+      try{document.getElementById('color-picker').value=savedCustom;}catch{}
+    } else {
+      document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('active',s.dataset.theme===currentTheme));
+      sv('custom-hex','');
+    }
+  }
+  document.getElementById('theme-grid').addEventListener('click',e=>{
+    const sw=e.target.closest('.swatch'); if(!sw) return;
+    currentTheme=sw.dataset.theme;
+    document.querySelectorAll('.swatch').forEach(s=>s.classList.toggle('active',s.dataset.theme===currentTheme));
+    document.documentElement.setAttribute('data-theme',currentTheme);
+    localStorage.setItem('user-theme',currentTheme);
+    localStorage.removeItem('adm-custom-accent');
+    const ov=document.getElementById('custom-theme-vars')||document.getElementById('admin-theme-override');
+    if(ov) ov.remove();
+    delete D.customAccent; sv('custom-hex','');
+    try{document.getElementById('color-picker').value='#4f6ef5';}catch{}
+    // Broadcast theme change to index.html instantly
+    try{if(typeof BroadcastChannel!=='undefined'){const bc=new BroadcastChannel('portfolio-admin-sync');bc.postMessage({type:'theme',theme:currentTheme,custom:''});bc.close();}}catch(e){}
+    toast('Theme: '+currentTheme);
+  });
+  function applyCustomHex(hex){
+    if(!/^#[0-9a-fA-F]{6}$/.test(hex)) return;
+    document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+    document.documentElement.removeAttribute('data-theme');
+    currentTheme='';
+    D.customAccent=hex;
+    localStorage.setItem('adm-custom-accent', hex);
+    localStorage.removeItem('user-theme');
+    // Broadcast to index.html
+    try{if(typeof BroadcastChannel!=='undefined'){const bc=new BroadcastChannel('portfolio-admin-sync');bc.postMessage({type:'theme',theme:'',custom:hex});bc.close();}}catch(e){}
+    let el=document.getElementById('custom-theme-vars');
+    if(!el){el=document.createElement('style');el.id='custom-theme-vars';document.head.appendChild(el);}
+    el.textContent=`:root{--acc:${hex};--acc2:${hex}26;--glow:${hex}80;}`;
+    try{document.getElementById('color-picker').value=hex;}catch{}
+    sv('custom-hex',hex);
+    toast('Custom color applied');
+  }
+  document.getElementById('custom-hex').addEventListener('input',e=>applyCustomHex(e.target.value));
+  document.getElementById('color-picker').addEventListener('input',e=>applyCustomHex(e.target.value));
+
+  /* ════════════════ SECTION MANAGER ════════════════ */
+  const SECTION_TYPES={
+    hero:'Hero',about:'About',skills:'Skills',projects:'Projects',
+    journey:'Journey',certs:'Certificates',contact:'Contact',custom:'Custom'
+  };
+
+  function populateSections(){
+    const container=document.getElementById('sec-manager');
+    container.innerHTML=SC.map((s,i)=>`
+      <div class="sec-row" draggable="true" data-idx="${i}" data-id="${esc(s.id)}">
+        <span class="sec-drag">⠿</span>
+        <div class="sec-info">
+          <div class="sec-name">${esc(s.label||s.id)}</div>
+          <div class="sec-type">${SECTION_TYPES[s.type]||s.type||s.id}</div>
+        </div>
+        <div class="sec-controls">
+          <button class="icon-btn" onclick="editSection(${i})" title="Edit label">✎</button>
+          <button class="icon-btn del" onclick="deleteSection(${i})" title="Remove">✕</button>
+          <label class="sec-vis-toggle" title="Show/Hide">
+            <input type="checkbox" ${s.visible!==false?'checked':''} onchange="toggleSection(${i},this.checked)"/>
+            <div class="sec-vis-track"></div>
+          </label>
+        </div>
+      </div>`).join('');
+    initSectionDrag();
+  }
+
+  window.editSection=function(idx){
+    const s=SC[idx]; if(!s) return;
+    openModal('Edit Section',`
+      <div class="form-col" style="margin-bottom:14px">
+        <label class="lbl">Section Label (shown in nav)</label>
+        <input class="inp" id="m-sec-label" value="${esc(s.label||s.id)}"/>
+      </div>
+      <div class="form-col">
+        <label class="lbl">Section ID (used in page anchor)</label>
+        <input class="inp" id="m-sec-id" value="${esc(s.id)}" ${s.type!=='custom'?'disabled style="opacity:.4"':''}/>
+        ${s.type!=='custom'?'<small style="color:rgba(255,255,255,.25);font-size:.6rem;margin-top:4px">Built-in sections cannot change their ID</small>':''}
+      </div>
+    `,()=>{
+      SC[idx].label=v('m-sec-label')||SC[idx].id;
+      if(s.type==='custom') SC[idx].id=v('m-sec-id')||SC[idx].id;
+      saveSecs(SC); populateSections(); toast('Section updated');
+    });
+  };
+
+  window.deleteSection=function(idx){
+    const s=SC[idx];
+    if(['hero'].includes(s?.type)){toast('Hero section cannot be removed','err');return;}
+    admConfirmDelete('section', s.label||s.id||'', () => {
+      SC.splice(idx,1); saveSecs(SC); populateSections();
+    });
+    /* admConfirmDelete is async — return here, callback fires on confirm */
+    return;
+    // dummy unreachable: toast('Section removed');
+  };
+
+  window.toggleSection=function(idx,visible){
+    if(SC[idx]) SC[idx].visible=visible;
+    saveSecs(SC);
+    toast((visible?'Showing':'Hiding')+' '+( SC[idx]?.label||SC[idx]?.id||'section'));
+  };
+
+  function initSectionDrag(){
+    const container=document.getElementById('sec-manager');
+    if(!container) return;
+    let dragIdx=null,overEl=null;
+    function clearOver(){if(overEl){overEl.classList.remove('drag-over');overEl=null;}}
+    container.addEventListener('dragstart',e=>{
+      const row=e.target.closest('.sec-row'); if(!row) return;
+      dragIdx=parseInt(row.dataset.idx); row.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+    });
+    container.addEventListener('dragend',e=>{
+      e.target.closest('.sec-row')?.classList.remove('dragging'); clearOver(); dragIdx=null;
+    });
+    container.addEventListener('dragover',e=>{
+      e.preventDefault();
+      const row=e.target.closest('.sec-row');
+      if(!row||row===overEl) return; clearOver(); overEl=row; overEl.classList.add('drag-over');
+    });
+    container.addEventListener('dragleave',e=>{if(!container.contains(e.relatedTarget))clearOver();});
+    container.addEventListener('drop',e=>{
+      e.preventDefault();
+      const dropRow=e.target.closest('.sec-row'); clearOver();
+      if(!dropRow||dragIdx===null) return;
+      const dropIdx=parseInt(dropRow.dataset.idx);
+      if(dragIdx===dropIdx) return;
+      const[moved]=SC.splice(dragIdx,1); SC.splice(dropIdx,0,moved);
+      saveSecs(SC); populateSections(); toast('Section order saved');
+    });
+  }
+
+  /* ── Preset add ── */
+  document.getElementById('preset-grid').addEventListener('click',e=>{
+    const card=e.target.closest('.preset-card'); if(!card) return;
+    const preset=card.dataset.preset;
+    const existingTypes=SC.map(s=>s.type);
+    if(preset!=='custom'&&existingTypes.includes(preset)){
+      toast(`A "${preset}" section already exists`,'err'); return;
+    }
+    if(preset==='custom'){
+      openModal('Add Custom Section',`
+        <div class="form-col" style="margin-bottom:14px">
+          <label class="lbl">Section Label</label>
+          <input class="inp" id="m-cs-label" placeholder="e.g. Publications"/>
+        </div>
+        <div class="form-col">
+          <label class="lbl">Section ID (anchor)</label>
+          <input class="inp" id="m-cs-id" placeholder="e.g. publications"/>
+        </div>
+      `,()=>{
+        const label=v('m-cs-label').trim();
+        const id=v('m-cs-id').trim().replace(/\s+/g,'-').toLowerCase()||'custom-'+uid();
+        if(!label){toast('Label is required','err');return;}
+        SC.push({id,label,type:'custom',visible:true});
+        saveSecs(SC); populateSections();
+        toast(`Section "${label}" added — edit index.html to add its HTML`);
+      });
+    } else {
+      const labels={hero:'Hero',about:'About',skills:'Skills',projects:'Projects',journey:'Journey',certs:'Certificates',contact:'Contact'};
+      SC.push({id:preset,label:labels[preset]||preset,type:preset,visible:true});
+      saveSecs(SC); populateSections(); toast(`"${labels[preset]||preset}" section added`);
+    }
+  });
+
+  /* ════════════════ ACCOUNT ════════════════ */
+  document.getElementById('save-creds-btn').addEventListener('click',()=>{
+    const id=v('new-id').trim(),pass=v('new-pass'),pass2=v('new-pass2');
+    if(!id||!pass) return toast('ID and password are required','err');
+    if(pass!==pass2) return toast('Passwords do not match','err');
+    saveCreds({id,pass}); sv('new-id',''); sv('new-pass',''); sv('new-pass2','');
+    document.getElementById('logged-in-as').textContent=id;
+    toast('Credentials updated ✓');
+  });
+
+  /* ════════════════ SAVE ALL ════════════════ */
+  function saveAll(){
+    D.heroImg   = v('h-img');
+    D.firstName = v('h-fname');
+    D.lastName  = v('h-lname');
+    D.greetText = v('h-greet');
+    D.roles     = v('h-roles').split('\n').filter(r=>r.trim());
+    D.heroDesc  = v('h-desc');
+    D.badgeText = v('h-badge');
+    D.btn1Text  = v('h-btn1');
+    D.btn2Text  = v('h-btn2');
+    D.cvUrl     = v('h-cv');
+    D.aboutSub  = v('a-sub');
+    D.aboutP1   = v('a-p1');
+    D.aboutP2   = v('a-p2');
+    D.email     = v('c-email');
+    D.location  = v('c-loc');
+    D.github    = v('c-gh');
+    D.linkedin  = v('c-li');
+    D.instagram = v('c-ig');
+    if(D.customAccent||localStorage.getItem('adm-custom-accent')){
+      D.customAccent=D.customAccent||localStorage.getItem('adm-custom-accent');
+      D.theme='';
+    } else if(currentTheme){
+      D.theme=currentTheme;
+      localStorage.setItem('user-theme',currentTheme);
+    }
+    saveData(D); saveSecs(SC);
+    // Broadcast to portfolio sync (cross-tab via storage event + same-tab via BroadcastChannel)
+    localStorage.setItem('adminEmail', D.email||'');
+    try{if(typeof BroadcastChannel!=='undefined'){const bc=new BroadcastChannel('portfolio-admin-sync');bc.postMessage({type:'save',ts:Date.now()});bc.close();}}catch(e){}
+    toast('All changes saved ✓');
+  }
+  document.getElementById('save-all-btn').onclick=saveAll;
+  document.getElementById('save-top-btn').onclick=saveAll;
+  document.getElementById('preview-portfolio-btn').addEventListener('click',()=>{saveAll();window.open('index.html','_blank');});
+
+  /* ════════════════ RESET ════════════════ */
+  document.getElementById('reset-btn').addEventListener('click',()=>{
+    admConfirmDelete('RESET', 'All portfolio data will be lost', () => {
+    localStorage.removeItem(KEY_DATA); localStorage.removeItem(KEY_SEC); localStorage.removeItem('user-theme');
+    D={}; SC=defaultSections(); populateAll(); toast('All data reset to defaults');
+    });
+  });
+
+  /* ════════════════ DRAG LIST HELPER ════════════════ */
+  function initDragList(listId,onReorder){
+    // Always get a fresh reference — DOM is rebuilt on each populate call
+    const container=document.getElementById(listId);
+    if(!container) return;
+    let dragIdx=null,overEl=null;
+    function clearOver(){if(overEl){overEl.classList.remove('drag-over');overEl=null;}}
+    container.addEventListener('dragstart',e=>{
+      const item=e.target.closest('.card-item'); if(!item) return;
+      dragIdx=parseInt(item.dataset.idx); item.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+    });
+    container.addEventListener('dragend',e=>{
+      e.target.closest('.card-item')?.classList.remove('dragging'); clearOver(); dragIdx=null;
+    });
+    container.addEventListener('dragover',e=>{
+      e.preventDefault();
+      const item=e.target.closest('.card-item');
+      if(!item||item===overEl) return; clearOver(); overEl=item; overEl.classList.add('drag-over');
+    });
+    container.addEventListener('dragleave',e=>{if(!container.contains(e.relatedTarget))clearOver();});
+    container.addEventListener('drop',e=>{
+      e.preventDefault();
+      const dropItem=e.target.closest('.card-item'); clearOver();
+      if(!dropItem||dragIdx===null) return;
+      const dropIdx=parseInt(dropItem.dataset.idx);
+      if(dragIdx===dropIdx) return;
+      onReorder(dragIdx,dropIdx); dragIdx=null;
+    });
+  }
+
+  /* ════════════════ MODAL ════════════════ */
+  function openModal(title,bodyHTML,onSave){
+    document.getElementById('modal-title').textContent=title;
+    document.getElementById('modal-body').innerHTML=bodyHTML;
+    modalSaveFn=onSave;
+    const ov=document.getElementById('modal-ov');
+    ov.classList.add('open');
+    setTimeout(()=>ov.querySelector('input')?.focus(),120);
+  }
+  function closeModal(){
+    document.getElementById('modal-ov').classList.remove('open');
+    modalSaveFn=null;
+  }
+  document.getElementById('modal-cancel').onclick=closeModal;
+  document.getElementById('modal-save').onclick=()=>{if(modalSaveFn){modalSaveFn();closeModal();}};
+  document.getElementById('modal-ov').addEventListener('click',e=>{if(e.target===document.getElementById('modal-ov'))closeModal();});
+
+  /* ════════════════ KEYBOARD ════════════════ */
+  window.addEventListener('keydown',e=>{
+    if(e.key==='Escape') closeModal();
+    if(e.ctrlKey&&(e.key==='s'||e.keyCode===83)){e.preventDefault();saveAll();}
+  });
+
+  setTimeout(()=>document.getElementById('l-id')?.focus(),100);
+})();
+</script>
+<script src="admin-patch.js"></script>
+<script src="admin-cms.js"></script>
+<script src="admin-extend.js"></script>
+</body>
+<script src="cloudinary-media.js"></script>
+<script src="admin-controller.js"></script>
+</html>

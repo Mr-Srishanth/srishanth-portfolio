@@ -1,0 +1,1595 @@
+/* ═══════════════════════════════════════════════════════════════════
+   ENHANCEMENTS.CSS — Base · Layout · Navbar · Buttons · Sections
+   Load order: 1 of 3
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. THEME VARIABLES ─────────────────────────────────────────── */
+:root {
+  --acc:#4f46e5; --acc2:rgba(79,70,229,0.18); --glow:rgba(79,70,229,0.5);
+  --bg:#0a0a0f; --bg2:#0f0f17; --bg3:#14141e; --card:#0d0d15;
+  --border:rgba(255,255,255,0.18); --text:#dde0f0; --muted:#606080;
+  --anim-fast:0.25s; --anim-med:0.5s; --anim-slow:0.9s;
+  --ease-main:cubic-bezier(0.22,1,0.36,1);
+  --ease-spring:cubic-bezier(0.34,1.56,0.64,1);
+  --ease-in:cubic-bezier(0.4,0,1,1);
+  --ease-out:cubic-bezier(0,0,0.2,1);
+  /* --glow-idle/hover/active removed — GlowSystem uses filter:drop-shadow, not box-shadow */
+}
+/* ── All 13 theme definitions — single authoritative source ── */
+[data-theme="blue"]    {--acc:#4f6ef5;--acc2:rgba(79,110,245,0.15);--glow:rgba(79,110,245,0.45);}
+[data-theme="pink"]    {--acc:#e91e8c;--acc2:rgba(233,30,140,0.15);--glow:rgba(233,30,140,0.45);}
+[data-theme="green"]   {--acc:#00ff88;--acc2:rgba(0,255,136,0.12);--glow:rgba(0,255,136,0.4);}
+[data-theme="yellow"]  {--acc:#e5c62a;--acc2:rgba(229,198,42,0.12);--glow:rgba(229,198,42,0.4);}
+[data-theme="purple"]  {--acc:#a855f7;--acc2:rgba(168,85,247,0.15);--glow:rgba(168,85,247,0.45);}
+[data-theme="orange"]  {--acc:#f97316;--acc2:rgba(249,115,22,0.15);--glow:rgba(249,115,22,0.4);}
+[data-theme="cyan"]    {--acc:#22d3ee;--acc2:rgba(34,211,238,0.12);--glow:rgba(34,211,238,0.4);}
+[data-theme="rose"]    {--acc:#f43f5e;--acc2:rgba(244,63,94,0.15);--glow:rgba(244,63,94,0.45);}
+[data-theme="emerald"] {--acc:#10b981;--acc2:rgba(16,185,129,0.14);--glow:rgba(16,185,129,0.42);}
+[data-theme="gold"]    {--acc:#f5c518;--acc2:rgba(245,197,24,0.14);--glow:rgba(245,197,24,0.42);}
+[data-theme="sunset"]  {--acc:#fb7185;--acc2:rgba(251,113,133,0.15);--glow:rgba(251,113,133,0.45);}
+[data-theme="ocean"]   {--acc:#38bdf8;--acc2:rgba(56,189,248,0.14);--glow:rgba(56,189,248,0.44);}
+[data-theme="rainbow"] {--acc:#a78bfa;--acc2:rgba(167,139,250,0.15);--glow:rgba(167,139,250,0.45);}
+
+#skill-tree-section {
+  padding: 100px 6%;
+  text-align: center;
+}
+
+#skill-tree-mount {
+  margin-top: 40px;
+  min-height: 500px;
+}
+
+/* ── 2. RESET ───────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{margin:0;padding:0;height:100%;background:#0a0a0f;}
+html{font-size:16px;scroll-behavior:auto;scroll-padding-top:68px;}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;overflow-x:hidden;cursor:none;}
+input,textarea,select,[contenteditable]{cursor:auto;font-family:inherit;}
+a{text-decoration:none;color:inherit}
+button{border:none;background:none;font-family:inherit}
+::selection{background:var(--acc);color:#000}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--acc);border-radius:2px}
+
+/* ── 3. CURSOR ELEMENTS ─────────────────────────────────────────── */
+/* position:fixed top:0 left:0 — JS rAF writes left/top each frame.
+   transform: translate(-50%,-50%) centers BOTH elements on the exact
+   same coordinate — dot will always be perfectly inside the ring.
+   JS must NEVER override transform (CSS owns it). */
+#cur-dot,
+#cur-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 2000001; /* above intro overlay (2000000) so cursor shows in all sections */
+  transform: translate(-50%, -50%);
+}
+#cur-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--acc);
+  transition:
+    background 0.25s ease,
+    opacity    0.15s ease,
+    scale      0.15s var(--ease-spring);
+}
+#cur-ring {
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--acc);
+  border-radius: 50%;
+  z-index: 2000001;
+  opacity: 0.75;
+  transition:
+    opacity      0.20s var(--ease-main),
+    border-color 0.25s ease,
+    scale        0.18s var(--ease-spring);
+}
+
+/* Click ripple — expands from click point, fades out */
+.cursor-ripple {
+  position: fixed;
+  top: 0; left: 0;
+  width: 20px; height: 20px;
+  border: 2px solid var(--acc);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99997;
+  /* transform-origin centre; JS sets the translate position via transform,
+     animation then adds scale on top of it via transform-origin */
+  transform-origin: center center;
+  animation: cursorRipple 0.5s cubic-bezier(0, 0.2, 0.2, 1) forwards;
+}
+@keyframes cursorRipple {
+  from { opacity: 1;  scale: 1;   }
+  to   { opacity: 0;  scale: 3.5; }
+}
+
+/* Legacy ripple class — keep for backward compatibility */
+.cur-ripple{position:fixed;pointer-events:none;z-index:99997;width:10px;height:10px;border-radius:50%;border:2px solid var(--acc);transform:translate(-50%,-50%);animation:ripple .7s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes ripple{0%{width:10px;height:10px;opacity:.9}100%{width:60px;height:60px;opacity:0}}
+.btn-ripple-origin{position:absolute;border-radius:50%;background:rgba(255,255,255,.25);transform:scale(0);animation:btn-ripple .5s var(--ease-out) forwards;pointer-events:none}
+@keyframes btn-ripple{to{transform:scale(4);opacity:0}}
+
+/* ── 4. PROGRESS BAR ────────────────────────────────────────────── */
+#pbar{position:fixed;top:0;left:0;height:2px;width:0;background:linear-gradient(90deg,var(--acc),transparent);z-index:9999;transition:width .1s linear,background var(--anim-fast)}
+
+/* ── 5. NAVBAR ──────────────────────────────────────────────────── */
+#nav{position:fixed;top:0;left:0;right:0;z-index:1000;height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 6%;background:rgba(10,10,15,.97);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:height .4s var(--ease-main),background .4s var(--ease-main),box-shadow .4s var(--ease-main),border-color .4s var(--ease-main)}
+.nav-logo{font-family:'Orbitron',sans-serif;font-size:1.2rem;font-weight:700;color:var(--acc);letter-spacing:3px;transition:color var(--anim-fast) var(--ease-main),letter-spacing .4s var(--ease-main)}
+.nav-logo:hover{letter-spacing:5px}
+.nav-logo .acc{color:var(--acc);transition:color .3s}
+.nav-links{display:flex;gap:30px;list-style:none;align-items:center}
+.nav-links a{font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:500;letter-spacing:2px;color:var(--muted);text-transform:uppercase;position:relative;padding-bottom:3px;display:inline-block;transition:color .25s var(--ease-main)}
+/* Magnetic nav: will-change primes the compositor layer; no CSS transition on
+   transform so the rAF lerp loop has full, jitter-free control */
+.nav-links a { will-change: transform; }
+/* The ::after underline is absolutely positioned relative to the link,
+   so it travels with the translated element naturally — no extra fix needed */
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--acc);transition:width .35s var(--ease-main)}
+.nav-links a:hover,.nav-links a.active{color:var(--acc)}
+.nav-links a:hover::after,.nav-links a.active::after{width:100%}
+.nav-right{display:flex;align-items:center;gap:12px}
+#thm-wrap{position:relative}
+/* ── PALETTE THEME BUTTON — futuristic, subtle ── */
+.palette-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+  cursor: none;
+}
+.palette-btn:hover {
+  box-shadow: 0 0 20px var(--acc);
+  border-color: var(--acc);
+}
+.palette-icon {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: var(--acc);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px var(--acc));
+  transition:
+    stroke 0.5s cubic-bezier(0.22,1,0.36,1),
+    filter 0.5s cubic-bezier(0.22,1,0.36,1);
+}
+
+/* ── THEME PULSE ── */
+.theme-pulse {
+  position: fixed;
+  width: 16px;
+  height: 16px;
+  background: var(--acc);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0.2;
+  pointer-events: none;
+  z-index: 9998;
+}
+.theme-pulse.active {
+  animation: theme-pulse-anim 0.5s ease-out forwards;
+}
+@keyframes theme-pulse-anim {
+  from { transform: translate(-50%, -50%) scale(0); opacity: 0.25; }
+  to   { transform: translate(-50%, -50%) scale(25); opacity: 0; }
+}
+
+/* ── SMOOTH THEME TRANSITION ── */
+/* Scoped to #main-site only — never fights intro.css transitions on #intro-overlay */
+#main-site *:not(#intro-overlay):not(#intro-overlay *) {
+  transition:
+    background-color 0.6s cubic-bezier(0.22,1,0.36,1),
+    color            0.6s cubic-bezier(0.22,1,0.36,1),
+    border-color     0.6s cubic-bezier(0.22,1,0.36,1),
+    box-shadow       0.6s cubic-bezier(0.22,1,0.36,1) !important;
+}
+/* Exclude rAF-driven and reveal elements from the global override */
+#cur-dot, #cur-ring,
+.reveal, .reveal-left, .reveal-right, .reveal-scale,
+.anim-fade-up, .anim-fade-in, .anim-scale,
+.anim-slide-left, .anim-slide-right,
+#pbar {
+  transition-duration: unset !important;
+}
+/* Intro system: no inherited transitions — owns its own timing */
+#intro-overlay,
+#intro-overlay * {
+  transition-property: revert !important;
+}
+
+/* ── EMAIL LINK ── */
+.email-link {
+  color: var(--acc);
+  text-decoration: none;
+  font-size: inherit;
+  transition: opacity 0.3s ease;
+}
+.email-link:hover { opacity: 0.75; }
+
+#thm-picker{position:absolute;top:48px;right:0;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 12px;display:none;gap:9px;flex-wrap:wrap;width:186px;z-index:2000;box-shadow:0 16px 48px rgba(0,0,0,.7)}
+#thm-picker.open{display:flex}
+.tsw{width:26px;height:26px;border-radius:50%;border:2px solid transparent;transition:transform .35s var(--ease-spring),border-color var(--anim-fast);flex-shrink:0}
+.tsw:hover{transform:scale(1.35) rotate(10deg)}
+.tsw:active{transform:scale(.9);transition-duration:.08s}
+.tsw.on{border-color:#fff}
+.nav-cta{font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:2px;padding:8px 16px;border:1px solid var(--acc);color:var(--acc);border-radius:4px;text-transform:uppercase;transition:background .3s,color .3s,transform .2s var(--ease-spring)}
+.nav-cta:hover{background:var(--acc);color:#000;transform:scale(1.05)}
+.nav-cta:active{transform:scale(.96);transition-duration:.08s}
+.ham{display:none;flex-direction:column;gap:5px;padding:4px}
+.ham span{width:20px;height:2px;background:var(--text);border-radius:2px;transition:transform .3s,opacity .3s}
+#mnav{display:none;position:fixed;top:68px;left:0;right:0;background:rgba(10,10,15,.98);border-bottom:1px solid var(--border);padding:20px 6%;flex-direction:column;gap:16px;z-index:999}
+#mnav.open{display:flex}
+#mnav a{font-family:'Orbitron',sans-serif;font-size:.65rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;padding:8px 0;border-bottom:1px solid var(--border);transition:color .3s}
+#mnav a:hover{color:var(--acc)}
+
+/* ── 6. SHARED SECTION STYLES ──────────────────────────────────── */
+section{position:relative;z-index:1}
+section:not(#contact)::after{content:'';position:absolute;bottom:0;left:6%;right:6%;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)}
+.stag{font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:4px;color:var(--acc);text-transform:uppercase;margin-bottom:10px;transition:color .3s}
+.stag::before{content:'▍';margin-right:5px;font-size:.5rem;animation:stag-blink 1.8s step-end infinite}
+@keyframes stag-blink{0%,100%{opacity:1}50%{opacity:0}}
+.stit{font-family:'Orbitron',sans-serif;font-size:clamp(1.7rem,3.5vw,2.8rem);font-weight:700;line-height:1.1;margin-bottom:14px;transition:color .3s}
+.stit.acc{color:var(--acc)}
+.stit span.acc{color:var(--acc);transition:color .3s}
+.ssub{color:var(--muted);font-size:.88rem;line-height:1.8;max-width:520px;margin:0 auto}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s var(--ease-main),transform .7s var(--ease-main)}
+.reveal.in{opacity:1;transform:none}
+.reveal-left{opacity:0;transform:translateX(-28px);transition:opacity .7s var(--ease-main),transform .7s var(--ease-main)}
+.reveal-right{opacity:0;transform:translateX(28px);transition:opacity .7s var(--ease-main),transform .7s var(--ease-main)}
+.reveal-scale{opacity:0;transform:scale(.88);transition:opacity .6s var(--ease-main),transform .6s var(--ease-spring)}
+.reveal-left.in,.reveal-right.in,.reveal-scale.in{opacity:1;transform:none}
+
+/* ── 7. UTILITY CLASSES ─────────────────────────────────────────── */
+.acc{color:var(--acc);transition:color .3s}
+.c-white{color:#fff}
+.c-green{color:#22c55e}
+.c-blue{color:#58a6ff}
+.c-pink{color:#e91e8c}
+.ta-center{text-align:center}
+.mb-0{margin-bottom:0}
+.mb-52{margin-bottom:52px}
+.w-60{width:60%}
+/* Stagger delays */
+.sd-1{transition-delay:.07s}
+.sd-2{transition-delay:.12s}
+.sd-3{transition-delay:.16s}
+.sd-4{transition-delay:.20s}
+.sd-5{transition-delay:.27s}
+.sd-6{transition-delay:.34s}
+.sd-7{transition-delay:.40s}
+/* Back to top */
+#btt{position:fixed;bottom:26px;right:26px;width:38px;height:38px;border-radius:50%;background:var(--acc);color:#000;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;opacity:0;pointer-events:none;transition:opacity .3s,background var(--anim-fast),transform .25s var(--ease-spring);z-index:500}
+#btt.on{opacity:1;pointer-events:all}
+#btt:hover{transform:translateY(-5px) scale(1.14)}
+#btt:active{transform:translateY(2px) scale(.9);transition-duration:.08s}
+
+/* ── 8. HERO ────────────────────────────────────────────────────── */
+#home{min-height:100vh;display:flex;align-items:center;padding:68px 6% 0;gap:60px;position:relative;overflow:hidden;box-sizing:border-box}
+.h-left{flex:1;max-width:580px;z-index:2;padding-top:8px}
+.h-right{flex:1;display:flex;justify-content:center;align-items:center;position:relative;z-index:2}
+.h-greet{font-family:'Space Mono',monospace;font-size:.8rem;color:var(--acc);margin-bottom:20px;letter-spacing:.5px;transition:color .3s}
+.h-name{font-family:'Orbitron',sans-serif;font-size:clamp(2rem,5.5vw,4.2rem);font-weight:900;line-height:1.05;margin-bottom:16px}
+.h-name .acc{color:var(--acc);transition:color .3s}
+.h-name .c-white{color:#fff}
+.h-typed{font-family:'Space Mono',monospace;font-size:.95rem;color:var(--text);margin-bottom:20px;min-height:24px}
+.tcur{display:inline-block;width:2px;height:.9em;background:var(--acc);vertical-align:middle;margin-left:2px;animation:blink 1s step-end infinite;transition:background .3s}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.h-desc{font-size:.88rem;color:var(--muted);line-height:1.85;margin-bottom:24px;max-width:460px}
+.h-badge{display:inline-flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 14px;font-family:'Space Mono',monospace;font-size:.65rem;margin-bottom:28px;letter-spacing:.3px}
+.h-badge strong{color:var(--acc);transition:color .3s}
+.dg{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:pd 2s infinite}
+.do{width:7px;height:7px;border-radius:50%;background:#f97316;animation:pd 2s .5s infinite}
+@keyframes pd{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.h-btns{display:flex;gap:12px;flex-wrap:wrap}
+.h-ring{position:relative;width:360px;height:360px;border-radius:50%;overflow:hidden;}
+.h-ring::before,.h-ring::after{content:none;display:none}
+.h-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:top center;position:relative;z-index:1;border:2px solid var(--acc2);transition:border-color .3s}
+/* Hero entry */
+.h-greet,.h-name,.h-typed,.h-desc,.h-badge,.h-btns{opacity:0;animation:hero-up .72s cubic-bezier(.22,.61,.36,1) forwards}
+.h-greet{animation-delay:.10s}.h-name{animation-delay:.22s}.h-typed{animation-delay:.34s}
+.h-desc{animation-delay:.44s}.h-badge{animation-delay:.54s}.h-btns{animation-delay:.64s}
+.h-right{opacity:0;animation:hero-fade .72s cubic-bezier(.22,.61,.36,1) .18s forwards}
+@keyframes hero-up{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes hero-fade{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+/* Letter reveal */
+.letter-reveal{display:inline-block;opacity:0;transform:translateY(20px);animation-fill-mode:both;animation-play-state:paused}
+.text-reveal-active .letter-reveal{animation-name:letter-in;animation-duration:.55s;animation-timing-function:var(--ease-main);animation-play-state:running}
+@keyframes letter-in{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+
+/* ── 9. BUTTONS ─────────────────────────────────────────────────── */
+.btn-p,.btn-o,.btn-send{position:relative;overflow:hidden;transition:background var(--anim-fast) var(--ease-main),color var(--anim-fast) var(--ease-main),border-color var(--anim-fast) var(--ease-main),box-shadow var(--anim-med) var(--ease-main),transform .2s var(--ease-spring)}
+.btn-p{font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:11px 26px;border-radius:5px;background:var(--acc);color:#000;display:inline-block}
+.btn-p:hover{transform:translateY(-3px) scale(1.04)}.btn-p:active{transform:translateY(1px) scale(.97);transition-duration:.08s}
+.btn-o{font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:11px 26px;border-radius:5px;border:1px solid rgba(255,255,255,.12);color:var(--text);display:inline-block}
+.btn-o:hover{border-color:var(--acc);color:var(--acc);transform:translateY(-3px) scale(1.04)}.btn-o:active{transform:translateY(1px) scale(.97);transition-duration:.08s}
+.btn-p::after,.btn-send::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.18) 50%,transparent 70%);transform:translateX(-150%);transition:transform .55s var(--ease-main);pointer-events:none}
+.btn-p:hover::after,.btn-send:hover::after{transform:translateX(150%)}
+.btn-send{width:100%;padding:12px;background:var(--acc);color:#000;border-radius:6px;font-family:'Orbitron',sans-serif;font-size:.64rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-send:hover{transform:translateY(-2px) scale(1.02)}.btn-send:active{transform:translateY(1px) scale(.98);transition-duration:.08s}
+
+/* ── 10. ABOUT ───────────────────────────────────────────────────── */
+#about{padding:110px 6%;text-align:center}
+.about-inner{display:flex;gap:80px;align-items:flex-start;text-align:left;max-width:1100px;margin:0 auto;flex-wrap:wrap}
+.about-left{flex:1.2;min-width:280px}
+.about-sub-h{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:14px;color:var(--text)}
+.about-left p{color:var(--muted);line-height:1.9;font-size:.86rem;margin-bottom:12px}
+.about-right{flex:1;min-width:240px;display:flex;flex-direction:column;gap:14px}
+.about-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px 18px;display:flex;align-items:center;gap:14px;transition:border-color var(--anim-fast) var(--ease-main),transform .35s var(--ease-spring)}
+.about-card:hover{border-color:var(--acc);transform:translateY(-3px)}
+.about-card:hover .about-card-icon{animation:icon-spin .5s var(--ease-spring)}
+.about-card-icon{width:38px;height:38px;border-radius:8px;background:var(--acc2);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--acc);flex-shrink:0;transition:background .3s,color .3s}
+.about-card-text strong{display:block;font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:600;color:var(--text);letter-spacing:.5px;margin-bottom:2px}
+.about-card-text span{font-size:.78rem;color:var(--muted)}
+@keyframes icon-spin{0%{transform:rotate(0) scale(1)}40%{transform:rotate(-15deg) scale(1.18)}100%{transform:rotate(0) scale(1)}}
+
+/* ── 11. SKILLS ─────────────────────────────────────────────────── */
+#skills{padding:110px 6%;text-align:center}
+.sk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:860px;margin:50px auto 0}
+.sk-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px 22px;text-align:left;position:relative;transition:border-color var(--anim-fast) var(--ease-main),box-shadow var(--anim-med) var(--ease-main),transform .35s var(--ease-spring)}
+.sk-card:hover{border-color:var(--acc);transform:translateY(-4px)}
+.sk-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sk-left{display:flex;align-items:center;gap:10px}
+.sk-ic{font-size:1.25rem}.sk-nm{font-family:'Orbitron',sans-serif;font-size:.7rem;font-weight:600;letter-spacing:.5px}
+.sk-pc{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--acc);transition:color .3s}
+.sk-lock{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--muted);letter-spacing:1px}
+.bar-bg{width:100%;height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;margin-top:2px}
+.bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--acc),rgba(255,255,255,.15));width:0;transition:width 1.4s var(--ease-main),background var(--anim-fast);position:relative;overflow:hidden}
+.bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.22) 50%,transparent 100%);transform:translateX(-100%);animation:bar-shimmer 2.4s 1.6s ease infinite}
+@keyframes bar-shimmer{0%{transform:translateX(-100%)}60%,100%{transform:translateX(100%)}}
+/* Radar */
+.radar-wrap{margin:70px auto 0;max-width:520px;text-align:center}
+.radar-h{font-family:'Orbitron',sans-serif;font-size:clamp(1.3rem,2.5vw,1.9rem);font-weight:700;margin-bottom:6px}
+.radar-h span{color:var(--acc);transition:color .3s}
+.radar-sub{font-size:.82rem;color:var(--muted);margin-bottom:28px}
+#radar-svg{width:100%;max-width:420px;height:auto}
+#radar-poly{stroke-dasharray:1200;stroke-dashoffset:1200;transition:stroke-dashoffset 1.8s var(--ease-main),fill .6s ease,stroke .4s ease}
+#radar-poly.drawn{stroke-dashoffset:0}
+/* Skill Tree */
+.tree-wrap{margin:80px auto 0;text-align:center;max-width:780px}
+.tree-h{font-family:'Orbitron',sans-serif;font-size:clamp(1.3rem,2.5vw,1.9rem);font-weight:700;color:var(--acc);margin-bottom:6px;transition:color .3s}
+.tree-sub{font-size:.82rem;color:var(--muted);margin-bottom:40px}
+.tree-nodes{display:flex;justify-content:center;gap:30px;flex-wrap:wrap;position:relative}
+.tree-node{display:flex;flex-direction:column;align-items:center;gap:10px;transition:transform .3s var(--ease-spring)}
+.tree-node:hover{transform:translateY(-6px) scale(1.06)}.tree-node:active{transform:scale(.94);transition-duration:.08s}
+.tn-circle{width:80px;height:80px;border-radius:50%;background:var(--bg3);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.5rem;position:relative;transition:border-color .3s,filter .35s ease}
+.tn-circle.active{border-color:var(--acc)}
+.tn-circle.locked{opacity:.4;filter:grayscale(1)}
+/* node-glow-pulse removed — GlowSystem .glow-idle handles tree node breathing via filter */
+.tn-badge{position:absolute;top:-4px;right:-4px;width:22px;height:22px;border-radius:50%;background:var(--acc);color:#000;font-family:'Orbitron',sans-serif;font-size:.55rem;font-weight:700;display:flex;align-items:center;justify-content:center;transition:background .3s}
+.tn-name{font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:600;letter-spacing:.5px;text-align:center}
+.tn-mini{width:5px;height:5px;border-radius:1px;background:var(--acc);margin-top:2px;transition:background .3s}
+.tn-mini.multi{background:linear-gradient(90deg,var(--acc),#a855f7)}
+/* Skill modal */
+#sk-modal{position:fixed;inset:0;z-index:5000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.7);backdrop-filter:blur(8px)}
+#sk-modal.open{display:flex}
+.sk-modal-box{background:#0d1117;border:1px solid var(--border);border-radius:14px;padding:32px;max-width:480px;width:90%;position:relative;animation:modal-enter .3s var(--ease-spring)}
+@keyframes modal-enter{from{opacity:0;transform:scale(.88) translateY(16px)}to{opacity:1;transform:none}}
+.skm-head{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.skm-ico{width:52px;height:52px;border-radius:10px;background:var(--acc2);display:flex;align-items:center;justify-content:center;font-size:1.6rem;border:1px solid rgba(255,255,255,.08)}
+.skm-title{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700}
+.skm-level{font-family:'Space Mono',monospace;font-size:.68rem;color:var(--acc);margin-top:2px;transition:color .3s}
+.skm-desc{font-size:.82rem;color:var(--muted);margin:14px 0 8px;line-height:1.7}
+.skm-xp-row{display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:.7rem;color:var(--muted);margin-bottom:6px}
+.skm-xp-row span{color:var(--acc);transition:color .3s}
+.skm-bar{width:100%;height:8px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden}
+.skm-bar-fill{height:100%;background:linear-gradient(90deg,#3b82f6,#a855f7);border-radius:4px;transition:width 1s ease}
+.skm-hint{font-family:'Space Mono',monospace;font-size:.6rem;color:var(--muted);margin-top:8px}
+.skm-close{margin-top:20px;width:100%;padding:11px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text);transition:border-color .3s,color .3s}
+.skm-close:hover{border-color:var(--acc);color:var(--acc)}
+
+/* ── 12. PROJECTS ───────────────────────────────────────────────── */
+#projects{padding:110px 6%;text-align:center}
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.pj{background:var(--card);border:1px solid color-mix(in srgb,var(--acc) 25%,transparent);border-radius:14px;padding:20px;overflow:hidden;position:relative;transition:border-color .4s ease,box-shadow .4s ease,transform .35s var(--ease-spring),background .4s ease}
+.pj:hover{transform:translateY(-6px) scale(1.008);border-color:var(--acc);box-shadow:0 10px 40px rgba(0,0,0,0.5),0 0 25px color-mix(in srgb,var(--acc) 35%,transparent)}
+.pj::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--acc),transparent);transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease-main)}
+.pj:hover::before{transform:scaleX(1)}
+.pj-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.pj-ic{font-size:1.4rem;color:var(--acc);transition:color .4s ease}
+.pj-links{display:flex;gap:8px}
+.pj-links a{font-size:1rem;color:var(--muted);transition:color .4s ease,opacity .2s}
+.pj-links a:hover{color:var(--acc)}
+.pj-title{font-family:'Orbitron',sans-serif;font-size:.82rem;font-weight:600;margin-bottom:7px}
+.pj-desc{font-size:.76rem;color:var(--muted);line-height:1.6;margin-bottom:10px}
+.pj-tags{display:flex;flex-wrap:wrap;gap:6px}
+.ptag{font-size:.55rem;padding:3px 7px;border-radius:5px;background:color-mix(in srgb,var(--acc) 12%,transparent);color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 35%,transparent);transition:color .4s ease,border-color .4s ease,background .4s ease}
+
+/* ── 13. JOURNEY ────────────────────────────────────────────────── */
+#journey{padding:110px 6%;text-align:center}
+.vtl{position:relative;max-width:680px;margin:56px auto 0}
+.vtl-line{position:absolute;left:50%;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--acc),transparent);transform:translateX(-50%);transition:background .3s}
+.vtl-item{position:relative;display:flex;margin-bottom:50px}
+.vtl-item:nth-child(odd){flex-direction:row-reverse}
+.vtl-item:nth-child(odd) .vtl-card{margin-right:calc(50% + 28px);margin-left:0}
+.vtl-item:nth-child(even) .vtl-card{margin-left:calc(50% + 28px)}
+.vtl-dot{position:absolute;left:50%;top:18px;width:13px;height:13px;border-radius:50%;background:var(--acc);transform:translateX(-50%);border:2px solid var(--bg);z-index:2;transition:background .3s,box-shadow .3s}
+.vtl-item:nth-child(odd){--vtl-x:-24px}.vtl-item:nth-child(even){--vtl-x:24px}
+.vtl-item .vtl-card{opacity:0;transform:translateX(var(--vtl-x,0)) translateY(12px);transition:opacity .65s var(--ease-main),transform .65s var(--ease-main),border-color var(--anim-fast),box-shadow var(--anim-med)}
+.vtl-item.in .vtl-card{opacity:1;transform:none}
+.vtl-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;flex:1;max-width:calc(50% - 34px);text-align:left;transition:border-color .3s,box-shadow .35s,transform .35s var(--ease-spring)}
+.vtl-card:hover{border-color:var(--acc);transform:translateY(-3px) !important}
+.vtl-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.vtl-date{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--muted);letter-spacing:1px}
+.vtl-badge{font-size:.9rem}
+.vtl-title{font-family:'Orbitron',sans-serif;font-size:.72rem;font-weight:600;color:var(--acc);margin-bottom:5px;transition:color .3s}
+.vtl-desc{font-size:.76rem;color:var(--muted);line-height:1.6}
+/* Continuous Growth */
+.cg-wrap{margin:90px auto 0;text-align:center;max-width:1100px}
+.cg-h{font-family:'Orbitron',sans-serif;font-size:clamp(1.3rem,2.5vw,2rem);font-weight:700;color:var(--acc);margin-bottom:4px;transition:color .3s}
+.cg-sub{font-size:.82rem;color:var(--muted);margin-bottom:6px}
+.cg-hint{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--muted);margin-bottom:28px;letter-spacing:2px}
+.cg-rail-wrap{position:relative;overflow-x:auto;overflow-y:hidden;padding-bottom:20px;cursor:grab;user-select:none;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.cg-rail-wrap:active{cursor:grabbing}
+.cg-rail-wrap::-webkit-scrollbar{height:3px}
+.cg-rail-wrap::-webkit-scrollbar-thumb{background:var(--acc);border-radius:2px}
+.cg-rail{display:flex;position:relative;padding:60px 60px 20px;width:max-content;align-items:stretch}
+.cg-track{position:absolute;top:32px;left:0;right:0;height:2px;background:rgba(255,255,255,.08)}
+.cg-track-fill{position:absolute;left:0;top:0;height:100%;background:var(--acc);transition:background .3s}
+.cg-item{position:relative;flex-shrink:0;width:280px;margin-right:30px;display:flex;flex-direction:column}
+.cg-dot{position:absolute;top:-46px;left:50%;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:var(--acc);border:2px solid var(--bg);transition:background .3s,box-shadow .3s}
+.cg-stick{position:absolute;top:-36px;left:50%;width:2px;height:28px;background:var(--acc);transform:translateX(-50%);opacity:.5;transition:background .3s}
+.cg-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;text-align:left;transition:border-color var(--anim-fast) var(--ease-main),box-shadow var(--anim-med) var(--ease-main),transform .35s var(--ease-spring);flex:1;display:flex;flex-direction:column}
+.cg-card:hover{border-color:var(--acc);transform:translateY(-4px)}
+.cg-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.cg-ic{width:36px;height:36px;border-radius:7px;background:var(--acc2);border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:.9rem;color:var(--acc);transition:background .3s,color .3s}
+.cg-st{font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:1px;padding:2px 8px;border-radius:3px;text-transform:uppercase}
+.st-done{background:rgba(34,197,94,.12);color:#22c55e}
+.st-on{background:var(--acc2);color:var(--acc)}
+.st-act{background:var(--acc2);color:var(--acc)}
+.st-prog{background:rgba(168,85,247,.12);color:#a855f7}
+.cg-title{font-family:'Orbitron',sans-serif;font-size:.76rem;font-weight:600;margin-bottom:7px;transition:color .3s}
+.cg-card:hover .cg-title{color:var(--acc)}
+.cg-desc{font-size:.76rem;color:var(--muted);line-height:1.6;flex:1}
+
+/* ── 14. CERTIFICATES ───────────────────────────────────────────── */
+#certs{padding:110px 6%;text-align:center}
+.ach-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;max-width:1060px;margin:50px auto 0}
+.ach-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:26px 18px;text-align:center;transition:border-color var(--anim-fast) var(--ease-main),transform .35s var(--ease-spring)}
+.ach-card:hover{border-color:var(--acc);transform:translateY(-3px)}
+.ach-card:hover .ach-ic{animation:icon-pop .45s var(--ease-spring)}
+.ach-ic{font-size:1.6rem;color:var(--acc);margin-bottom:12px;display:block;transition:color .3s}
+.ach-t{font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:600;margin-bottom:8px}
+.ach-d{font-size:.74rem;color:var(--muted);line-height:1.6}
+.ach-v{display:inline-flex;align-items:center;gap:3px;margin-top:10px;font-size:.62rem;color:var(--acc);transition:color .3s}
+.ach-v:hover{text-decoration:underline}
+@keyframes icon-pop{0%{transform:scale(1) rotate(0)}40%{transform:scale(1.35) rotate(-8deg)}70%{transform:scale(.92) rotate(3deg)}100%{transform:scale(1) rotate(0)}}
+.mycert-wrap{margin-top:72px;text-align:center}
+.mycert-h{font-family:'Orbitron',sans-serif;font-size:clamp(1.3rem,2.5vw,1.9rem);font-weight:700;margin-bottom:6px}
+.mycert-h span{color:var(--acc);transition:color .3s}
+.mycert-sub{font-size:.82rem;color:var(--muted);margin-bottom:50px}
+/* .cert-row layout owned exclusively by awwwards-polish.css (loads last) */
+.cert-c{display:flex;flex-direction:column;align-items:center;gap:10px}
+.cert-ring-btn{width:110px;height:110px;border-radius:50%;background:var(--bg3);border:2px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:1.7rem;color:var(--acc);transition:border-color var(--anim-fast) var(--ease-main),box-shadow var(--anim-med) var(--ease-main),transform .3s var(--ease-spring)}
+.cert-ring-btn:hover{border-color:var(--acc);transform:scale(1.1) rotate(4deg)}
+.cert-ring-btn:active{transform:scale(.93);transition-duration:.08s}
+.cert-nm{font-family:'Orbitron',sans-serif;font-size:.66rem;font-weight:600;letter-spacing:.5px}
+.cert-pl{font-size:.6rem;color:var(--muted)}
+.cert-vl{font-size:.6rem;color:var(--acc);display:flex;align-items:center;gap:3px;transition:color .3s}
+.cert-vl:hover{text-decoration:underline}
+/* Cert modal */
+#cert-modal{position:fixed;inset:0;z-index:5000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.8);backdrop-filter:blur(10px)}
+#cert-modal.open{display:flex}
+.cert-modal-box{position:relative;max-width:600px;width:92%;background:#0d0d15;border:1px solid var(--border);border-radius:14px;padding:20px;animation:modal-enter .28s var(--ease-spring)}
+.cert-modal-box img{width:100%;border-radius:8px;display:block}
+.cert-close{position:absolute;top:12px;right:14px;width:30px;height:30px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);font-size:1rem;color:var(--text);display:flex;align-items:center;justify-content:center;transition:border-color .3s,color .3s}
+.cert-close:hover{border-color:var(--acc);color:var(--acc)}
+/* Certificate paper */
+.cert-paper{background:#f5f0e8;border-radius:8px;padding:32px;text-align:center;font-family:serif}
+.cert-paper-org{font-size:.9rem;font-weight:700;color:#333;margin-bottom:6px}
+.cert-paper-sub{font-size:.55rem;color:#666;margin-bottom:20px}
+.cert-paper-title{font-size:1.5rem;font-weight:900;color:#1a1a1a;letter-spacing:3px;margin-bottom:8px}
+.cert-paper-for{font-size:.6rem;color:#888;margin-bottom:20px}
+.cert-paper-name{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700;color:#1a1a1a;margin-bottom:16px}
+.cert-paper-body{font-size:.55rem;color:#666;line-height:1.7;max-width:380px;margin:0 auto}
+.cert-paper-footer{display:flex;justify-content:space-around;margin-top:24px;font-size:.5rem;color:#888}
+/* Terminal */
+.term-wrap{margin:72px auto 0;text-align:center;max-width:800px}
+.term-h{font-family:'Orbitron',sans-serif;font-size:clamp(1.3rem,2.5vw,1.9rem);font-weight:700;color:var(--acc);margin-bottom:32px;transition:color .3s}
+.term-box{background:#0d1117;border:1px solid rgba(255,255,255,.08);border-radius:12px;overflow:hidden}
+.term-hdr{background:#161b22;padding:10px 16px;display:flex;align-items:center;gap:7px;border-bottom:1px solid rgba(255,255,255,.05)}
+.tb{width:12px;height:12px;border-radius:50%}
+.tb.r{background:#ff5f57}.tb.y{background:#febc2e}.tb.g{background:#28c840}
+.term-pr{font-family:'Space Mono',monospace;font-size:.66rem;color:#7c8590;margin-left:8px}
+.term-body{padding:26px;text-align:left;font-family:'Space Mono',monospace;font-size:.72rem;line-height:2.1}
+.tc{color:#58a6ff}.to{color:#8b949e}.tg{color:#3fb950}
+
+/* ── 15. CONTACT ────────────────────────────────────────────────── */
+#contact{padding:110px 6%}
+.ct-inner{display:flex;gap:56px;max-width:1060px;margin:0 auto;flex-wrap:wrap}
+.ct-left{flex:1;min-width:260px;isolation:isolate}
+.ct-left h2{font-family:'Orbitron',sans-serif;font-size:clamp(1.4rem,2.5vw,2rem);font-weight:700;margin-bottom:10px}
+.ct-left h2 span{color:var(--acc);transition:color .3s}
+.ct-left p{color:var(--muted);font-size:.84rem;line-height:1.85;margin-bottom:28px}
+.ct-row{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.ct-ic{width:38px;height:38px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.95rem;color:var(--acc);flex-shrink:0;transition:border-color .3s,color .3s}
+.ct-lbl{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:1px}
+.ct-val{font-size:.84rem;color:var(--text)}
+.socials{display:flex;gap:9px;margin-top:24px}
+.soc{width:40px;height:40px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.95rem;color:var(--muted);transition:border-color var(--anim-fast) var(--ease-main),color var(--anim-fast) var(--ease-main),box-shadow var(--anim-med) var(--ease-main),transform .25s var(--ease-spring)}
+.soc:hover{border-color:var(--acc);color:var(--acc);transform:translateY(-5px) scale(1.14)}
+.soc:active{transform:translateY(2px) scale(.9);transition-duration:.08s}
+.ct-right{flex:1.3;min-width:300px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:32px;transition:border-color .3s}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;transition:color .25s}
+.fg input,.fg textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 13px;color:var(--text);font-size:.84rem;outline:none;resize:none;transition:border-color .3s,box-shadow var(--anim-med) var(--ease-main),transform .2s var(--ease-spring)}
+.fg input::placeholder,.fg textarea::placeholder{color:rgba(255,255,255,.12)}
+.fg input:focus,.fg textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc2),0 4px 12px rgba(0,0,0,.2);transform:translateY(-2px)}
+.fg textarea{height:120px}
+#fmsg{margin-top:10px;font-family:'Space Mono',monospace;font-size:.7rem;text-align:center;min-height:18px;transition:color .3s}
+
+/* ── 16. FOOTER ─────────────────────────────────────────────────── */
+footer{padding:32px 6%;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.fc{font-family:'Space Mono',monospace;font-size:.66rem;color:var(--muted)}
+.fc span{color:var(--acc);transition:color .3s}
+.fs{display:flex;gap:16px}
+.fs a{color:var(--muted);font-size:.95rem;transition:color .3s,transform .25s var(--ease-spring)}
+.fs a:hover{color:var(--acc);transform:translateY(-2px)}
+
+/* ── 17. FOCUS STATES ───────────────────────────────────────────── */
+a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:3px;border-radius:4px}
+
+/* ── 18. RESPONSIVE ─────────────────────────────────────────────── */
+@media(max-width:900px){
+  .nav-links{display:none}.ham{display:flex}
+  #home{flex-direction:column;padding-top:110px;padding-bottom:50px;gap:40px;text-align:center}
+  .h-left{max-width:100%}.h-btns{justify-content:center}.h-badge{justify-content:center}
+  .h-right{order:-1}.h-ring{width:220px;height:220px}
+  .about-inner{flex-direction:column}
+  .sk-grid{grid-template-columns:1fr}
+  .projects-grid{grid-template-columns:1fr}
+  .ach-grid{grid-template-columns:repeat(2,1fr)}
+  .vtl-item,.vtl-item:nth-child(odd){flex-direction:column}
+  .vtl-item:nth-child(odd) .vtl-card,.vtl-item:nth-child(even) .vtl-card{margin-left:36px;margin-right:0;max-width:calc(100% - 52px)}
+  .vtl-line{left:16px}.vtl-dot{left:16px}
+  .ct-inner{flex-direction:column}
+  footer{flex-direction:column;text-align:center}
+}
+@media(max-width:768px){
+  html{scroll-padding-top:60px}
+  #home{padding-top:80px;min-height:100svh;box-sizing:border-box}
+  .h-left{padding-top:0}
+  /* nav-links text-shadow override removed — GlowSystem is disabled on touch/mobile via JS */
+}
+@media not all and (min-height:1svh){#home{min-height:calc(100vh - 60px)}}
+@media(max-width:580px){
+  #nav{padding:0 4%}
+  #home,#about,#skills,#projects,#journey,#certs,#contact{padding-left:4%;padding-right:4%}
+  .ach-grid{grid-template-columns:1fr}
+  /* .cert-row responsive owned by awwwards-polish.css */
+  .cert-ring-btn{width:82px;height:82px;font-size:1.3rem}
+}
+@media(min-width:769px) and (max-width:900px){#home{min-height:calc(100vh - 68px);box-sizing:border-box}}
+
+/* ── 19. REDUCED MOTION ─────────────────────────────────────────── */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  html{scroll-behavior:smooth !important}
+  .letter-reveal{opacity:1 !important;transform:none !important}
+  .h-ring{will-change:auto !important}
+}
+
+
+/* ════════════════════════════════════════════════════════════════════
+   STEP 2 — HERO SECTION FIX
+   h-left: completely static, no overflow clipping on hero text.
+   h-ring: only receives JS parallax transform (max 5px).
+   Improved spacing between hero elements.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* Ensure hero overflow doesn't clip greeting */
+#home {
+  overflow: visible !important;
+}
+
+/* h-left: rock solid, never moves */
+.h-left {
+  transform: none !important;
+  will-change: auto !important;
+  overflow: visible !important;
+  position: relative;
+  z-index: 2;
+}
+
+/* Greeting: ensure visibility, no clipping */
+.h-greet {
+  overflow: visible !important;
+  opacity: 0;
+  animation: hero-up .72s cubic-bezier(.22,.61,.36,1) 0.10s forwards;
+  margin-bottom: 24px;    /* Step 2: increased spacing */
+}
+
+/* Name: bigger gap below */
+.h-name {
+  margin-bottom: 20px;    /* Step 2: was 16px */
+}
+
+/* Typed text: comfortable gap */
+.h-typed {
+  margin-bottom: 24px;    /* Step 2: was 20px */
+}
+
+/* Description: clear readable gap */
+.h-desc {
+  margin-bottom: 28px;    /* Step 2: was 24px */
+  line-height: 1.9;
+}
+
+/* Badge: comfortable bottom */
+.h-badge {
+  margin-bottom: 32px;    /* Step 2: was 28px */
+}
+
+/* h-ring: GPU layer for smooth parallax, JS owns transform */
+.h-ring {
+  will-change: transform;
+  transition: none !important;
+  animation: none !important;
+}
+
+
+/* ════════════════════════════════════════════════════════════════════
+   STEP 6 — NAVBAR PREMIUM
+   Handled via CSS class toggling from enhancements.js.
+   Default: translucent blur. Scrolled: slightly more opaque.
+   ════════════════════════════════════════════════════════════════════ */
+#nav {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(10,10,15,0.75);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: height 0.4s ease, background 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+}
+#nav.scrolled {
+  background: rgba(10,10,15,0.92);
+  border-bottom-color: rgba(255,255,255,0.08);
+  box-shadow: 0 2px 24px rgba(0,0,0,0.4);
+}
+
+
+/* ════════════════════════════════════════════════════════════════════
+   SKILL TREE — hidden (removed in Step 1)
+   ════════════════════════════════════════════════════════════════════ */
+#skill-tree-section { display: none !important; }
+.radar-wrap         { display: none !important; }
+.tree-wrap          { display: none !important; }
+#sk-modal           { display: none !important; }
+
+
+/* ══ MULTI-COLOR THEME SYSTEM — v2 ══════════════════════════════
+   Each theme exposes --acc-lo (deep) --acc (primary) --acc-hi (light)
+   in addition to the existing --acc2/--glow so old code still works.
+   --acc-grad = ready-to-use gradient string for buttons/bars.
+   --acc-lo  = darker shade  (hover states, deep glows)
+   --acc     = primary       (all existing var(--acc) usages unchanged)
+   --acc-hi  = lighter shade (subtle borders, backgrounds)
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Blue (default — unchanged) ── */
+[data-theme="blue"] {
+  --acc:      #4f6ef5;
+  --acc-lo:   #3b55d4;
+  --acc-hi:   #93a8fb;
+  --acc2:     rgba(79,110,245,0.15);
+  --glow:     rgba(79,110,245,0.45);
+  --acc-grad: linear-gradient(90deg, #3b55d4, #4f6ef5, #93a8fb);
+}
+
+/* ── Pink ── */
+[data-theme="pink"] {
+  --acc:      #e91e8c;
+  --acc-lo:   #b8166e;
+  --acc-hi:   #f472b6;
+  --acc2:     rgba(233,30,140,0.15);
+  --glow:     rgba(233,30,140,0.45);
+  --acc-grad: linear-gradient(90deg, #b8166e, #e91e8c, #f472b6);
+}
+
+/* ── Green ── */
+[data-theme="green"] {
+  --acc:      #00ff88;
+  --acc-lo:   #00c46a;
+  --acc-hi:   #6effc4;
+  --acc2:     rgba(0,255,136,0.12);
+  --glow:     rgba(0,255,136,0.40);
+  --acc-grad: linear-gradient(90deg, #00c46a, #00ff88, #6effc4);
+}
+
+/* ── Yellow ── */
+[data-theme="yellow"] {
+  --acc:      #e5c62a;
+  --acc-lo:   #c4a718;
+  --acc-hi:   #fde68a;
+  --acc2:     rgba(229,198,42,0.12);
+  --glow:     rgba(229,198,42,0.40);
+  --acc-grad: linear-gradient(90deg, #c4a718, #e5c62a, #fde68a);
+}
+
+/* ── Purple ── */
+[data-theme="purple"] {
+  --acc:      #a855f7;
+  --acc-lo:   #7e22ce;
+  --acc-hi:   #d8b4fe;
+  --acc2:     rgba(168,85,247,0.15);
+  --glow:     rgba(168,85,247,0.45);
+  --acc-grad: linear-gradient(90deg, #7e22ce, #a855f7, #d8b4fe);
+}
+
+/* ── Orange ── */
+[data-theme="orange"] {
+  --acc:      #f97316;
+  --acc-lo:   #c2590b;
+  --acc-hi:   #fdba74;
+  --acc2:     rgba(249,115,22,0.15);
+  --glow:     rgba(249,115,22,0.40);
+  --acc-grad: linear-gradient(90deg, #c2590b, #f97316, #fdba74);
+}
+
+/* ── Cyan ── */
+[data-theme="cyan"] {
+  --acc:      #22d3ee;
+  --acc-lo:   #0e9fb8;
+  --acc-hi:   #a5f3fc;
+  --acc2:     rgba(34,211,238,0.12);
+  --glow:     rgba(34,211,238,0.40);
+  --acc-grad: linear-gradient(90deg, #0e9fb8, #22d3ee, #a5f3fc);
+}
+
+/* ── Rose ── */
+[data-theme="rose"] {
+  --acc:      #f43f5e;
+  --acc-lo:   #be123c;
+  --acc-hi:   #fda4af;
+  --acc2:     rgba(244,63,94,0.15);
+  --glow:     rgba(244,63,94,0.45);
+  --acc-grad: linear-gradient(90deg, #be123c, #f43f5e, #fda4af);
+}
+
+/* ── Emerald ── */
+[data-theme="emerald"] {
+  --acc:      #10b981;
+  --acc-lo:   #065f46;
+  --acc-hi:   #6ee7b7;
+  --acc2:     rgba(16,185,129,0.14);
+  --glow:     rgba(16,185,129,0.42);
+  --acc-grad: linear-gradient(90deg, #065f46, #10b981, #6ee7b7);
+}
+
+/* ── Sunset (two-tone warm) ── */
+[data-theme="sunset"] {
+  --acc:      #fb7185;
+  --acc-lo:   #f97316;
+  --acc-hi:   #fcd34d;
+  --acc2:     rgba(251,113,133,0.15);
+  --glow:     rgba(251,113,133,0.45);
+  --acc-grad: linear-gradient(90deg, #f97316, #fb7185, #fcd34d);
+}
+
+/* ── Ocean (two-tone cool) ── */
+[data-theme="ocean"] {
+  --acc:      #38bdf8;
+  --acc-lo:   #2563eb;
+  --acc-hi:   #818cf8;
+  --acc2:     rgba(56,189,248,0.14);
+  --glow:     rgba(56,189,248,0.44);
+  --acc-grad: linear-gradient(90deg, #2563eb, #38bdf8, #818cf8);
+}
+
+
+/* ══ RAINBOW THEME ═══════════════════════════════════════════════
+   CSS custom-property animation is not universally supported yet,
+   so we use a hue-rotate filter on a base gradient element combined
+   with @property (where supported) for a smooth real variable shift.
+   Fallback: hue-rotate on the root, which affects all hsl/filter usage.
+   The effect is premium and subtle — not garish.
+   ════════════════════════════════════════════════════════════════ */
+
+/* @property registration for browsers that support it (Chrome 85+, Edge 85+) */
+@property --rainbow-hue {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg;
+}
+
+[data-theme="rainbow"] {
+  --rainbow-hue:  0deg;
+  /* Derive all accent vars from the animating hue */
+  --acc:      hsl(var(--rainbow-hue), 90%, 65%);
+  --acc-lo:   hsl(calc(var(--rainbow-hue) - 20deg), 90%, 50%);
+  --acc-hi:   hsl(calc(var(--rainbow-hue) + 20deg), 90%, 80%);
+  --acc2:     hsla(var(--rainbow-hue), 90%, 65%, 0.15);
+  --glow:     hsla(var(--rainbow-hue), 90%, 65%, 0.45);
+  --acc-grad: linear-gradient(90deg,
+    hsl(calc(var(--rainbow-hue) - 30deg), 90%, 60%),
+    hsl(var(--rainbow-hue), 90%, 65%),
+    hsl(calc(var(--rainbow-hue) + 30deg), 90%, 70%)
+  );
+  animation: rainbow-hue-shift 6s linear infinite;
+}
+
+@keyframes rainbow-hue-shift {
+  from { --rainbow-hue:   0deg; }
+  to   { --rainbow-hue: 360deg; }
+}
+
+/* Fallback for browsers without @property: hue-rotate on filter-based elements */
+@supports not (syntax: '<angle>') {
+  [data-theme="rainbow"] {
+    --acc:  #f87171;
+    --acc2: rgba(248,113,113,0.15);
+    --glow: rgba(248,113,113,0.45);
+    --acc-grad: linear-gradient(90deg, #f87171, #a78bfa, #34d399);
+    animation: rainbow-fallback 6s linear infinite;
+  }
+  @keyframes rainbow-fallback {
+    0%   { filter: hue-rotate(0deg);   }
+    100% { filter: hue-rotate(360deg); }
+  }
+}
+
+
+/* ══ GRADIENT UPGRADES — opt-in classes ═════════════════════════
+   Applied to key elements to use --acc-grad where it looks premium.
+   All existing var(--acc) usage is unchanged — these are additive.
+   ════════════════════════════════════════════════════════════════ */
+
+/* Progress bar — gradient fill */
+#pbar {
+  background: var(--acc-grad, linear-gradient(90deg, var(--acc), transparent));
+}
+
+/* Primary button — gradient background */
+.btn-p {
+  background: var(--acc-grad, var(--acc));
+  border: none;
+  color: #000;
+}
+.btn-p:hover {
+  background: var(--acc-grad, var(--acc));
+  opacity: 0.88;
+}
+
+/* Nav underline active indicator */
+.nav-links a.active::after,
+.nav-links a:hover::after {
+  background: var(--acc-grad, var(--acc));
+}
+
+/* Skill bar fill */
+.bar-fill {
+  background: var(--acc-grad, linear-gradient(90deg, var(--acc-lo, var(--acc)), var(--acc)));
+}
+
+/* Section heading accent text */
+.stit.acc,
+.acc {
+  color: var(--acc); /* unchanged — gradient on text is a separate opt-in below */
+}
+
+/* Hero name accent — subtle gradient text when supported */
+.h-name .acc {
+  background: var(--acc-grad, var(--acc));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  /* Fallback: solid colour via color property still set by .acc */
+}
+
+/* Timeline filled line */
+.vtl-line {
+  background: var(--acc-grad, linear-gradient(180deg, var(--acc), transparent)) !important;
+}
+
+/* CG track fill */
+.cg-track-fill {
+  background: var(--acc-grad, var(--acc));
+}
+
+/* Rainbow swatch in theme picker */
+.tsw[data-t="rainbow"] {
+  background: conic-gradient(#f87171, #fb923c, #fbbf24, #34d399, #38bdf8, #818cf8, #f87171);
+  border: 2px solid transparent;
+}
+.tsw[data-t="rainbow"].on {
+  outline: 3px solid #fff;
+  outline-offset: 1px;
+}
+
+/* Admin swatch for rainbow */
+.adm-swatch[data-theme="rainbow"] {
+  background: conic-gradient(#f87171, #fb923c, #fbbf24, #34d399, #38bdf8, #818cf8, #f87171) !important;
+}
+.swatch[data-theme="rainbow"] {
+  background: conic-gradient(#f87171, #fb923c, #fbbf24, #34d399, #38bdf8, #818cf8, #f87171) !important;
+}
+
+
+/* ══ REDUCED MOTION — disable rainbow animation ══════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  [data-theme="rainbow"] {
+    animation: none !important;
+    --acc:      #818cf8;
+    --acc-lo:   #6366f1;
+    --acc-hi:   #c7d2fe;
+    --acc2:     rgba(129,140,248,0.15);
+    --glow:     rgba(129,140,248,0.45);
+    --acc-grad: linear-gradient(90deg, #6366f1, #818cf8, #c7d2fe);
+  }
+}
+
+
+/* ══ GOLD THEME ══════════════════════════════════════════════════
+   Warm, premium gold — subtle and refined, not garish.
+   Three-stop gradient: deep antique gold → rich gold → pale gold.
+═══════════════════════════════════════════════════════════════════ */
+[data-theme="gold"] {
+  --acc:      #d4af37;
+  --acc-lo:   #b8860b;
+  --acc-hi:   #f5deb3;
+  --acc2:     rgba(212,175,55,0.15);
+  --glow:     rgba(212,175,55,0.40);
+  --acc-grad: linear-gradient(90deg, #b8860b, #d4af37, #f5deb3);
+}
+
+/* Gold swatch in theme picker */
+.tsw[data-t="gold"] {
+  background: linear-gradient(135deg, #b8860b, #d4af37) !important;
+}
+.adm-swatch[data-theme="gold"],
+.swatch[data-theme="gold"] {
+  background: linear-gradient(135deg, #b8860b, #d4af37) !important;
+}
+
+
+/* ══ GLOBAL THEME TRANSITION ════════════════════════════════════
+   Smooth 0.4s ease across all colour-carrying properties.
+   Scoped to specific properties — avoids fighting layout/transform
+   transitions which have their own timing in the rest of the system.
+═══════════════════════════════════════════════════════════════════ */
+:root {
+  --theme-transition: 0.4s ease;
+}
+
+*,
+*::before,
+*::after {
+  transition-property:
+    background-color,
+    color,
+    border-color,
+    box-shadow,
+    outline-color,
+    text-shadow,
+    fill,
+    stroke;
+  transition-duration: var(--theme-transition);
+  transition-timing-function: ease;
+}
+
+/* Re-apply fast overrides for interactive elements so they still
+   feel snappy — the global transition above is only for theme switches. */
+.btn-p, .btn-o, .btn-send, .nav-cta,
+a, button, .tsw,
+.sk-card, .pj, .ach-card, .about-card, .vtl-card, .cg-card {
+  /* Override back to element-specific timing set elsewhere */
+  transition-duration: var(--anim-fast, 0.3s), var(--anim-fast, 0.3s), var(--anim-fast, 0.3s), var(--anim-med, 0.5s);
+}
+
+/* Transforms stay untouched — never inherit the theme transition */
+.h-ring,
+.h-left,
+#cur-dot,
+#cur-ring,
+.adm-cert-card,
+.sub-grip {
+  transition-property: transform, opacity, filter !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; }
+}
+
+
+/* ══ CURSOR SYSTEM — contextual overrides ═══════════════════════
+   These restore native cursors in contexts where the custom cursor
+   would be wrong, invisible, or conflicting.
+   ════════════════════════════════════════════════════════════════ */
+
+/* Input fields — always show text cursor */
+input,
+textarea,
+select,
+[contenteditable] {
+  cursor: text !important;
+}
+
+/* Buttons and links — show pointer (needed when body has cursor:none) */
+a, button, label, .tsw, [role="button"] {
+  cursor: pointer !important;
+}
+
+/* Admin panel overlay — restore full native cursor system */
+#adm-overlay,
+#adm-overlay *,
+#adm-login,
+#adm-login *,
+#adm-modal-ov,
+#adm-modal-ov * {
+  cursor: auto !important;
+}
+/* Input/textarea inside admin always text cursor */
+#adm-overlay input,
+#adm-overlay textarea,
+#adm-overlay select,
+#adm-login input {
+  cursor: text !important;
+}
+/* Clickable elements inside admin show pointer */
+#adm-overlay button,
+#adm-overlay .adm-nav-item,
+#adm-overlay .adm-swatch,
+#adm-overlay .adm-cert-card,
+#adm-overlay .adm-icon-btn,
+#adm-overlay .adm-add-btn,
+#adm-overlay .adm-btn-sm,
+#adm-overlay .adm-cert-drop-zone,
+#adm-overlay .adm-profile-drop-zone,
+#adm-login button {
+  cursor: pointer !important;
+}
+/* Draggable items in admin get grab cursor */
+#adm-overlay [draggable="true"],
+#adm-overlay .adm-drag-handle,
+#adm-overlay .adm-cert-card-drag {
+  cursor: grab !important;
+}
+
+/* Drag in progress — grabbing cursor + hide custom cursor */
+.cg-rail-wrap.dragging,
+.cg-rail-wrap.dragging * {
+  cursor: grabbing !important;
+}
+/* Hide custom dot/ring during CG rail drag to avoid confusion */
+body.adm-uploading #cur-dot,
+body.adm-uploading #cur-ring {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+/* Mobile / touch — hide custom cursor elements entirely */
+@media (hover: none) and (pointer: coarse) {
+  #cur-dot, #cur-ring { display: none !important; }
+  body { cursor: auto !important; }
+}
+
+/* ══ CERT EMOJI IN CIRCLE ══════════════════════════════════════════ */
+.cert-emoji {
+  font-size: 2.4rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* No float animation — static, clean */
+  filter: none;
+  transition: transform 0.3s var(--ease-spring), filter 0.25s ease;
+  user-select: none;
+}
+.cert-item:hover .cert-emoji {
+  transform: scale(1.2) rotate(-5deg);
+  /* Subtle theme-coloured outline glow on hover only */
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--glow) 55%, transparent));
+}
+.cert-item:hover .cert-circle {
+  transform: scale(1.07);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--glow) 35%, transparent);
+  border-color: color-mix(in srgb, var(--acc) 60%, transparent);
+  /* no background change — glow is outside only */
+}
+
+/* ══ CERT MODAL — new image-first design ═══════════════════════════ */
+.cert-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(4, 4, 12, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  pointer-events: none;
+  transition: background 0.38s ease, backdrop-filter 0.38s ease;
+}
+.cert-modal-backdrop.open {
+  background: rgba(4, 4, 12, 0.88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  pointer-events: all;
+}
+.cert-modal-box {
+  position: relative;
+  width: min(680px, 94vw);
+  max-height: 90vh;
+  background: rgba(10, 10, 20, 0.98);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(0.88) translateY(24px);
+  transition: opacity 0.38s cubic-bezier(0.22,1,0.36,1),
+              transform 0.38s cubic-bezier(0.22,1,0.36,1);
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+}
+.cert-modal-backdrop.open .cert-modal-box {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+.cert-close-btn {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.6);
+  font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 2;
+  transition: background 0.2s, color 0.2s, transform 0.2s, border-color 0.2s;
+}
+.cert-close-btn:hover {
+  background: rgba(239,68,68,0.2);
+  border-color: rgba(239,68,68,0.4);
+  color: #f87171;
+  transform: scale(1.1) rotate(90deg);
+}
+
+/* Image view — full certificate display */
+.cert-modal-img-view { display: none; flex-direction: column; }
+.cert-modal-img-view.active { display: flex; }
+
+/* The modal box when showing an image — taller, wider */
+.cert-modal-backdrop.open .cert-modal-box.has-image {
+  width: min(860px, 96vw);
+  max-height: 94vh;
+}
+
+/* ══ HORIZONTAL MULTI-IMAGE SCROLL ════════════════════════════════ */
+.cert-modal-img-scroll {
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+}
+
+/* Horizontal track */
+.cert-modal-img-list {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  height: 100%;
+  will-change: transform;
+  transition: transform 0.42s cubic-bezier(0.22,1,0.36,1);
+}
+
+/* Each slide fills the scroll viewport */
+.cert-modal-full-img {
+  flex: 0 0 100%;
+  width: 100%;
+  max-height: calc(94vh - 130px);
+  object-fit: contain;
+  background: #fff;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Arrow navigation buttons */
+.cert-modal-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(10,10,20,0.75);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.8);
+  font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s, opacity 0.2s;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.cert-modal-arrow:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.4);
+  transform: translateY(-50%) scale(1.08);
+}
+.cert-modal-arrow:active {
+  transform: translateY(-50%) scale(0.95);
+}
+.cert-modal-arrow.hidden { opacity: 0; pointer-events: none; }
+.cert-modal-arrow-prev { left: 10px; }
+.cert-modal-arrow-next { right: 10px; }
+
+/* Dot pagination */
+.cert-modal-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 0 2px;
+  flex-shrink: 0;
+}
+.cert-modal-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.25s;
+  padding: 0;
+}
+.cert-modal-dot.active {
+  background: rgba(255,255,255,0.85);
+  transform: scale(1.35);
+}
+.cert-modal-dot:hover:not(.active) {
+  background: rgba(255,255,255,0.45);
+  transform: scale(1.2);
+}
+
+/* Swipe hint line under dots */
+.cert-modal-swipe-hint {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.44rem;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.2);
+  text-align: center;
+  padding-bottom: 8px;
+}
+
+/* Bottom meta bar */
+.cert-modal-img-meta {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  background: rgba(6,6,16,0.98);
+  flex-shrink: 0;
+}
+.cert-modal-emoji { font-size: 1.6rem; flex-shrink: 0; }
+.cert-modal-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.70rem; font-weight: 700;
+  letter-spacing: 1.5px; color: rgba(255,255,255,0.88);
+}
+.cert-modal-org {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.50rem; letter-spacing: 1.5px;
+  color: var(--acc); margin-top: 3px;
+}
+/* Image count badge */
+.cert-modal-count {
+  margin-left: auto;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.48rem;
+  letter-spacing: 1px;
+  color: rgba(255,255,255,0.3);
+  flex-shrink: 0;
+}
+
+/* Text view (emoji + body) */
+.cert-modal-text-view { display: none; flex-direction: column; align-items: center; padding: 48px 36px; text-align: center; }
+.cert-modal-text-view.active { display: flex; }
+.cert-modal-emoji-big { font-size: 4rem; margin-bottom: 20px; animation: emoji-bounce 0.5s var(--ease-spring); }
+@keyframes emoji-bounce { 0%{transform:scale(0) rotate(-15deg)} 60%{transform:scale(1.2) rotate(4deg)} 100%{transform:scale(1) rotate(0)} }
+.cert-modal-body-text { font-size: 0.76rem; color: rgba(255,255,255,0.45); line-height: 1.75; max-width: 420px; margin-top: 12px; }
+/* ══ GLOBAL TRANSITION SMOOTHING ═══════════════════════════════════
+   Consistent easing across all interactive elements
+   ════════════════════════════════════════════════════════════════ */
+.sk-card, .pj, .ach-card, .about-card, .vtl-card, .cg-card,
+.soc, .ct-ic, .btn-p, .btn-o, .btn-send, .nav-cta {
+  transition-timing-function: cubic-bezier(0.22,1,0.36,1) !important;
+  transition-duration: 0.3s !important;
+}
+.sk-card:hover, .pj:hover, .ach-card:hover, .about-card:hover, .vtl-card:hover {
+  transition-duration: 0.2s !important;
+}
+
+/* Section fade-in */
+section { transition: opacity 0.5s ease; }
+
+/* Cert circle — unified smooth */
+.cert-circle {
+  transition: transform 0.35s cubic-bezier(0.22,1,0.36,1),
+              box-shadow 0.35s cubic-bezier(0.22,1,0.36,1),
+              border-color 0.3s ease !important;
+}
+
+/* Smooth color transitions follow theme changes */
+*, *::before, *::after {
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+/* But NOT everything — only specific properties. Override for animated elements */
+.cert-circle, .cert-item, .cert-emoji, .btn-p, .btn-o,
+.sk-card, .pj, .nav-links a, .soc {
+  transition-property: transform, opacity, box-shadow, border-color, color, background-color;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SMOOTH GLOBAL TRANSITIONS v2.0
+   Theme color changes animate smoothly across everything.
+   Page loads fade in. Sections reveal cleanly.
+════════════════════════════════════════════════════════════════ */
+
+/* ── Theme color transitions — targeted only, never global ── */
+/* Applying transition to * breaks CSS animations on ::before/::after */
+
+/* Elements that carry --acc color and need smooth theme switching */
+.nav-logo, .nav-logo .acc, .acc,
+.stag, .stit span.acc, .h-greet, .tcur,
+.nav-cta, .nav-links a,
+.btn-p, .btn-o, .btn-send,
+.sk-card, .pj, .ach-card, .about-card, .vtl-card,
+.soc, .ct-ic,
+#pbar, #btt,
+.cert-tab-btn,
+.cert-label,
+.bar-fill {
+  transition-property: color, background-color, border-color,
+                        box-shadow, fill, stroke, opacity, transform;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.22,1,0.36,1);
+}
+
+/* ── Page load body fade ── */
+@keyframes page-enter {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+body {
+  animation: page-enter 0.5s ease both;
+}
+
+/* ── Section fade-in on scroll (existing .reveal enhanced) ── */
+.reveal {
+  transition: opacity 0.55s cubic-bezier(0.22,1,0.36,1),
+              transform 0.55s cubic-bezier(0.22,1,0.36,1) !important;
+}
+.reveal.in {
+  transition: opacity 0.55s cubic-bezier(0.22,1,0.36,1),
+              transform 0.55s cubic-bezier(0.22,1,0.36,1) !important;
+}
+
+/* ── Nav logo smooth color on theme change ── */
+.nav-logo, .nav-logo .acc, .acc, .stag {
+  transition: color 0.35s cubic-bezier(0.22,1,0.36,1) !important;
+}
+
+/* ── Active nav link indicator smooth ── */
+.nav-links a::after {
+  transition: width 0.3s cubic-bezier(0.22,1,0.36,1),
+              background-color 0.35s ease !important;
+}
+
+/* ── Buttons smooth press ── */
+.btn-p, .btn-o {
+  transition: background 0.25s ease,
+              border-color 0.25s ease,
+              color 0.25s ease,
+              transform 0.18s cubic-bezier(0.34,1.56,0.64,1),
+              box-shadow 0.25s ease !important;
+}
+.btn-p:active, .btn-o:active {
+  transform: scale(0.96) !important;
+  transition-duration: 0.08s !important;
+}
+
+/* ── Skill bar fill smooth on theme ── */
+.bar-fill {
+  transition: width 0.65s cubic-bezier(0.22,1,0.36,1),
+              background 0.35s ease !important;
+}
+
+/* ── Nav CTA button theme-follows ── */
+.nav-cta {
+  transition: background 0.25s ease, color 0.25s ease,
+              border-color 0.35s ease, transform 0.18s cubic-bezier(0.34,1.56,0.64,1) !important;
+}
+
+/* ── Cards smooth on theme switch ── */
+.sk-card, .pj, .ach-card, .about-card, .vtl-card {
+  transition: border-color 0.35s ease,
+              box-shadow 0.35s ease,
+              transform 0.3s cubic-bezier(0.22,1,0.36,1),
+              background-color 0.35s ease !important;
+}
+
+/* ── Cert circle smooth ── */
+.cert-circle {
+  transition: border-color 0.35s ease,
+              box-shadow 0.35s ease,
+              transform 0.35s cubic-bezier(0.22,1,0.36,1) !important;
+}
+
+/* ── Cert tabs bar smooth ── */
+.cert-tab-btn {
+  transition: border-color 0.25s ease,
+              background-color 0.25s ease,
+              color 0.25s ease,
+              transform 0.2s cubic-bezier(0.22,1,0.36,1) !important;
+}
+
+/* ── Section dividers follow theme ── */
+section::after {
+  transition: background 0.35s ease !important;
+}
+
+/* ── Progress bar follow theme ── */
+#pbar {
+  transition: width 0.1s linear, background 0.35s ease !important;
+}
+
+/* ── Theme flash animation (triggered by visual-builder.js ThemeCycle) ── */
+body.theme-flash::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--acc);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 99999;
+  animation: theme-flash-anim 0.35s ease forwards;
+}
+@keyframes theme-flash-anim {
+  0%   { opacity: 0.07; }
+  100% { opacity: 0; }
+}
+
+/* ── Reduced motion: strip all custom transitions ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+  body { animation: none !important; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   CONTINUOUS GROWTH — enhanced scroll UI
+════════════════════════════════════════════════════════════════ */
+
+/* ── Control pills row ── */
+.cg-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.cg-ctrl-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.48rem;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.32);
+  text-transform: uppercase;
+  user-select: none;
+  transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease;
+}
+.cg-ctrl-pill:hover {
+  border-color: rgba(255,255,255,0.25);
+  color: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.05);
+}
+.cg-ctrl-ico {
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+/* ── cg-wrap relative for edge overlays ── */
+.cg-wrap { position: relative; }
+
+/* ── Edge fade overlays ── */
+.cg-fade-left,
+.cg-fade-right {
+  position: absolute;
+  top: 0; bottom: 20px;
+  width: 80px;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}
+.cg-fade-left {
+  left: 0;
+  background: linear-gradient(to right, var(--bg) 0%, transparent 100%);
+}
+.cg-fade-right {
+  right: 0;
+  background: linear-gradient(to left, var(--bg) 0%, transparent 100%);
+}
+.cg-fade-left.hidden, .cg-fade-right.hidden { opacity: 0; }
+
+/* ── Progress dots ── */
+.cg-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 18px;
+}
+.cg-prog-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: none; padding: 0; cursor: pointer;
+  transition: background 0.25s ease, transform 0.25s ease, width 0.25s ease;
+}
+.cg-prog-dot.active {
+  background: var(--acc);
+  transform: scale(1.4);
+  width: 18px;
+  border-radius: 3px;
+  box-shadow: 0 0 8px var(--glow);
+}
+.cg-prog-dot:hover:not(.active) {
+  background: rgba(255,255,255,0.35);
+  transform: scale(1.2);
+}
+
+/* ── Card animation states ── */
+/* Cards enter from the side — JS adds .cg-visible when in viewport */
+.cg-item {
+  transition: transform 0.4s cubic-bezier(0.22,1,0.36,1),
+              opacity  0.4s ease;
+}
+
+/* All cards equal priority — no active elevation */
+
+/* Drag momentum visual — cards tilt slightly when dragging */
+.cg-rail-wrap.dragging .cg-card {
+  transition: none;
+  pointer-events: none;
+}
+.cg-rail-wrap.dragging .cg-item {
+  transition: none;
+}
+
+
+
+/* ── Keyboard shortcut pill highlight on key press ── */
+.cg-ctrl-pill.active-key {
+  border-color: var(--acc);
+  color: var(--acc);
+  background: var(--acc2);
+}
+
+/* ── Magnetic nav links: CSS must NOT transition transform —
+   the rAF lerp loop owns transform completely.
+   Override the broad transition-property rule above. ── */
+.nav-links a {
+  transition-property: color, opacity, box-shadow, border-color, background-color !important;
+}

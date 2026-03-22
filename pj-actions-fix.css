@@ -1,0 +1,107 @@
+/* ═══════════════════════════════════════════════════════════════════
+   PJ-ACTIONS-FIX.CSS
+   Fixes project card button layout — no redesign, spacing only.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Card: ensure it never clips content ── */
+.pj {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 2. Push actions to bottom of card ── */
+.pj-tags {
+  flex: 1;           /* grows to fill remaining space */
+  align-content: flex-start;
+}
+
+/* ── 3. Action bar container ── */
+.pj-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── 4. Each action button ── */
+.pj-actions a {
+  flex: 1 1 auto;
+  min-width: 100px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  transition: background 0.25s ease, color 0.25s ease,
+              border-color 0.25s ease, transform 0.2s ease,
+              box-shadow 0.25s ease;
+  cursor: pointer;
+}
+
+/* GitHub button — outlined */
+.pj-actions a.pj-btn-gh {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--muted);
+}
+.pj-actions a.pj-btn-gh:hover {
+  border-color: var(--acc);
+  color: var(--acc);
+  transform: translateY(-2px);
+}
+.pj-actions a.pj-btn-gh:active {
+  transform: scale(0.96);
+  transition-duration: 0.07s;
+}
+
+/* Live / Open button — filled accent */
+.pj-actions a.pj-btn-live {
+  background: var(--acc);
+  border: 1px solid transparent;
+  color: #000;
+  font-weight: 700;
+}
+.pj-actions a.pj-btn-live:hover {
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--acc) 45%, transparent);
+  transform: translateY(-2px);
+}
+.pj-actions a.pj-btn-live:active {
+  transform: scale(0.96);
+  transition-duration: 0.07s;
+}
+
+/* ── 5. Hide the old icon-only links in pj-top ── */
+.pj-links {
+  display: none !important;
+}
+
+/* ── 6. Responsive: stack on very small screens ── */
+@media (max-width: 480px) {
+  .pj-actions {
+    flex-direction: column;
+    gap: 7px;
+  }
+  .pj-actions a {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+/* ── 7. When only one button (no live/github), keep it natural width ── */
+.pj-actions a:only-child {
+  flex: 0 1 auto;
+  min-width: 120px;
+}

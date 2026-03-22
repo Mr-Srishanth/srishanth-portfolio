@@ -1,0 +1,170 @@
+/* ═══════════════════════════════════════════════════════════════════
+   PREMIUM-UPGRADES.CSS v7.0 — Minimal Premium Edition
+   STEP 5: Reduced glow intensity — idle:1px hover:4px active:6px
+   STEP 6: Navbar backdrop blur
+   STEP 8: Removed cinematic loader, swatch pulse, ring-float animations
+   ═══════════════════════════════════════════════════════════════════ */
+
+
+/* ══ STEP 6 — NAVBAR PREMIUM LOOK ═══════════════════════════════════ */
+#nav {
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  background: rgba(10,10,15,0.75) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+}
+/* Scrolled state — slightly more opaque */
+#nav.scrolled {
+  background: rgba(10,10,15,0.92) !important;
+  border-bottom-color: rgba(255,255,255,0.08) !important;
+}
+
+
+/* ══ GLOW SYSTEM v3 — Reduced · Subtle · Step 5 ════════════════════
+   idle:  1px blur (barely perceptible — just alive)
+   hover: 4px blur (perceptible, not harsh)
+   active:6px blur (peak, clean)
+   All transitions CSS-driven at 0.35s ease
+   ══════════════════════════════════════════════════════════════════ */
+.glow-idle,
+.glow-hover,
+.glow-active {
+  transition: filter 0.35s ease, text-shadow 0.35s ease;
+}
+
+/* Idle: minimal — no breathing animation (Step 8) */
+.glow-idle {
+  filter: drop-shadow(0 0 1px var(--glow));
+}
+
+/* Hover: 4px — subtle, perceptible */
+.glow-hover {
+  filter: drop-shadow(0 0 4px var(--glow));
+}
+
+/* Active: 6px — peak, clean */
+.glow-active {
+  filter: drop-shadow(0 0 6px var(--glow));
+}
+
+/* Nav links: text-shadow only */
+.nav-links a.glow-idle,
+.nav-links a.glow-hover,
+.nav-links a.glow-active {
+  filter: none !important;
+  transition: text-shadow 0.35s ease;
+}
+.nav-links a.glow-idle   { text-shadow: none; }
+.nav-links a.glow-hover  { text-shadow: 0 0 4px var(--glow); }
+.nav-links a.glow-active { text-shadow: 0 0 6px var(--glow); }
+
+/* Cards — consistent with base scale */
+.sk-card.glow-hover,    .pj.glow-hover,
+.ach-card.glow-hover,   .about-card.glow-hover,
+.vtl-card.glow-hover,   .cg-card.glow-hover {
+  filter: drop-shadow(0 0 4px var(--glow));
+}
+.sk-card.glow-active,   .pj.glow-active,
+.ach-card.glow-active,  .about-card.glow-active,
+.vtl-card.glow-active,  .cg-card.glow-active {
+  filter: drop-shadow(0 0 6px var(--glow));
+}
+
+/* Buttons */
+.btn-p.glow-hover   { filter: drop-shadow(0 0 4px var(--glow)); }
+.btn-p.glow-active  { filter: drop-shadow(0 0 6px var(--glow)); }
+.btn-o.glow-hover   { filter: drop-shadow(0 0 4px var(--glow)); }
+.btn-o.glow-active  { filter: drop-shadow(0 0 6px var(--glow)); }
+.nav-cta.glow-hover  { filter: drop-shadow(0 0 3px var(--glow)); }
+.nav-cta.glow-active { filter: drop-shadow(0 0 5px var(--glow)); }
+
+/* Social icons */
+.soc.glow-hover  { filter: drop-shadow(0 0 3px var(--glow)); }
+.soc.glow-active { filter: drop-shadow(0 0 5px var(--glow)); }
+
+/* Cert rings */
+.cert-ring-btn.glow-hover  { filter: drop-shadow(0 0 4px var(--glow)); }
+.cert-ring-btn.glow-active { filter: drop-shadow(0 0 6px var(--glow)); }
+
+/* Timeline dots */
+.vtl-dot.glow-hover  { filter: drop-shadow(0 0 3px var(--glow)); }
+.vtl-dot.glow-active { filter: drop-shadow(0 0 6px var(--glow)); }
+
+/* Skill tree active node */
+.tree-node-active .tn-circle {
+  border-color: var(--acc) !important;
+  filter: drop-shadow(0 0 5px var(--glow));
+  transition: filter 0.35s ease, border-color 0.35s ease;
+}
+
+
+/* ══ TIMELINE ════════════════════════════════════════════════ */
+.vtl-line {
+  background: linear-gradient(180deg, var(--acc) 0%, var(--glow) 65%, transparent 100%) !important;
+}
+.vtl-dot {
+  filter: drop-shadow(0 0 3px var(--glow));
+  outline: 2px solid var(--acc);
+  transition: filter 0.35s ease;
+}
+
+
+/* ══ PROGRESS BAR ═══════════════════════════════════════════ */
+#pbar {
+  box-shadow: 0 0 4px var(--glow);
+  transition: box-shadow 0.25s;
+}
+
+
+/* ══ SKILL TREE POPUP ════════════════════════════════════════ */
+#tree-popup {
+  position: absolute; z-index: 8000; display: none;
+  background: rgba(13,17,23,0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--acc2);
+  border-radius: 14px; padding: 22px 24px; width: 280px;
+  box-shadow: 0 0 0 1px var(--acc2), 0 24px 48px rgba(0,0,0,0.65);
+  filter: drop-shadow(0 0 6px var(--glow));
+  font-family: 'Rajdhani', sans-serif;
+}
+
+
+/* ══ TERMINAL ════════════════════════════════════════════════ */
+.term-box {
+  border-color: var(--acc2) !important;
+  box-shadow:
+    0 0 0 1px var(--acc2),
+    0 0 32px rgba(0,0,0,0.65),
+    inset 0 0 20px rgba(0,0,0,0.4) !important;
+}
+.tc { color: var(--acc) !important; }
+.tg { text-shadow: 0 0 4px rgba(63,185,80,0.25); }
+.tc.typing::after {
+  content: '▌'; color: var(--acc);
+  animation: tcur 0.65s step-end infinite; margin-left: 1px;
+}
+@keyframes tcur { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+
+/* ══ THEME SWATCH ACTIVE — no animation (Step 8) ════════════ */
+.tsw.on {
+  outline: 3px solid var(--acc);
+  filter: drop-shadow(0 0 4px var(--glow));
+}
+
+
+/* ══ HIDE DEAD LOGIN BLOCKS ══════════════════════════════════ */
+#loginPage, #adminPanel { display: none !important; visibility: hidden !important; }
+
+
+/* ══ REDUCED MOTION ══════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .glow-idle, .glow-hover, .glow-active    { filter: none !important; }
+  .nav-links a.glow-idle,
+  .nav-links a.glow-hover,
+  .nav-links a.glow-active                  { text-shadow: none !important; }
+  .tc.typing::after                          { animation: none !important; }
+  .vtl-line                                  { height: 100% !important; }
+  .vtl-dot                                   { filter: none !important; outline: none !important; }
+}

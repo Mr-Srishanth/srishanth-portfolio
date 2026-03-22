@@ -1,0 +1,311 @@
+/* ═══════════════════════════════════════════════════════════════════
+   INTRO.CSS — Cinematic Entry System  v2.0
+   STRATEGY: DOM-level hide via display:none — zero glitch guarantee.
+   Loaded FIRST in <head> so the rule fires before first paint.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. HARD BLOCK: main site is invisible until intro completes ──
+   Uses display:none (not just opacity) so the browser never
+   paints or composites main content during the intro.             */
+html.intro-active {
+  overflow: hidden !important;
+}
+
+html.intro-active body {
+  overflow: hidden !important;
+}
+
+/* This is the key: display:none means zero paint, zero flash */
+html.intro-active #main-site {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* ── 2. INTRO OVERLAY ──────────────────────────────────────────── */
+#intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: #080810;
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity  0.85s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: all;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Exit state — added by JS just before #main-site reveal */
+#intro-overlay.intro-exit {
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
+}
+
+/* ── 3. MAIN SITE REVEAL ──────────────────────────────────────── */
+#main-site {
+  display: block;
+  opacity: 0;
+  transform: scale(0.97) translateY(6px);
+  transition:
+    opacity   0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s,
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+  will-change: opacity, transform;
+}
+
+#main-site.site-enter {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+#main-site.site-settled {
+  will-change: auto;
+  transform: none;
+  opacity: 1;
+  transition: none;
+}
+
+/* ── 4. AMBIENT GLOW ─────────────────────────────────────────── */
+.intro-glow {
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  background: radial-gradient(circle, var(--acc, #4f6ef5) 0%, transparent 65%);
+  opacity: 0;
+  filter: blur(80px);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: scale(0.5);
+  transition:
+    opacity   1.0s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: none;
+}
+.intro-glow.visible {
+  opacity: 0.20;
+  transform: scale(1);
+  animation: intro-glow-breathe 4s ease-in-out infinite 1.2s;
+}
+@keyframes intro-glow-breathe {
+  0%, 100% { opacity: 0.15; transform: scale(1);    }
+  50%       { opacity: 0.25; transform: scale(1.08); }
+}
+
+.intro-glow-outer {
+  position: absolute;
+  width: 950px;
+  height: 950px;
+  background: radial-gradient(circle, var(--acc, #4f6ef5) 0%, transparent 52%);
+  opacity: 0;
+  filter: blur(130px);
+  border-radius: 50%;
+  pointer-events: none;
+  transition: opacity 1.5s ease;
+}
+.intro-glow-outer.visible { opacity: 0.06; }
+
+/* ── 5. INTRO CONTENT ─────────────────────────────────────────── */
+.intro-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+#intro-greet {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 6px;
+  color: var(--acc, #4f6ef5);
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity   0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+#intro-greet.visible {
+  opacity: 0.85;
+  transform: translateY(0);
+}
+
+#intro-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(2rem, 5.5vw, 3.6rem);
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  color: #fff;
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity   0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  min-height: 1.2em;
+  white-space: nowrap;
+}
+#intro-name.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+#intro-name .intro-acc {
+  color: var(--acc, #4f6ef5);
+}
+
+#intro-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 0.82em;
+  background: var(--acc, #4f6ef5);
+  vertical-align: middle;
+  margin-left: 3px;
+  border-radius: 1px;
+  animation: intro-blink 0.65s step-end infinite;
+}
+@keyframes intro-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+#intro-cursor.done {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.intro-divider {
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--acc, #4f6ef5), transparent);
+  opacity: 0;
+  transition:
+    width   0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.4s ease;
+  border-radius: 1px;
+}
+.intro-divider.visible {
+  width: 220px;
+  opacity: 0.45;
+}
+
+#intro-tagline {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: clamp(0.82rem, 2vw, 1.08rem);
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.42);
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity   0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  max-width: 500px;
+}
+#intro-tagline.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── 6. PROGRESS BAR ─────────────────────────────────────────── */
+#intro-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(
+    90deg,
+    var(--acc, #4f6ef5) 0%,
+    rgba(255, 255, 255, 0.4) 100%
+  );
+  box-shadow: 0 0 10px var(--acc, #4f6ef5), 0 0 20px var(--acc, #4f6ef5);
+}
+
+/* ── 7. SKIP BUTTON ──────────────────────────────────────────── */
+#intro-skip {
+  position: absolute;
+  bottom: 30px;
+  right: 36px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 2.5px;
+  color: rgba(255, 255, 255, 0.18);
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.5s ease, color 0.2s ease;
+  user-select: none;
+  border: none;
+  background: none;
+  padding: 8px 12px;
+}
+#intro-skip.visible { opacity: 1; }
+#intro-skip:hover   { color: rgba(255, 255, 255, 0.6); }
+
+/* ── 8. SCANLINE TEXTURE (cinematic feel) ────────────────────── */
+#intro-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.025) 2px,
+    rgba(0, 0, 0, 0.025) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── 9. HERO ANIMATION FREEZE ─────────────────────────────────── */
+html.intro-active .h-greet,
+html.intro-active .h-name,
+html.intro-active .h-typed,
+html.intro-active .h-desc,
+html.intro-active .h-badge,
+html.intro-active .h-btns,
+html.intro-active .h-right {
+  animation-play-state: paused !important;
+}
+
+html.intro-active .reveal,
+html.intro-active .reveal-left,
+html.intro-active .reveal-right,
+html.intro-active .reveal-scale {
+  transition: none !important;
+}
+
+/* ── 10. REDUCED MOTION ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  #intro-overlay  { display: none !important; }
+  html.intro-active #main-site {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  #main-site {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  html.intro-active { overflow: unset !important; }
+  html.intro-active body { overflow: unset !important; }
+}
+
+/* ── 11. MOBILE ──────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .intro-glow       { width: 300px; height: 300px; }
+  .intro-glow-outer { width: 550px; height: 550px; }
+  #intro-name       { white-space: normal; font-size: clamp(1.6rem, 8vw, 2.4rem); }
+  #intro-skip       { bottom: 20px; right: 20px; }
+}

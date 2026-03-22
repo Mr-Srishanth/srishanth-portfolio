@@ -1,0 +1,105 @@
+/* ═══════════════════════════════════════════════════════════════════
+   TIMELINE-DRAG-FIX.CSS v2.0 — Minimal
+   Fixes vtl-line (JS owns height), cg-rail drag setup.
+   ═══════════════════════════════════════════════════════════════════ */
+
+
+/* ── TIMELINE LINE — superseded by timeline.css ──
+   timeline.css uses transform:scaleY (not height).
+   These rules are intentionally removed to avoid conflict. */
+/* .vtl-line rules are now in timeline.css */
+
+/* Ghost track behind filled line */
+.vtl-line-ghost {
+  position: absolute;
+  left: 50%; top: 0;
+  width: 2px; height: 100%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.06);
+  border-radius: 1px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Static node dots */
+.vtl-dot {
+  position: absolute;
+  left: 50%; top: 18px;
+  transform: translateX(-50%);
+  z-index: 2;
+  transition: filter 0.35s ease;
+}
+
+/* Travelling scroll dot */
+.vtl-scroll-dot {
+  position: absolute;
+  left: 50%; top: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+/* VTL container */
+.vtl { position: relative; }
+
+
+/* ── CONTINUOUS GROWTH DRAG ── */
+#cg-rail-wrap,
+.cg-rail-wrap {
+  overflow-x: hidden !important;
+  overflow-y: visible;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  scrollbar-width: none !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+#cg-rail-wrap::-webkit-scrollbar,
+.cg-rail-wrap::-webkit-scrollbar { display: none !important; }
+#cg-rail-wrap:active,
+.cg-rail-wrap:active { cursor: grabbing; }
+
+#cg-rail,
+.cg-rail {
+  width: max-content !important;
+  transition: none !important;
+  will-change: transform;
+  position: relative !important;
+  backface-visibility: hidden;
+}
+
+/* Track */
+.cg-track {
+  position: absolute !important;
+  top: 32px !important; left: 0 !important; right: 0 !important;
+  height: 2px !important; width: auto !important;
+  background: rgba(255,255,255,0.07);
+  pointer-events: none;
+}
+
+/* Track fill — JS controls width */
+.cg-track-fill,
+#cg-track-fill {
+  width: 0%;
+  transition: none !important;
+  will-change: width;
+}
+
+/* Dragging state — suppress card transforms */
+.cg-rail-wrap.dragging .cg-card,
+#cg-rail-wrap.dragging .cg-card {
+  transform: none !important;
+  transition: none !important;
+}
+.cg-rail-wrap.dragging .cg-card * { pointer-events: none; }
+.cg-rail-wrap.dragging .cg-card.glow-hover,
+.cg-rail-wrap.dragging .cg-card.glow-active { filter: none !important; }
+
+
+/* ── REDUCED MOTION ── */
+@media (prefers-reduced-motion: reduce) {
+  .vtl-line       { transition: none !important; }
+  .vtl-dot        { animation: none !important; transition: none !important; }
+  .vtl-scroll-dot { display: none !important; }
+  .vtl-line-ghost { opacity: 0.10 !important; }
+}
